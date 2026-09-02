@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#f0eadf" />
+    <title>Phyo Aung Zaw — Mobile Engineer</title>
+    <meta name="description" content="Selected product work by Phyo Aung Zaw, a senior mobile engineer based in Ho Chi Minh City." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/styles/main.css" />
+  </head>
+  <body>
+    <canvas class="liquid-trail" id="liquid-trail" aria-hidden="true"></canvas>
+    <a class="skip-link" href="#work">Skip to selected work</a>
+
+    <header class="site-header site-header--work" id="site-header">
+      <a class="brand" href="#top" aria-label="Back to top">
+        <span class="brand__monogram">PAZ</span>
+        <span class="brand__name" data-wave>Phyo Aung Zaw</span>
+      </a>
+      <nav class="work-nav" aria-label="Portfolio">
+        <a href="#work" data-wave>Selected work</a>
+        <a href="#experience" data-wave>Experience</a>
+        <a href="#contact" data-wave>Contact</a>
+      </nav>
+      <div class="header-actions">
+        <button class="nav__sound" type="button" aria-pressed="false" aria-label="Turn on the lo-fi soundscape">
+          <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+          <span class="nav__sound-label" data-wave>Lo-fi off</span>
+        </button>
+        <a class="header-world" href="./world.html" aria-label="Explore my world — travel, photography and stories">
+          <svg class="globe-icon" viewBox="0 0 40 40" aria-hidden="true">
+            <circle cx="20" cy="20" r="17"></circle><ellipse cx="20" cy="20" rx="8" ry="17"></ellipse><path d="M3 20h34M6.5 11.5h27M6.5 28.5h27"></path>
+          </svg>
+          <span><b data-wave>Explore my world</b><small data-wave>Travel / photography</small></span>
+          <i>↗</i>
+        </a>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero__liquid" id="hero-liquid" aria-hidden="true">
+          <span class="liquid-orb liquid-orb--one"></span>
+          <span class="liquid-orb liquid-orb--two"></span>
+          <span class="liquid-orb liquid-orb--three"></span>
+          <span class="liquid-sheen"></span>
+        </div>
+        <div class="hero__meta meta-row">
+          <span>SENIOR MOBILE ENGINEER</span>
+          <span>HO CHI MINH CITY · GMT+7</span>
+          <span>PORTFOLIO / 2026</span>
+        </div>
+
+        <div class="hero__statement">
+          <p class="kicker" data-reveal>ENGINEERING DIGITAL EXPERIENCES<br />FROM HO CHI MINH CITY</p>
+          <h1 id="hero-title" class="hero__title">
+            <span data-hero-line>Building for people.</span>
+            <span class="hero__title-indent" data-hero-line>Shaped by places.</span>
+          </h1>
+          <p class="hero__intro" data-reveal>
+            I turn complex product requirements into dependable mobile systems—then step outside to collect the places and moments that keep the work human.
+          </p>
+        </div>
+
+        <div class="hero__footer">
+          <a class="hero__work-link" href="#work"><span>Selected product work</span><b>Scroll to explore ↓</b></a>
+        </div>
+      </section>
+
+      <section class="work" id="work" aria-labelledby="work-title">
+        <div class="chapter-intro">
+          <p class="chapter-intro__index">01 / SELECTED WORK</p>
+          <h2 id="work-title" class="chapter-intro__title">Systems with<br /><em>human edges.</em></h2>
+          <div class="chapter-intro__side">
+            <p>Product engineering across fintech, banking, commerce and delivery—built for real constraints and real people.</p>
+            <span>SELECTED WORK · 2022—2026</span>
+          </div>
+        </div>
+
+        <div class="work-list" id="work-list"></div>
+
+        <section class="experience" id="experience" aria-labelledby="experience-title">
+          <div class="experience__head">
+            <p>05 / EXPERIENCE</p>
+            <h3 id="experience-title">Nine years,<br />still curious.</h3>
+            <span>2016 — PRESENT</span>
+          </div>
+          <div class="experience__rows">
+            <article><time>2024 — PRESENT</time><h4>Senior Mobile Engineer</h4><p>Product engineering · Ho Chi Minh City</p></article>
+            <article><time>2021 — 2024</time><h4>Mobile Engineer, Flutter</h4><p>Cross-platform products · Ho Chi Minh City</p></article>
+            <article><time>2019 — 2021</time><h4>Mobile Engineer, Android</h4><p>Mobile product teams · Yangon</p></article>
+            <article><time>2016 — 2019</time><h4>Android Engineer</h4><p>The beginning · Yangon</p></article>
+          </div>
+        </section>
+
+        <section class="practice" aria-labelledby="practice-title">
+          <div class="practice__label"><span>06 / PRACTICE</span><span>THE ENGINEERING VIEW</span></div>
+          <h3 id="practice-title">I care about the quiet parts: architecture that holds, releases that feel routine, and details that earn trust.</h3>
+          <div class="practice__grid">
+            <div><b>01</b><span>Mobile craft</span><p>Kotlin, Jetpack, Coroutines, Flutter and carefully tuned interfaces.</p></div>
+            <div><b>02</b><span>Systems thinking</span><p>Clean architecture, MVI/MVVM, testable flows and security hardening.</p></div>
+            <div><b>03</b><span>Product delivery</span><p>CI/CD, release ownership and close collaboration across disciplines.</p></div>
+          </div>
+        </section>
+      </section>
+
+      <section class="world-invite" aria-labelledby="world-invite-title">
+        <div class="world-invite__orb" aria-hidden="true"><span></span><span></span><span></span></div>
+        <p>OUTSIDE THE WORK / CHAPTER TWO</p>
+        <h2 id="world-invite-title">One life,<br /><em>Two worlds.</em></h2>
+        <a href="./world.html"><span>Enter the atlas</span><b>Explore my world ↗</b></a>
+      </section>
+
+      <section class="contact" id="contact" aria-labelledby="contact-title">
+        <p class="eyebrow">NEXT / A CONVERSATION</p>
+        <h2 id="contact-title">Let’s build<br /><em>something lasting.</em></h2>
+        <a class="contact__email" href="mailto:kyrie.paz@vietpay.com">kyrie.paz@vietpay.com <span>↗</span></a>
+        <footer>
+          <span>PHYO AUNG ZAW © 2026</span>
+          <span>HO CHI MINH CITY · VIETNAM</span>
+          <a href="#top">BACK TO TOP ↑</a>
+        </footer>
+      </section>
+    </main>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

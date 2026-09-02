@@ -1,0 +1,141 @@
+/* Shared World → Country Discovery state. The WebGL globe stays inside
+   .world__scene for both modes; only the surrounding interface changes. */
+.country-discovery {
+  position: relative;
+  z-index: 10;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.world-discovery-header {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.world-discovery-header .discovery-header__back {
+  border: 0;
+  padding: 0;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+
+.country-discovery .discovery-finale__back {
+  border: 0;
+  border-bottom: 1px solid transparent;
+  padding: 0 0 .3rem;
+  color: rgba(242,237,227,.56);
+  background: transparent;
+  cursor: pointer;
+}
+
+html.is-discovery {
+  height: auto;
+  min-height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.world-page.is-discovery {
+  height: auto;
+  min-height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.world-page.is-discovery .world {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100svh;
+}
+
+.world-page.is-discovery .country-discovery {
+  height: auto;
+  overflow: visible;
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.world-page.is-discovery .world-discovery-header {
+  pointer-events: auto;
+}
+
+.country-discovery .discovery-hero {
+  z-index: 1;
+  background: transparent;
+  pointer-events: none;
+}
+
+.country-discovery .discovery-hero__sticky,
+.country-discovery .discovery-orbit {
+  pointer-events: none;
+}
+
+.country-discovery .memory-photo,
+.country-discovery .deep-dive-link,
+.country-discovery .discovery-finale__back {
+  pointer-events: auto;
+}
+
+.country-discovery .memory-scene {
+  z-index: 5;
+}
+
+.country-discovery .discovery-finale {
+  z-index: 4;
+  background: transparent;
+}
+
+.shared-globe-spacer {
+  min-height: 100svh;
+  pointer-events: none;
+}
+
+.shared-globe-hero-spacer {
+  display: none;
+  pointer-events: none;
+}
+
+.world-page.has-memory-open {
+  overflow: hidden;
+}
+
+.world-page.is-changing-view .world__globe {
+  pointer-events: none;
+}
+
+@media (max-width: 900px) {
+  .country-discovery .discovery-hero {
+    min-height: 100svh;
+    padding-bottom: 5rem;
+  }
+
+  .country-discovery .discovery-hero__sticky {
+    min-height: 100svh;
+    padding-top: 68px;
+  }
+
+  .shared-globe-hero-spacer {
+    display: block;
+    width: 124vw;
+    aspect-ratio: 1;
+    margin: 11vh 0 0 -12vw;
+  }
+
+  .shared-globe-spacer {
+    min-height: 68svh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .world-page.is-changing-view .world__globe {
+    pointer-events: auto;
+  }
+}

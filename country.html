@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#f0eadf" />
+    <title>Country Journal — Phyo Aung Zaw</title>
+    <meta name="description" content="A photographic country journal from the world of Phyo Aung Zaw." />
+    <script>
+      (() => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('from') !== 'discovery') return;
+        document.documentElement.classList.add('from-discovery');
+        try {
+          const handoff = JSON.parse(sessionStorage.getItem('paz-country-handoff'));
+          if (!handoff || handoff.id !== params.get('place')) return;
+          const [a, b, c] = handoff.palette || [];
+          if (a && b && c) {
+            document.documentElement.style.setProperty('--handoff-a', a);
+            document.documentElement.style.setProperty('--handoff-b', b);
+            document.documentElement.style.setProperty('--handoff-c', c);
+          }
+          if (handoff.image) document.documentElement.style.setProperty('--handoff-image', `url("${handoff.image}")`);
+          window.__PAZ_COUNTRY_HANDOFF__ = handoff;
+        } catch { /* continue with the palette fallback */ }
+      })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/styles/main.css" />
+    <link rel="stylesheet" href="/src/styles/country.css" />
+  </head>
+  <body class="country-page">
+    <canvas class="liquid-trail" id="liquid-trail" aria-hidden="true"></canvas>
+    <div class="country-entry" id="country-entry" aria-hidden="true">
+      <span>DEEP DIVE / <i id="country-entry-label">JAPAN</i></span>
+      <strong id="country-entry-name">Japan</strong>
+    </div>
+    <script>
+      if (document.documentElement.classList.contains('from-discovery')) {
+        const id = new URLSearchParams(window.location.search).get('place') || 'japan';
+        const country = window.__PAZ_COUNTRY_HANDOFF__?.country || id.charAt(0).toUpperCase() + id.slice(1);
+        document.getElementById('country-entry-label').textContent = country.toUpperCase();
+        document.getElementById('country-entry-name').textContent = country;
+      }
+    </script>
+
+    <header class="country-header">
+      <div class="country-header__routes">
+        <a class="country-header__back" id="country-back-discovery" href="./world.html?view=discovery&amp;place=japan" data-return-label="DISCOVERY" aria-label="Back to country discovery">
+          <span aria-hidden="true">←</span><span data-wave>Back to discovery</span>
+        </a>
+        <a class="country-header__world" id="country-back-world" href="./world.html?focus=japan" data-return-label="THE WORLD" data-wave>World</a>
+      </div>
+      <span id="country-header-label" data-wave>JAPAN / 2025</span>
+      <button class="nav__sound" type="button" aria-pressed="false" aria-label="Turn on the lo-fi soundscape">
+        <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <span class="nav__sound-label" data-wave>Lo-fi off</span>
+      </button>
+    </header>
+
+    <main id="country-content"></main>
+    <script type="module" src="/src/country.js"></script>
+  </body>
+</html>

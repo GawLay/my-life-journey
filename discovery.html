@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Country Discovery — Explore My World</title>
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      const place = params.get('place') || 'vietnam';
+      window.location.replace(`./world.html?view=discovery&place=${encodeURIComponent(place)}`);
+    </script>
+  </head>
+  <body></body>
+</html>
