@@ -6,6 +6,16 @@
     <meta name="theme-color" content="#f0eadf" />
     <title>Phyo Aung Zaw — Mobile Engineer</title>
     <meta name="description" content="Selected product work by Phyo Aung Zaw, a senior mobile engineer based in Ho Chi Minh City." />
+    <script>
+      (() => {
+        try {
+          if (sessionStorage.getItem('paz-entry') === 'work') {
+            sessionStorage.removeItem('paz-entry');
+            document.documentElement.classList.add('is-entering');
+          }
+        } catch { /* storage can be unavailable */ }
+      })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -13,6 +23,7 @@
   </head>
   <body>
     <canvas class="liquid-trail" id="liquid-trail" aria-hidden="true"></canvas>
+    <div class="work-entry" aria-hidden="true"><span>PHYO AUNG ZAW</span></div>
     <a class="skip-link" href="#work">Skip to selected work</a>
 
     <header class="site-header site-header--work" id="site-header">

@@ -68,9 +68,9 @@ h1, h2, h3, h4, p, dl, dd { margin: 0; }
 .site-header.on-dark .identity-nav__item { border-color: var(--line-light); }
 .site-header.on-dark .identity-nav__num, .site-header.on-dark .identity-nav__desc { color: rgba(242,237,227,.58); }
 .brand { display: flex; align-items: center; gap: 0.8rem; justify-self: start; }
-.brand__monogram { font: 500 0.72rem/1 var(--mono); letter-spacing: 0.08em; border: 1px solid currentColor; padding: 0.5rem 0.45rem; }
-.brand__name { font: 500 0.78rem/1 var(--body); letter-spacing: 0.02em; }
-.work-nav { display: flex; align-items: center; gap: clamp(1rem, 2.3vw, 2.2rem); font: 400 .66rem/1 var(--mono); letter-spacing: .05em; text-transform: uppercase; }
+.brand__monogram { font: 500 0.8rem/1 var(--mono); letter-spacing: 0.08em; border: 1px solid currentColor; padding: 0.5rem 0.45rem; }
+.brand__name { font: 500 0.88rem/1 var(--body); letter-spacing: 0.02em; }
+.work-nav { display: flex; align-items: center; gap: clamp(1rem, 2.3vw, 2.2rem); font: 400 .74rem/1 var(--mono); letter-spacing: .05em; text-transform: uppercase; }
 .work-nav a { position: relative; }
 .work-nav a::after { content: ""; position: absolute; left: 0; right: 0; bottom: -.35rem; height: 1px; background: currentColor; transform: scaleX(0); transform-origin: right; transition: transform 400ms var(--ease); }
 .work-nav a:hover::after { transform: scaleX(1); transform-origin: left; }
@@ -108,6 +108,7 @@ h1, h2, h3, h4, p, dl, dd { margin: 0; }
 .header-actions { justify-self: end; display: flex; align-items: center; gap: clamp(.8rem, 2vw, 1.8rem); }
 .header-contact { font: 500 0.7rem/1 var(--mono); text-transform: uppercase; border-bottom: 1px solid currentColor; padding-bottom: 0.2rem; }
 .nav__sound { display: inline-flex; align-items: center; gap: .5rem; border: 0; padding: 0; background: transparent; cursor: pointer; font: 500 .66rem/1 var(--mono); text-transform: uppercase; }
+.site-header .nav__sound { font-size: .74rem; }   /* slightly larger on the Work top bar only */
 .nav__sound .eq { height: 12px; display: inline-flex; align-items: flex-end; gap: 2px; }
 .nav__sound .eq i { width: 2px; height: 3px; display: block; background: currentColor; transition: height 300ms var(--ease); }
 .nav__sound.is-on .eq i { animation: equalize 950ms ease-in-out infinite alternate; }
@@ -117,9 +118,9 @@ h1, h2, h3, h4, p, dl, dd { margin: 0; }
 @keyframes equalize { to { height: 11px; } }
 .header-world { display: flex; align-items: center; gap: .65rem; padding-left: 1rem; border-left: 1px solid var(--line); }
 .header-world > span { display: grid; gap: .18rem; }
-.header-world b { font: 500 .68rem/1 var(--mono); text-transform: uppercase; }
-.header-world small { font: 400 .55rem/1 var(--mono); color: var(--charcoal-soft); text-transform: uppercase; }
-.header-world i { font: normal 400 .8rem/1 var(--mono); }
+.header-world b { font: 500 .76rem/1 var(--mono); text-transform: uppercase; }
+.header-world small { font: 400 .62rem/1 var(--mono); color: var(--charcoal-soft); text-transform: uppercase; }
+.header-world i { font: normal 400 .88rem/1 var(--mono); }
 .globe-icon { width: 29px; height: 29px; fill: none; stroke: currentColor; stroke-width: 1.15; }
 
 .kicker, .eyebrow, .meta-row { font: 400 0.7rem/1.5 var(--mono); letter-spacing: 0.08em; text-transform: uppercase; }
@@ -179,7 +180,11 @@ h1, h2, h3, h4, p, dl, dd { margin: 0; }
 
 .work { background: var(--cream); }
 .work-list { padding: 0 var(--gutter); }
-.project { min-height: 135svh; display: grid; grid-template-columns: minmax(250px, 0.8fr) minmax(430px, 1.35fr); gap: clamp(3rem, 8vw, 9rem); align-items: start; padding: clamp(5rem, 10vw, 9rem) 0; border-bottom: 1px solid var(--line); }
+/* Gentle scroll-snap so a fast flick can't overshoot a project — it settles on
+   each one. Proximity keeps slow reading free; snap-stop stops a fast scroll from
+   skipping past a section. Scoped to the Work page (the only page with projects). */
+html:has(.project) { scroll-snap-type: y proximity; }
+.project { min-height: 135svh; display: grid; grid-template-columns: minmax(250px, 0.8fr) minmax(430px, 1.35fr); gap: clamp(3rem, 8vw, 9rem); align-items: start; padding: clamp(5rem, 10vw, 9rem) 0; border-bottom: 1px solid var(--line); scroll-snap-align: start; scroll-snap-stop: always; scroll-margin-top: 84px; }
 .project:nth-child(even) { grid-template-columns: minmax(430px, 1.35fr) minmax(250px, 0.8fr); }
 .project:nth-child(even) .project__content { order: 2; }
 .project__content { display: flex; flex-direction: column; align-items: flex-start; position: sticky; top: clamp(7rem, 15vh, 10rem); }
@@ -242,6 +247,15 @@ h1, h2, h3, h4, p, dl, dd { margin: 0; }
 .world-page-transition.is-active::before { transform: scale(18); }
 .world-page-transition.is-active span { opacity: 1; transform: translateY(0); }
 .world-page-transition.is-active i { opacity: 1; transform: scale(1); }
+
+/* Charcoal cover that reveals the Work page when returning from "Explore my world".
+   Collapsed (invisible) by default; only covers when arriving via that hand-off,
+   so a first visit is untouched. main.js irises it open. */
+.work-entry { position: fixed; inset: 0; z-index: 10000; background: var(--charcoal); color: var(--cream); display: grid; place-items: center; clip-path: circle(0% at 50% 50%); pointer-events: none; }
+.work-entry span { font: 400 .7rem/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; opacity: 0; }
+html.is-entering .work-entry { clip-path: circle(150% at 50% 50%); }
+html.is-entering .work-entry span { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .work-entry { display: none; } }
 
 .world-transition { height: 220svh; position: relative; background: var(--cream); }
 .world-transition__sticky { position: sticky; top: 0; height: 100svh; overflow: hidden; display: grid; place-items: center; isolation: isolate; }
@@ -363,7 +377,7 @@ h1, h2, h3, h4, p, dl, dd { margin: 0; }
   .hero__intro { width: min(38ch, 80%); }
   .chapter-intro { grid-template-columns: .45fr 1.55fr; }
   .chapter-intro__side { grid-column: 2; max-width: 40ch; }
-  .project, .project:nth-child(even) { grid-template-columns: 1fr; min-height: auto; gap: 3.5rem; }
+  .project, .project:nth-child(even) { grid-template-columns: 1fr; min-height: auto; gap: 3.5rem; scroll-snap-stop: normal; }
   .project:nth-child(even) .project__content { order: initial; }
   .project__content { width: min(620px, 90%); position: relative; top: auto; }
   .project__visual { min-height: min(82vw, 680px); height: auto; position: relative; top: auto; }

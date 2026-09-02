@@ -8,6 +8,9 @@ import { initHeaderWave } from './modules/headerWave.js';
 gsap.registerPlugin(ScrollTrigger);
 
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+// Set by index.html's head script when we arrive back from "Explore my world":
+// the page paints under a charcoal cover that we iris open on load.
+const entering = !reduced && document.documentElement.classList.contains('is-entering');
 document.documentElement.classList.add('js');
 
 renderWork();
@@ -26,7 +29,8 @@ function setupMotion() {
   }
 
   const ease = 'power3.out';
-  const intro = gsap.timeline({ defaults: { ease } });
+  // When returning under the cover, hold the hero a beat so it reveals as the iris opens.
+  const intro = gsap.timeline({ defaults: { ease }, delay: entering ? .22 : 0 });
   intro
     .fromTo('[data-hero-line]', { autoAlpha: 0, y: 48 }, { autoAlpha: 1, y: 0, duration: 1.25, stagger: 0.16 }, 0.15)
     .fromTo('.hero [data-reveal]', { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.9, stagger: 0.12 }, 0.45)
@@ -113,6 +117,25 @@ function setupLiquidPointer() {
   }, { passive: true });
 }
 
+function playEntryReveal() {
+  const cover = document.querySelector('.work-entry');
+  if (!entering || !cover) {
+    document.documentElement.classList.remove('is-entering');
+    return;
+  }
+  gsap.fromTo(cover,
+    { clipPath: 'circle(150% at 50% 50%)' },
+    {
+      clipPath: 'circle(0% at 50% 50%)',
+      duration: .95,
+      ease: 'power3.inOut',
+      onComplete: () => {
+        document.documentElement.classList.remove('is-entering');
+        gsap.set(cover, { clearProps: 'clipPath' });
+      },
+    });
+}
+
 function setupWorldLinks() {
   const clearTransition = () => {
     document.querySelectorAll('.world-page-transition').forEach((overlay) => overlay.remove());
@@ -140,11 +163,20 @@ async function boot() {
   initHeaderWave();
   setupHeader();
   setupMotion();
+  playEntryReveal();
   setupLiquidPointer();
   initLiquidTrail();
   initSound();
   setupWorldLinks();
   requestAnimationFrame(() => ScrollTrigger.refresh());
 }
+
+// Reset the cover if the page is restored from the back/forward cache.
+window.addEventListener('pageshow', (event) => {
+  if (!event.persisted) return;
+  document.documentElement.classList.remove('is-entering');
+  const cover = document.querySelector('.work-entry');
+  if (cover) gsap.set(cover, { clearProps: 'clipPath' });
+});
 
 boot();

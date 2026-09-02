@@ -251,7 +251,7 @@ export function initCountryDiscovery({ globe, globeMount, places, reduced = fals
     window.history.replaceState({ ...currentState, pazView: 'world', place: place?.id || null }, '', url);
   }
 
-  function enter(place, { instant = false } = {}) {
+  function enter(place, { instant = false, reveal = false } = {}) {
     if (!place || changing || (viewMode === 'countryDiscovery' && selectedPlace?.id === place.id)) return;
     changing = true;
     selectedPlace = place;
@@ -291,6 +291,27 @@ export function initCountryDiscovery({ globe, globeMount, places, reduced = fals
       gsap.set(scrollCue, { autoAlpha: 1 });
       document.body.classList.remove('is-changing-view');
       changing = false;
+      return;
+    }
+
+    if (reveal) {
+      // Landing straight in discovery from a Deep Dive page: the world chrome is
+      // hidden and the globe pre-framed instantly, then the hero settles in while
+      // world.js irises the entry cover open over the top — no jarring pop-in.
+      gsap.set(worldTargets, { autoAlpha: 0 });
+      gsap.set(globeMount, { xPercent: 0, yPercent: 0, scale: discoveryScale, autoAlpha: 1 });
+      gsap.timeline({
+        delay: .3,
+        onComplete: () => {
+          document.body.classList.remove('is-changing-view');
+          changing = false;
+        },
+      })
+        .to(header, { autoAlpha: 1, duration: .5, ease: 'power2.out' }, 0)
+        .to(titleItems, { y: 0, autoAlpha: 1, stagger: .08, duration: .7, ease: 'power3.out' }, .08)
+        .to(meta, { y: 0, autoAlpha: 1, duration: .6, ease: 'power3.out' }, .24)
+        .to(photos, { scale: 1, autoAlpha: 1, stagger: .06, duration: .66, ease: 'power3.out' }, .28)
+        .to(scrollCue, { autoAlpha: 1, duration: .45, ease: 'power2.out' }, .6);
       return;
     }
 

@@ -61,6 +61,42 @@ function animateWorldEntrance() {
     .from('.world__countries', { yPercent: 100, duration: .8, ease: 'power3.out' }, .8);
 }
 
+// Rebuild the exact warm cover the Deep Dive page departs under (same palette /
+// photo), so the two page-covers read as one continuous surface across the load.
+function discoveryCoverBackground(place) {
+  let palette = place.memories[7]?.palette || place.memories[0]?.palette;
+  let image = null;
+  try {
+    const handoff = JSON.parse(sessionStorage.getItem('paz-country-handoff'));
+    if (handoff?.id === place.id) {
+      palette = handoff.palette || palette;
+      image = handoff.image || null;
+    }
+  } catch { /* storage can be unavailable */ }
+  if (image) return `url("${image}") center / cover no-repeat`;
+  if (palette?.length === 3) return `linear-gradient(135deg, ${palette[0]}, ${palette[1]} 52%, ${palette[2]}) center / cover no-repeat`;
+  return '';
+}
+
+function revealIntoDiscovery(place) {
+  const entry = document.querySelector('.world-entry');
+  if (reduced || !entry) {
+    gsap.set('.world-entry', { clipPath: 'circle(0% at 50% 50%)' });
+    discovery.enter(place, { instant: true });
+    return;
+  }
+  // The Deep Dive page hands off under a warm place-cover; match it and keep it in
+  // place, build the discovery view behind it, then iris the cover open to reveal it.
+  entry.style.background = discoveryCoverBackground(place);
+  entry.querySelector('span').textContent = 'DISCOVERY';
+  discovery.enter(place, { reveal: true });
+  // Leave the inline circle(0%) in place on completion — the CSS default for
+  // .world-entry is circle(150%) (covering), so clearing props would re-cover it.
+  gsap.fromTo(entry,
+    { clipPath: 'circle(150% at 50% 50%)' },
+    { clipPath: 'circle(0% at 50% 50%)', duration: 1.05, ease: 'power3.inOut' });
+}
+
 function setupSceneParallax() {
   if (reduced || !window.matchMedia('(pointer:fine)').matches) return;
   const memories = [...document.querySelectorAll('.world-memory')];
@@ -89,7 +125,11 @@ function setupBackToWork() {
     if (returningToWork || discovery.viewMode !== 'world') return;
     returningToWork = true;
     document.body.classList.add('is-returning');
+    // Tell the Work page to open under a matching charcoal cover so the hand-off
+    // stays seamless instead of hard-cutting from dark overlay to the lit page.
+    try { sessionStorage.setItem('paz-entry', 'work'); } catch { /* storage can be unavailable */ }
     const entry = document.querySelector('.world-entry');
+    entry.style.background = '';   // back to the charcoal CSS default for this cover
     entry.querySelector('span').textContent = 'RETURN TO WORK';
     gsap.fromTo(entry,
       { clipPath: 'circle(0% at 50% 50%)' },
@@ -107,6 +147,8 @@ function restoreWorldState() {
   document.body.classList.remove('is-returning');
   if (discovery.viewMode !== 'world') return;
   gsap.set(mount, { clearProps: 'transform,opacity,visibility' });
+  const entry = document.querySelector('.world-entry');
+  if (entry) entry.style.background = '';
   gsap.set('.world-entry', { clipPath: 'circle(0% at 50% 50%)' });
   globe.autoRotate = true;
   globe.focus(activeFocus);
@@ -122,8 +164,7 @@ if (reduced) globe.ready.finally(() => globe.render());
 else gsap.ticker.add(() => globe.render());
 
 if (requestedDiscovery && requestedPlace) {
-  gsap.set('.world-entry', { clipPath: 'circle(0% at 50% 50%)' });
-  discovery.enter(requestedPlace, { instant: true });
+  revealIntoDiscovery(requestedPlace);
 } else {
   globe.ready.then(() => globe.focus(activeFocus));
   animateWorldEntrance();
