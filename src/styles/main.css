@@ -208,14 +208,14 @@ html:has(.project) { scroll-snap-type: y proximity; }
 .project--offset .project__phone { transform: translate(18%, -5%); }
 .project--offset .project__visual:hover .project__phone { transform: translate(18%, -6.5%); }
 
-.experience { padding: var(--section) 0; border-bottom: 1px solid var(--line); }
+.experience { padding: var(--section) var(--gutter); border-bottom: 1px solid var(--line); }
 .experience__head { display: grid; grid-template-columns: .6fr 1.4fr auto; gap: 2rem; align-items: start; margin-bottom: clamp(4rem, 8vw, 7rem); }
-.experience__head p, .experience__head span { font: 400 .66rem/1.4 var(--mono); letter-spacing: .07em; color: var(--terracotta); }
+.experience__head p, .experience__head span { font: 400 .76rem/1.45 var(--mono); letter-spacing: .06em; color: var(--terracotta); }
 .experience__head span { color: var(--charcoal-soft); }
 .experience__head h3 { font: 400 clamp(3rem, 6vw, 6.2rem)/.88 var(--display); letter-spacing: -.035em; }
 .experience__rows { border-top: 1px solid var(--line); }
 .experience__rows article { display: grid; grid-template-columns: .6fr 1.4fr auto; gap: 2rem; align-items: baseline; padding: 1.8rem 0; border-bottom: 1px solid var(--line); }
-.experience__rows time, .experience__rows p { font: 400 .65rem/1.5 var(--mono); letter-spacing: .04em; color: var(--charcoal-soft); }
+.experience__rows time, .experience__rows p { font: 400 .78rem/1.55 var(--mono); letter-spacing: .035em; color: var(--charcoal-soft); }
 .experience__rows h4 { font: 400 clamp(1.45rem, 2.7vw, 2.7rem)/1 var(--display); }
 .experience__rows p { text-align: right; }
 

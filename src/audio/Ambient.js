@@ -2,7 +2,8 @@
  * Ambient — a calm but *active* generative lo-fi loop, built entirely with the
  * Web Audio API (no audio files). A warm pad + soft sub bass + a plucky arpeggio
  * running through a dub-style delay, a gentle kick and light hats, over a slow
- * mellow chord progression. Starts silent; fades in on the first user gesture.
+ * mellow chord progression. The UI can remember an "on" preference, while audio
+ * itself starts on the first user gesture to respect browser autoplay rules.
  */
 export default class Ambient {
   constructor() {
@@ -227,19 +228,21 @@ export default class Ambient {
     }
   }
 
-  /** Toggle sound on/off with a smooth fade. Returns the new enabled state. */
-  async toggle() {
+  /** Set sound on/off with a smooth fade. Returns the resulting enabled state. */
+  async setEnabled(enabled) {
     if (!this.built) this._build();
-    if (this.ctx.state === 'suspended') await this.ctx.resume();
+    if (this.ctx.state === 'suspended') {
+      try { await this.ctx.resume(); } catch (_) { /* waits for a trusted gesture */ }
+    }
 
-    this.enabled = !this.enabled;
+    this.enabled = Boolean(enabled);
     const now = this.ctx.currentTime;
     const g = this.master.gain;
     g.cancelScheduledValues(now);
     g.setValueAtTime(g.value, now);
     g.linearRampToValueAtTime(this.enabled ? this.volume : 0.0, now + (this.enabled ? 1.6 : 0.9));
 
-    if (this.enabled) {
+    if (this.enabled && !this._timer) {
       this.step = 0;
       this.nextTime = this.ctx.currentTime + 0.15;
       this._timer = setInterval(() => this._scheduler(), this.tickMs);
@@ -248,5 +251,10 @@ export default class Ambient {
       this._timer = null;
     }
     return this.enabled;
+  }
+
+  /** Toggle sound on/off with a smooth fade. Returns the new enabled state. */
+  toggle() {
+    return this.setEnabled(!this.enabled);
   }
 }
