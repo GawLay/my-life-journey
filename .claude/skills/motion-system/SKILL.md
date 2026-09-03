@@ -41,15 +41,24 @@ already be painting a matching cover before its first paint**, then iris it open
 1. **Outgoing page** animates its cover closed (`0% → 150%`) and navigates in the tween's
    `onComplete` (`window.location.assign(...)`). Set any hand-off state *before* the tween.
 2. **Incoming page** decides to cover *before first paint* via an inline `<head>` script
-   that reads a flag and adds a class — never via a module that runs after paint:
+   that reads the hand-off state, sets CSS variables and adds a class — never via a
+   module that runs after paint. "Before first paint" includes the cover's complete
+   visual state: background image or palette, overlay/tint, label copy, typography and
+   clip state. If a module supplies any of those later, the default cover can flash for
+   one frame even when the animation itself is correct:
    - Work return: `world.js` sets `sessionStorage 'paz-entry' = 'work'`; `index.html`'s head
      script consumes it and adds `html.is-entering`; `main.js` irises `.work-entry` open and
      holds the hero intro a beat (`intro` timeline `delay`).
-   - Deep-dive → discovery: `world.js#revealIntoDiscovery` keeps `.world-entry` covering,
-     enters discovery in a `reveal` mode (content settles behind the cover), then irises open.
-3. **Match the cover's colour** so the two page-covers read as one surface. The discovery
-   arrival rebuilds the exact warm gradient the Deep Dive page departs under, from
-   `sessionStorage 'paz-country-handoff'` (fallback: the place's memory palette).
+   - Deep-dive → discovery: `world.html` consumes `sessionStorage
+     'paz-country-handoff'` in its head, sets `--handoff-*` variables plus
+     `html.is-discovery-entry`, and snapshots the value on `window.__PAZ_COUNTRY_HANDOFF__`.
+     CSS paints the complete `.world-entry` cover immediately; `world.js#revealIntoDiscovery`
+     may reuse that snapshot to animate the cover open, but must not be its first visual writer.
+3. **Match the entire cover, not only its colour.** When outgoing and incoming covers are
+   meant to read as one surface, use the same palette/image, overlay, label hierarchy,
+   typeface, size, casing and alignment on both sides of navigation. A large title becoming
+   a small caption, or a shaded gradient briefly becoming charcoal, reads as a duplicate or
+   black glitch even if both covers use the same iris timing.
 
 Consume one-shot flags immediately (remove on read) so they only affect the very next load,
 and reset covers on `pageshow` (bfcache) and when leaving a view.
@@ -81,3 +90,7 @@ mid-animation there. To verify without a visible tab:
 - Import the *same* gsap singleton and force finite tweens to their end to inspect the resting
   state: `getTweensOf(el).forEach(t => t.progress(1))` — then read computed styles / screenshot.
 - The real animation runs fine in a foreground tab; the freeze is only a verification artifact.
+
+For a cross-document hand-off, also sample foreground frames immediately before and after
+navigation. The background/palette, overlay and text treatment must remain visually identical
+at the boundary; checking only the finished destination cannot catch a one-frame seam.

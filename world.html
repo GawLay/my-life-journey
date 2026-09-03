@@ -6,6 +6,27 @@
     <meta name="theme-color" content="#171713" />
     <title>Explore My World — Phyo Aung Zaw</title>
     <meta name="description" content="An interactive atlas of places, photographs and memories from Phyo Aung Zaw." />
+    <script>
+      (() => {
+        const entryParams = new URLSearchParams(window.location.search);
+        const placeId = entryParams.get('place');
+        if (entryParams.get('view') !== 'discovery' || !placeId) return;
+        document.documentElement.classList.add('is-discovery-entry');
+        try {
+          const handoff = JSON.parse(sessionStorage.getItem('paz-country-handoff'));
+          if (!handoff || handoff.id !== placeId) return;
+          const [a, b, c] = handoff.palette || [];
+          if (a && b && c) {
+            document.documentElement.style.setProperty('--handoff-a', a);
+            document.documentElement.style.setProperty('--handoff-b', b);
+            document.documentElement.style.setProperty('--handoff-c', c);
+          }
+          if (handoff.image) document.documentElement.style.setProperty('--handoff-image', `url("${handoff.image}")`);
+          window.__PAZ_COUNTRY_HANDOFF__ = handoff;
+          sessionStorage.removeItem('paz-country-handoff');
+        } catch { /* continue with the palette fallback */ }
+      })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -16,7 +37,13 @@
   </head>
   <body class="world-page">
     <canvas class="liquid-trail" id="liquid-trail" aria-hidden="true"></canvas>
-    <div class="world-entry" aria-hidden="true"><span>EXPLORE MY WORLD</span></div>
+    <div class="world-entry" aria-hidden="true">
+      <span class="world-entry__default">EXPLORE MY WORLD</span>
+      <div class="world-entry__discovery">
+        <span>RETURN TO</span>
+        <strong>DISCOVERY</strong>
+      </div>
+    </div>
 
     <header class="world-header">
       <a class="world-header__back" href="./index.html"><span aria-hidden="true">←</span><span data-wave>Work / PAZ</span></a>

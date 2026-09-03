@@ -66,13 +66,11 @@ function animateWorldEntrance() {
 function discoveryCoverBackground(place) {
   let palette = place.memories[7]?.palette || place.memories[0]?.palette;
   let image = null;
-  try {
-    const handoff = JSON.parse(sessionStorage.getItem('paz-country-handoff'));
-    if (handoff?.id === place.id) {
-      palette = handoff.palette || palette;
-      image = handoff.image || null;
-    }
-  } catch { /* storage can be unavailable */ }
+  const handoff = window.__PAZ_COUNTRY_HANDOFF__;
+  if (handoff?.id === place.id) {
+    palette = handoff.palette || palette;
+    image = handoff.image || null;
+  }
   if (image) return `url("${image}") center / cover no-repeat`;
   if (palette?.length === 3) return `linear-gradient(135deg, ${palette[0]}, ${palette[1]} 52%, ${palette[2]}) center / cover no-repeat`;
   return '';
@@ -88,13 +86,17 @@ function revealIntoDiscovery(place) {
   // The Deep Dive page hands off under a warm place-cover; match it and keep it in
   // place, build the discovery view behind it, then iris the cover open to reveal it.
   entry.style.background = discoveryCoverBackground(place);
-  entry.querySelector('span').textContent = 'DISCOVERY';
   discovery.enter(place, { reveal: true });
   // Leave the inline circle(0%) in place on completion — the CSS default for
   // .world-entry is circle(150%) (covering), so clearing props would re-cover it.
   gsap.fromTo(entry,
     { clipPath: 'circle(150% at 50% 50%)' },
-    { clipPath: 'circle(0% at 50% 50%)', duration: 1.05, ease: 'power3.inOut' });
+    {
+      clipPath: 'circle(0% at 50% 50%)',
+      duration: 1.05,
+      ease: 'power3.inOut',
+      onComplete: () => document.documentElement.classList.remove('is-discovery-entry'),
+    });
 }
 
 function setupSceneParallax() {
@@ -129,8 +131,9 @@ function setupBackToWork() {
     // stays seamless instead of hard-cutting from dark overlay to the lit page.
     try { sessionStorage.setItem('paz-entry', 'work'); } catch { /* storage can be unavailable */ }
     const entry = document.querySelector('.world-entry');
+    document.documentElement.classList.remove('is-discovery-entry');
     entry.style.background = '';   // back to the charcoal CSS default for this cover
-    entry.querySelector('span').textContent = 'RETURN TO WORK';
+    entry.querySelector('.world-entry__default').textContent = 'RETURN TO WORK';
     gsap.fromTo(entry,
       { clipPath: 'circle(0% at 50% 50%)' },
       {
@@ -149,6 +152,7 @@ function restoreWorldState() {
   gsap.set(mount, { clearProps: 'transform,opacity,visibility' });
   const entry = document.querySelector('.world-entry');
   if (entry) entry.style.background = '';
+  document.documentElement.classList.remove('is-discovery-entry');
   gsap.set('.world-entry', { clipPath: 'circle(0% at 50% 50%)' });
   globe.autoRotate = true;
   globe.focus(activeFocus);

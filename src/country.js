@@ -156,7 +156,7 @@ function setupMotion() {
       const entry = document.getElementById('country-entry');
       gsap.set(entry, { autoAlpha: 1, clipPath: 'circle(0% at 50% 50%)' });
       entry.querySelector('strong').textContent = next.country;
-      entry.querySelector('i').textContent = next.country.toUpperCase();
+      entry.querySelector('span').textContent = `DEEP DIVE / ${next.country.toUpperCase()}`;
       gsap.to(entry, { clipPath: 'circle(150% at 50% 50%)', duration: 1, ease: 'power3.inOut', onComplete: () => { window.location.href = link.href; } });
     });
   });
@@ -172,7 +172,7 @@ function setupReturnNavigation() {
         return;
       }
       entry.querySelector('strong').textContent = link.dataset.returnLabel;
-      entry.querySelector('i').textContent = 'NAVIGATION';
+      entry.querySelector('span').textContent = 'RETURN TO';
       gsap.set(entry, { autoAlpha: 1 });
       gsap.fromTo(entry,
         { clipPath: 'circle(0% at 50% 50%)' },
@@ -191,5 +191,7 @@ requestAnimationFrame(() => ScrollTrigger.refresh());
 window.addEventListener('pageshow', (event) => {
   if (!event.persisted) return;
   gsap.killTweensOf('#country-entry');
+  document.querySelector('#country-entry span').textContent = `DEEP DIVE / ${place.country.toUpperCase()}`;
+  document.querySelector('#country-entry strong').textContent = place.country;
   gsap.set('#country-entry', { clipPath: 'circle(0% at 50% 50%)', clearProps: 'opacity,visibility' });
 });

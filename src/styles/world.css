@@ -43,8 +43,15 @@ body.world-page { color: var(--cream); }
 .world-country span { font: 400 .54rem/1 var(--mono); color: #d97858; }
 .world-country b { font: 400 clamp(.9rem, 1.4vw, 1.3rem)/1 var(--display); }
 
-.world-entry { position: fixed; inset: 0; z-index: 10000; background: var(--charcoal); display: grid; place-items: center; clip-path: circle(150% at 50% 50%); pointer-events: none; }
+.world-entry { position: fixed; inset: 0; z-index: 10000; isolation: isolate; background: var(--charcoal); display: grid; place-items: center; clip-path: circle(150% at 50% 50%); pointer-events: none; }
 .world-entry span { font: 400 .68rem/1 var(--mono); letter-spacing: .12em; }
+.world-entry__discovery { display: none; place-content: center; justify-items: center; }
+.world-entry__discovery span { font-size: .62rem; letter-spacing: .1em; }
+.world-entry__discovery strong { margin-top: 1rem; font: 400 clamp(5rem, 14vw, 15rem)/.75 var(--display); letter-spacing: -.05em; }
+.is-discovery-entry .world-entry { background: var(--handoff-image, linear-gradient(135deg, var(--handoff-a, #344b48), var(--handoff-b, #d0a66d) 52%, var(--handoff-c, #9f4935))) center / cover no-repeat; }
+.is-discovery-entry .world-entry::after { content: ""; position: absolute; inset: 0; z-index: -1; background: rgba(28,25,20,.34); }
+.is-discovery-entry .world-entry__default { display: none; }
+.is-discovery-entry .world-entry__discovery { display: grid; }
 .country-departure { position: fixed; inset: 0; z-index: 9000; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; padding: 14vh var(--gutter); pointer-events: none; color: var(--cream); opacity: 0; }
 .country-departure span, .country-departure i { font: 400 .65rem/1 var(--mono); letter-spacing: .1em; font-style: normal; }
 .country-departure span { color: #e48766; }
