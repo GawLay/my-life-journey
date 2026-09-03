@@ -41,6 +41,9 @@ npm run preview  # preview the production build
 
 Everything user-facing lives in **`index.html`** (content) and a few CSS variables.
 
+For the World gallery and Country Deep Dive image counts, ratios, filenames and
+export checklist, see [PHOTO_CONTENT_GUIDE.md](./PHOTO_CONTENT_GUIDE.md).
+
 | What | Where |
 | --- | --- |
 | Name / role / bio / links | `index.html` (search for `Kyrie Paz`, `mailto:`, social `<a>` tags) |

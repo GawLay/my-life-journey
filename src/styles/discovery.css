@@ -66,7 +66,8 @@ body.discovery-page { width: 100%; max-width: 100vw; color: var(--cream); overfl
 .memory-photo:hover em, .memory-photo:focus-visible em { opacity: 1; transform: scale(1); }
 
 .memory-scene { position: relative; min-height: 165svh; overflow: hidden; isolation: isolate; padding: var(--section) var(--gutter); }
-.memory-scene--feature { background: #d8c8b1; color: var(--charcoal); }
+/* Keep the final square photo clear of the next scene on short, wide viewports. */
+.memory-scene--feature { min-height: max(180svh, calc(clamp(14rem, 27vw, 28rem) + 85svh + 24vw + 5rem)); background: #d8c8b1; color: var(--charcoal); }
 .memory-scene--archive { min-height: 185svh; background: #9f5039; color: var(--cream); }
 .memory-scene__heading { position: relative; z-index: 8; display: grid; grid-template-columns: .55fr 1fr .7fr; gap: 2rem; align-items: start; }
 .memory-scene__heading > span { font: 400 .61rem/1.3 var(--mono); letter-spacing: .08em; color: var(--discovery-accent); }
@@ -105,7 +106,7 @@ body.discovery-page { width: 100%; max-width: 100vw; color: var(--cream); overfl
 .memory-viewer__caption span, .memory-viewer__caption p { font: 400 .62rem/1.4 var(--mono); letter-spacing: .09em; color: #e99673; }
 .memory-viewer__caption h2 { margin: 1rem 0; font: 400 clamp(3rem, 6vw, 7rem)/.85 var(--display); letter-spacing: -.04em; }
 
-.deep-dive-transition { position: fixed; z-index: 15000; overflow: hidden; isolation: isolate; display: grid; place-content: center; justify-items: center; color: var(--cream); background: var(--transition-image, linear-gradient(135deg, var(--discovery-cool), var(--discovery-warm), var(--discovery-accent))) center / cover no-repeat; pointer-events: none; }
+.deep-dive-transition { position: fixed; z-index: 15000; overflow: hidden; isolation: isolate; display: grid; place-content: center; justify-items: center; color: var(--cream); background-color: var(--discovery-cool); background-image: var(--transition-image, linear-gradient(135deg, var(--discovery-cool), var(--discovery-warm), var(--discovery-accent))); background-position: var(--transition-position, center); background-size: cover; background-repeat: no-repeat; pointer-events: none; }
 .deep-dive-transition::after { content: ""; position: absolute; inset: 0; z-index: -1; background: rgba(28,25,20,.34); }
 .deep-dive-transition span { font: 400 .62rem/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; }
 .deep-dive-transition strong { font: 400 clamp(5rem, 14vw, 15rem)/.75 var(--display); letter-spacing: -.05em; margin-top: 1rem; }

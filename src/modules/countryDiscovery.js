@@ -30,7 +30,7 @@ const archiveLayouts = [
 
 function photoSurface(memory) {
   if (memory.src) {
-    return `<img class="memory-photo__surface" src="${memory.src}" alt="${memory.alt}" loading="lazy" decoding="async" />`;
+    return `<img class="memory-photo__surface" src="${memory.src}" alt="${memory.alt}" loading="lazy" decoding="async" style="object-position:${memory.position || 'center'}" />`;
   }
   return '<span class="memory-photo__surface memory-photo__placeholder" aria-hidden="true"></span>';
 }
@@ -76,6 +76,7 @@ export function initCountryDiscovery({ globe, globeMount, places, reduced = fals
   let changing = false;
   let storyTransitioning = false;
   let sceneAnimations = [];
+  let storyCoverPreload = null;
 
   function killSceneAnimations() {
     sceneAnimations.forEach((animation) => {
@@ -91,6 +92,11 @@ export function initCountryDiscovery({ globe, globeMount, places, reduced = fals
     const featureMemories = place.memories.slice(orbitLayouts.length, orbitLayouts.length + featureLayouts.length);
     const archiveMemories = place.memories.slice(orbitLayouts.length + featureLayouts.length, orbitLayouts.length + featureLayouts.length + archiveLayouts.length);
     const cityList = place.cities.split(' / ').map((city) => city.trim());
+
+    if (place.deepDive?.cover?.src) {
+      storyCoverPreload = new Image();
+      storyCoverPreload.src = place.deepDive.cover.src;
+    }
 
     document.body.style.setProperty('--discovery-accent', place.memories[0].palette[2]);
     document.body.style.setProperty('--discovery-warm', place.memories[1].palette[1]);
@@ -390,6 +396,7 @@ export function initCountryDiscovery({ globe, globeMount, places, reduced = fals
     surface.style.backgroundImage = memory.src
       ? `url("${memory.src}")`
       : 'linear-gradient(135deg, var(--photo-a), var(--photo-b) 52%, var(--photo-c))';
+    surface.style.backgroundPosition = memory.position || 'center';
     document.getElementById('memory-viewer-index').textContent = String(memory.index).padStart(2, '0');
     document.getElementById('memory-viewer-title').textContent = memory.city;
     document.getElementById('memory-viewer-note').textContent = memory.moment;
@@ -424,7 +431,8 @@ export function initCountryDiscovery({ globe, globeMount, places, reduced = fals
     const sourceFrame = sourcePhoto?.querySelector('.memory-photo__surface')?.getBoundingClientRect()
       || visibleSource?.rect
       || link.getBoundingClientRect();
-    const sourceMemory = selectedPlace.memories.find((memory) => memory.id === sourcePhoto?.dataset.memory)
+    const sourceMemory = selectedPlace.deepDive?.cover
+      || selectedPlace.memories.find((memory) => memory.id === sourcePhoto?.dataset.memory)
       || selectedPlace.memories[orbitLayouts.length]
       || selectedPlace.memories[0];
     const [colorA, colorB, colorC] = sourceMemory.palette;
@@ -434,6 +442,7 @@ export function initCountryDiscovery({ globe, globeMount, places, reduced = fals
         country: selectedPlace.country,
         palette: sourceMemory.palette,
         image: sourceMemory.src || '',
+        position: sourceMemory.position || 'center',
       }));
     } catch { /* storage can be unavailable */ }
 
@@ -443,6 +452,8 @@ export function initCountryDiscovery({ globe, globeMount, places, reduced = fals
     transition.style.setProperty('--transition-image', sourceMemory.src
       ? `url("${sourceMemory.src}")`
       : `linear-gradient(135deg, ${colorA}, ${colorB} 52%, ${colorC})`);
+    transition.style.setProperty('--transition-position', sourceMemory.position || 'center');
+    transition.style.backgroundColor = colorA;
     document.body.appendChild(transition);
     gsap.set(transition, {
       left: sourceFrame.left,

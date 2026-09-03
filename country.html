@@ -20,7 +20,15 @@
             document.documentElement.style.setProperty('--handoff-b', b);
             document.documentElement.style.setProperty('--handoff-c', c);
           }
-          if (handoff.image) document.documentElement.style.setProperty('--handoff-image', `url("${handoff.image}")`);
+          if (handoff.position) document.documentElement.style.setProperty('--handoff-position', handoff.position);
+          if (handoff.image) {
+            document.documentElement.style.setProperty('--handoff-image', `url("${handoff.image}")`);
+            const preload = document.createElement('link');
+            preload.rel = 'preload';
+            preload.as = 'image';
+            preload.href = handoff.image;
+            document.head.appendChild(preload);
+          }
           window.__PAZ_COUNTRY_HANDOFF__ = handoff;
         } catch { /* continue with the palette fallback */ }
       })();

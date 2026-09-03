@@ -14,10 +14,10 @@ html, body.country-page { background: var(--cream); }
 .country-entry span { font: 400 .62rem/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; }
 .country-entry span i { font-style: normal; }
 .country-entry strong { margin-top: 1rem; font: 400 clamp(5rem, 14vw, 15rem)/.75 var(--display); letter-spacing: -.05em; }
-.from-discovery .country-entry { background: var(--handoff-image, linear-gradient(135deg, var(--handoff-a, #344b48), var(--handoff-b, #d0a66d) 52%, var(--handoff-c, #9f4935))) center / cover no-repeat; }
+.from-discovery .country-entry { background-color: var(--handoff-a, #344b48); background-image: var(--handoff-image, linear-gradient(135deg, var(--handoff-a, #344b48), var(--handoff-b, #d0a66d) 52%, var(--handoff-c, #9f4935))); background-position: var(--handoff-position, center); background-size: cover; background-repeat: no-repeat; }
 
 .country-hero { min-height: 100svh; position: relative; overflow: hidden; background: var(--charcoal); color: var(--cream); }
-.country-hero__photo { position: absolute !important; inset: 0; }
+.country-hero__photo { position: absolute !important; inset: 0; width: 100%; height: 100%; }
 .country-hero__photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(23,23,19,.15), rgba(23,23,19,.18) 50%, rgba(23,23,19,.75)); }
 .country-hero__copy { position: absolute; z-index: 3; inset: auto var(--gutter) 9vh; display: grid; grid-template-columns: auto 1fr auto; align-items: end; gap: 2rem; }
 .country-hero__copy span, .country-hero__copy p { font: 400 .69rem/1 var(--mono); letter-spacing: .1em; }
@@ -43,11 +43,12 @@ html, body.country-page { background: var(--cream); }
 .journal-photo { position: relative; overflow: hidden; isolation: isolate; color: var(--cream); display: flex; flex-direction: column; justify-content: space-between; padding: 1rem; background: var(--country-cool); }
 .journal-photo::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(145deg, var(--country-cool), var(--country-warm) 48%, var(--country-accent)); }
 .journal-photo::after { content: ""; position: absolute; inset: 0; background-image: linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px); background-size: 100% 4px; mix-blend-mode: overlay; }
+.journal-photo__image { position: absolute; z-index: 0; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: saturate(.88) contrast(.96); }
 .journal-photo span, .journal-photo b { position: relative; z-index: 1; font: 400 .58rem/1 var(--mono); letter-spacing: .07em; }
 .journal-photo b { align-self: flex-end; }
 .journal-photo--hero { min-height: 100%; }
 .journal-photo--hero::before { background: linear-gradient(125deg, #293e3d, var(--country-warm) 48%, var(--country-accent) 68%, #282722); }
-.from-discovery .journal-photo--hero::before { background: var(--handoff-image, linear-gradient(135deg, var(--handoff-a, #344b48), var(--handoff-b, #d0a66d) 52%, var(--handoff-c, #9f4935))) center / cover no-repeat; }
+.from-discovery .journal-photo--hero::before { background-color: var(--handoff-a, #344b48); background-image: var(--handoff-image, linear-gradient(135deg, var(--handoff-a, #344b48), var(--handoff-b, #d0a66d) 52%, var(--handoff-c, #9f4935))); background-position: var(--handoff-position, center); background-size: cover; background-repeat: no-repeat; }
 .journal-photo--wide { width: 100%; aspect-ratio: 16 / 9; }
 .photo-chapter--split { min-height: 100svh; display: grid; grid-template-columns: 1.05fr .95fr; gap: clamp(3rem, 8vw, 9rem); align-items: center; }
 .journal-photo--portrait { width: 72%; aspect-ratio: 4 / 5; justify-self: end; }

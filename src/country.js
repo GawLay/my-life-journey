@@ -27,8 +27,24 @@ try {
   const candidate = JSON.parse(sessionStorage.getItem('paz-country-handoff'));
   if (candidate?.id === place.id) storedHandoff = candidate;
 } catch { /* storage can be unavailable */ }
-const fallbackHandoff = place.memories[7] || place.memories[0];
+const deepDive = place.deepDive || {};
+const fallbackHandoff = deepDive.cover || place.memories[7] || place.memories[0];
 const handoffPalette = storedHandoff?.palette || fallbackHandoff.palette;
+const handoffImage = storedHandoff?.image || fallbackHandoff.src;
+const handoffPosition = storedHandoff?.position || fallbackHandoff.position || 'center';
+const fallbackStoryMemories = [place.memories[3], place.memories[4], place.memories[10], place.memories[2], place.memories[14]];
+const storyPhotos = Array.from({ length: 5 }, (_, photoIndex) => deepDive.photos?.[photoIndex] || fallbackStoryMemories[photoIndex]);
+
+function journalPhoto(photo, modifier, topLabel, bottomLabel, { eager = false } = {}) {
+  const extraClass = modifier === 'hero' ? ' country-hero__photo' : '';
+  const image = photo?.src
+    ? `<img class="journal-photo__image" src="${photo.src}" alt="${photo.alt}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" style="object-position:${photo.position || 'center'}" />`
+    : '';
+  const accessibility = photo?.src ? '' : `role="img" aria-label="Photograph placeholder for ${place.country}"`;
+  return `<div class="journal-photo journal-photo--${modifier}${extraClass}" ${accessibility}>
+    ${image}<span>${topLabel}</span><b>${bottomLabel}</b>
+  </div>`;
+}
 
 document.title = `${place.country} — World Journal / Phyo Aung Zaw`;
 document.body.style.setProperty('--country-accent', accent);
@@ -37,7 +53,8 @@ document.body.style.setProperty('--country-cool', cool);
 document.documentElement.style.setProperty('--handoff-a', handoffPalette[0]);
 document.documentElement.style.setProperty('--handoff-b', handoffPalette[1]);
 document.documentElement.style.setProperty('--handoff-c', handoffPalette[2]);
-if (storedHandoff?.image) document.documentElement.style.setProperty('--handoff-image', `url("${storedHandoff.image}")`);
+document.documentElement.style.setProperty('--handoff-position', handoffPosition);
+if (handoffImage) document.documentElement.style.setProperty('--handoff-image', `url("${handoffImage}")`);
 document.getElementById('country-entry-name').textContent = place.country;
 document.getElementById('country-entry-label').textContent = place.country.toUpperCase();
 document.getElementById('country-header-label').textContent = `${place.country.toUpperCase()} / ${place.year}`;
@@ -47,9 +64,7 @@ document.getElementById('country-back-world').href = `./world.html?focus=${encod
 const content = document.getElementById('country-content');
 content.innerHTML = `
   <section class="country-hero">
-    <div class="country-hero__photo journal-photo journal-photo--hero" role="img" aria-label="Placeholder for a hero photograph from ${place.country}">
-      <span>PHOTOGRAPH / PLACEHOLDER</span><b>${cities[0]} · ARRIVAL</b>
-    </div>
+    ${journalPhoto(fallbackHandoff, 'hero', 'PHOTOGRAPH / COVER', `${fallbackHandoff.city || cities[0]} · ${fallbackHandoff.moment || 'ARRIVAL'}`, { eager: true })}
     <div class="country-hero__copy">
       <span>${String(index + 1).padStart(2, '0')} / ${String(places.length).padStart(2, '0')}</span>
       <h1>${place.country}</h1>
@@ -60,7 +75,7 @@ content.innerHTML = `
 
   <section class="country-intro">
     <p class="country-intro__label">A PERSONAL FIELD NOTE</p>
-    <blockquote>“${place.note}”</blockquote>
+    <blockquote>“${deepDive.intro || place.note}”</blockquote>
     <dl>
       <div><dt>CHAPTER</dt><dd>${String(index + 1).padStart(2, '0')} / ${String(places.length).padStart(2, '0')}</dd></div>
       <div><dt>PHOTOGRAPHS</dt><dd>${String(place.photos).padStart(2, '0')}</dd></div>
@@ -71,26 +86,26 @@ content.innerHTML = `
 
   <section class="photo-story">
     <article class="photo-chapter photo-chapter--wide">
-      <header><span>01 / ${cities[0]}</span><time>${place.year}</time></header>
-      <div class="journal-photo journal-photo--wide" role="img" aria-label="Placeholder for a wide photograph from ${cities[0]}"><span>PHOTOGRAPH / PLACEHOLDER</span><b>BLUE HOUR / ${cities[0]}</b></div>
-      <p>The first walk without a destination. Light changing on unfamiliar streets; the city beginning to explain itself.</p>
+      <header><span>01 / ${storyPhotos[0]?.city || cities[0]}</span><time>${place.year}</time></header>
+      ${journalPhoto(storyPhotos[0], 'wide', '01 / OPENING', `${storyPhotos[0]?.moment || 'BLUE HOUR'} / ${storyPhotos[0]?.city || cities[0]}`)}
+      <p>${deepDive.opening || 'The first walk without a destination. Light changing on unfamiliar streets; the city beginning to explain itself.'}</p>
     </article>
 
     <article class="photo-chapter photo-chapter--split">
-      <div class="journal-photo journal-photo--portrait" role="img" aria-label="Placeholder for a portrait photograph from ${cities[1] || cities[0]}"><span>PHOTOGRAPH / PLACEHOLDER</span><b>${cities[1] || cities[0]} / 06:42</b></div>
-      <div class="photo-chapter__text"><span>02 / MORNING</span><h2>The hour before<br /><em>everything opens.</em></h2><p>Small rituals carry the shape of a place: shutters rising, breakfast behind a curtain, bicycles against old walls.</p></div>
+      ${journalPhoto(storyPhotos[1], 'portrait', '02 / MORNING', `${storyPhotos[1]?.city || cities[1] || cities[0]} / ${storyPhotos[1]?.moment || '06:42'}`)}
+      <div class="photo-chapter__text"><span>02 / ${storyPhotos[1]?.moment || 'MORNING'}</span><h2>${deepDive.portraitTitle || 'The hour before<br /><em>everything opens.</em>'}</h2><p>${deepDive.portraitCopy || 'Small rituals carry the shape of a place: shutters rising, breakfast behind a curtain, bicycles against old walls.'}</p></div>
     </article>
 
     <article class="photo-chapter photo-chapter--diptych">
-      <div class="journal-photo journal-photo--detail" role="img" aria-label="Placeholder for an architectural detail"><span>03 / DETAIL</span><b>TEXTURE / LIGHT</b></div>
-      <div class="journal-photo journal-photo--street" role="img" aria-label="Placeholder for a street photograph"><span>04 / STREET</span><b>${cities[2] || cities[0]} / AFTER RAIN</b></div>
-      <p>Not the landmark—the view beside it. Not the itinerary—the weather that changed it.</p>
+      ${journalPhoto(storyPhotos[2], 'detail', '03 / DETAIL', `${storyPhotos[2]?.city || cities[0]} / ${storyPhotos[2]?.moment || 'TEXTURE'}`)}
+      ${journalPhoto(storyPhotos[3], 'street', '04 / STREET', `${storyPhotos[3]?.city || cities[2] || cities[0]} / ${storyPhotos[3]?.moment || 'AFTER RAIN'}`)}
+      <p>${deepDive.diptychCopy || 'Not the landmark—the view beside it. Not the itinerary—the weather that changed it.'}</p>
     </article>
 
     <article class="photo-chapter photo-chapter--closing">
       <p class="photo-chapter__coordinates">${place.coordinates}</p>
-      <div class="journal-photo journal-photo--panorama" role="img" aria-label="Placeholder for a panoramic closing photograph"><span>05 / DEPARTURE</span><b>${place.country.toUpperCase()} / FIELD NOTES</b></div>
-      <blockquote>Some memories return as images. The lasting ones come back as sound, weather and pace.</blockquote>
+      ${journalPhoto(storyPhotos[4], 'panorama', '05 / DEPARTURE', `${storyPhotos[4]?.city || place.country.toUpperCase()} / ${storyPhotos[4]?.moment || 'FIELD NOTES'}`)}
+      <blockquote>${deepDive.closingCopy || 'Some memories return as images. The lasting ones come back as sound, weather and pace.'}</blockquote>
     </article>
   </section>
 
