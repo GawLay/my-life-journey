@@ -125,7 +125,8 @@ Vietnam uses all 20 unique iPhone photographs supplied. The duplicate
 `hoi_an_five copy.jpeg` is preserved with the masters but is not published.
 
 - Explore My World: 15 unique images.
-- Country Deep Dive: The Long Way cover plus 5 additional unique images.
+- Country Deep Dive: a four-city arc — The Long Way cover plus ten published
+  gallery photos reused across eight chapters (no extra files).
 - Cover: `08-the-long-way-mui-ne-coast.webp`.
 - Locations represented: Ho Chi Minh City, Đà Nẵng, Hội An and Mũi Né.
 - Published files: optimized WebP, maximum 2400 px, with GPS/EXIF removed.
@@ -153,14 +154,22 @@ Vietnam uses all 20 unique iPhone photographs supplied. The duplicate
 
 ### Vietnam Deep Dive sequence
 
-| Slot | File | City | Caption |
-| --- | --- | --- | --- |
-| Cover | `08-the-long-way-mui-ne-coast.webp` | Mũi Né | The Long Way |
-| 01 | `deep-01-hoi-an-old-town.webp` | Hội An | Old Town Afternoon |
-| 02 | `deep-02-hoi-an-flower-vendor.webp` | Hội An | Morning Market |
-| 03 | `deep-03-hoi-an-lantern-detail.webp` | Hội An | Lantern Detail |
-| 04 | `deep-04-hoi-an-river-market.webp` | Hội An | River Market |
-| 05 | `deep-05-mui-ne-dunes.webp` | Mũi Né | Departure |
+The Deep Dive is a four-city arc — Ho Chi Minh City → Đà Nẵng → Hội An → Mũi Né —
+authored as `deepDive.chapters` in `src/data/places.js` and rendered by
+`src/country.js#storyChapter`. It reuses already-published gallery photos, so it
+needs no extra files.
+
+| Chapter | Kind | File(s) | City | Caption |
+| --- | --- | --- | --- | --- |
+| Cover | hero | `08-the-long-way-mui-ne-coast.webp` | Mũi Né | The Long Way |
+| 1 | split | `01-arrival-saigon-cathedral.webp` | Ho Chi Minh City | Arrival · Notre-Dame |
+| 2 | wide | `15-departure-saigon-night-traffic.webp` | Ho Chi Minh City | After Dark · Bến Thành |
+| 3 | split | `05-morning-light-da-nang-lady-buddha.webp` | Đà Nẵng | Lady Buddha |
+| 4 | diptych | `11-weather-study-da-nang-macaque.webp` + `14-small-rituals-da-nang-beach.webp` | Đà Nẵng | Wild Edge · Shoreline |
+| 5 | wide | `deep-01-hoi-an-old-town.webp` | Hội An | Old Town |
+| 6 | split | `deep-02-hoi-an-flower-vendor.webp` | Hội An | Morning Market |
+| 7 | diptych | `deep-03-hoi-an-lantern-detail.webp` + `deep-04-hoi-an-river-market.webp` | Hội An | Lanterns · River Market |
+| 8 | closing | `deep-05-mui-ne-dunes.webp` | Mũi Né | Departure |
 
 ## Adding the 15 gallery paths
 

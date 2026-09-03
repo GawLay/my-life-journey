@@ -46,6 +46,62 @@ function journalPhoto(photo, modifier, topLabel, bottomLabel, { eager = false } 
   </div>`;
 }
 
+// A deep dive is a list of photo chapters. Vietnam supplies an explicit
+// `deepDive.chapters` arc (Ho Chi Minh City → Đà Nẵng → Hội An → Mũi Né); every
+// other country falls back to the original five-photo default, so its generated
+// journal is unchanged. Both feed the same four layout kinds below.
+const defaultChapters = [
+  { kind: 'wide', role: 'OPENING', eyebrow: storyPhotos[0]?.city || cities[0], photo: storyPhotos[0],
+    copy: deepDive.opening || 'The first walk without a destination. Light changing on unfamiliar streets; the city beginning to explain itself.' },
+  { kind: 'split', role: 'MORNING', eyebrow: `${storyPhotos[1]?.city || cities[1] || cities[0]} · MORNING`, photo: storyPhotos[1],
+    title: deepDive.portraitTitle || 'The hour before<br /><em>everything opens.</em>',
+    copy: deepDive.portraitCopy || 'Small rituals carry the shape of a place: shutters rising, breakfast behind a curtain, bicycles against old walls.' },
+  { kind: 'diptych', detailRole: 'DETAIL', streetRole: 'STREET', detail: storyPhotos[2], street: storyPhotos[3],
+    copy: deepDive.diptychCopy || 'Not the landmark—the view beside it. Not the itinerary—the weather that changed it.' },
+  { kind: 'closing', role: 'DEPARTURE', photo: storyPhotos[4],
+    copy: deepDive.closingCopy || 'Some memories return as images. The lasting ones come back as sound, weather and pace.' },
+];
+const chapters = deepDive.chapters?.length ? deepDive.chapters : defaultChapters;
+
+let photoPlate = 0;
+const plateLabel = (role) => `${String(++photoPlate).padStart(2, '0')} / ${role}`;
+const photoSub = (photo, fallback) => {
+  const moment = photo?.moment || fallback;
+  return photo?.city ? `${photo.city} / ${moment}` : moment;
+};
+
+function storyChapter(chapter) {
+  switch (chapter.kind) {
+    case 'split':
+      return `
+    <article class="photo-chapter photo-chapter--split">
+      ${journalPhoto(chapter.photo, 'portrait', plateLabel(chapter.role || 'MORNING'), photoSub(chapter.photo, 'MORNING'))}
+      <div class="photo-chapter__text"><span>${chapter.eyebrow || photoSub(chapter.photo, chapter.role || 'MORNING')}</span><h2>${chapter.title || ''}</h2><p>${chapter.copy || ''}</p></div>
+    </article>`;
+    case 'diptych':
+      return `
+    <article class="photo-chapter photo-chapter--diptych">
+      ${journalPhoto(chapter.detail, 'detail', plateLabel(chapter.detailRole || 'DETAIL'), photoSub(chapter.detail, 'TEXTURE'))}
+      ${journalPhoto(chapter.street, 'street', plateLabel(chapter.streetRole || 'STREET'), photoSub(chapter.street, 'AFTER RAIN'))}
+      <p>${chapter.copy || ''}</p>
+    </article>`;
+    case 'closing':
+      return `
+    <article class="photo-chapter photo-chapter--closing">
+      <p class="photo-chapter__coordinates">${chapter.eyebrow || place.coordinates}</p>
+      ${journalPhoto(chapter.photo, 'panorama', plateLabel(chapter.role || 'DEPARTURE'), photoSub(chapter.photo, 'FIELD NOTES'))}
+      <blockquote>${chapter.copy || ''}</blockquote>
+    </article>`;
+    default:
+      return `
+    <article class="photo-chapter photo-chapter--wide">
+      <header><span>${chapter.eyebrow || photoSub(chapter.photo, chapter.role || 'OPENING')}</span><time>${chapter.time || place.year}</time></header>
+      ${journalPhoto(chapter.photo, 'wide', plateLabel(chapter.role || 'OPENING'), photoSub(chapter.photo, 'BLUE HOUR'))}
+      <p>${chapter.copy || ''}</p>
+    </article>`;
+  }
+}
+
 document.title = `${place.country} — World Journal / Phyo Aung Zaw`;
 document.body.style.setProperty('--country-accent', accent);
 document.body.style.setProperty('--country-warm', warm);
@@ -85,28 +141,7 @@ content.innerHTML = `
   </section>
 
   <section class="photo-story">
-    <article class="photo-chapter photo-chapter--wide">
-      <header><span>01 / ${storyPhotos[0]?.city || cities[0]}</span><time>${place.year}</time></header>
-      ${journalPhoto(storyPhotos[0], 'wide', '01 / OPENING', `${storyPhotos[0]?.moment || 'BLUE HOUR'} / ${storyPhotos[0]?.city || cities[0]}`)}
-      <p>${deepDive.opening || 'The first walk without a destination. Light changing on unfamiliar streets; the city beginning to explain itself.'}</p>
-    </article>
-
-    <article class="photo-chapter photo-chapter--split">
-      ${journalPhoto(storyPhotos[1], 'portrait', '02 / MORNING', `${storyPhotos[1]?.city || cities[1] || cities[0]} / ${storyPhotos[1]?.moment || '06:42'}`)}
-      <div class="photo-chapter__text"><span>02 / ${storyPhotos[1]?.moment || 'MORNING'}</span><h2>${deepDive.portraitTitle || 'The hour before<br /><em>everything opens.</em>'}</h2><p>${deepDive.portraitCopy || 'Small rituals carry the shape of a place: shutters rising, breakfast behind a curtain, bicycles against old walls.'}</p></div>
-    </article>
-
-    <article class="photo-chapter photo-chapter--diptych">
-      ${journalPhoto(storyPhotos[2], 'detail', '03 / DETAIL', `${storyPhotos[2]?.city || cities[0]} / ${storyPhotos[2]?.moment || 'TEXTURE'}`)}
-      ${journalPhoto(storyPhotos[3], 'street', '04 / STREET', `${storyPhotos[3]?.city || cities[2] || cities[0]} / ${storyPhotos[3]?.moment || 'AFTER RAIN'}`)}
-      <p>${deepDive.diptychCopy || 'Not the landmark—the view beside it. Not the itinerary—the weather that changed it.'}</p>
-    </article>
-
-    <article class="photo-chapter photo-chapter--closing">
-      <p class="photo-chapter__coordinates">${place.coordinates}</p>
-      ${journalPhoto(storyPhotos[4], 'panorama', '05 / DEPARTURE', `${storyPhotos[4]?.city || place.country.toUpperCase()} / ${storyPhotos[4]?.moment || 'FIELD NOTES'}`)}
-      <blockquote>${deepDive.closingCopy || 'Some memories return as images. The lasting ones come back as sound, weather and pace.'}</blockquote>
-    </article>
+    ${chapters.map(storyChapter).join('')}
   </section>
 
   <footer class="country-footer">

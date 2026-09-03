@@ -69,7 +69,7 @@ const placeData = [
   },
   {
     id: 'vietnam', iso: 'VNM', country: 'Vietnam', year: 'NOW', cities: 'HO CHI MINH CITY / ĐÀ NẴNG / HỘI AN / MŨI NÉ',
-    coordinates: '10.8231° N / 106.6297° E', lat: 10.82, lng: 106.63, photos: 20, stories: 5,
+    coordinates: '10.8231° N / 106.6297° E', lat: 10.82, lng: 106.63, photos: 20, stories: 8,
     note: 'Home now: early coffee, late rides and the long road between city light, old-town colour and open sand.',
     gallery: [
       {
@@ -155,32 +155,94 @@ const placeData = [
         alt: 'Travellers waving beside two colourful open-top jeeps on the coast at Mũi Né',
         palette: ['#293833', '#c9b88f', '#a84732'],
       },
-      intro: 'Home is not one fixed point. It is city traffic after dark, lanterns over an old street, and the decision to take the longer road toward the sea.',
-      opening: 'Bougainvillea spills over a busy old-town corner, where shopfronts, lanterns and passing conversations share the same warm afternoon light.',
-      portraitTitle: 'The market opens<br /><em>one flower at a time.</em>',
-      portraitCopy: 'On the stone steps, yellow chrysanthemums and pink blossoms turn an ordinary morning into a small ceremony of colour.',
-      diptychCopy: 'Hội An lingers in handmade colour: silk lanterns up close, then the river market opening into a wider human scene.',
-      closingCopy: 'At Mũi Né, the road gives way to sand. People become small marks on the ridge, and the horizon does the remembering.',
-      photos: [
+      intro: 'Home is not one fixed point. It is cathedral bells and midnight traffic, a white statue over the sea, lanterns above an old street, and the long road out to the open sand.',
+      // A four-city arc: Ho Chi Minh City → Đà Nẵng → Hội An → Mũi Né. Each city
+      // is its own chapter set, rendered by src/country.js#storyChapter.
+      chapters: [
         {
-          src: '/images/world/vietnam/deep-01-hoi-an-old-town.webp', city: 'HỘI AN', moment: 'OLD TOWN AFTERNOON', position: 'center 48%',
-          alt: 'A busy Hội An old-town shopfront framed by yellow walls and flowering bougainvillea',
+          kind: 'split', role: 'ARRIVAL', eyebrow: 'HO CHI MINH CITY · ARRIVAL',
+          title: 'Not where I&rsquo;m from &mdash;<br /><em>where I live now.</em>',
+          copy: 'The basilica has worn its scaffolding for years now. Saigon isn&rsquo;t where I grew up, but it&rsquo;s the city I keep coming back to &mdash; learning its streets again after every trip, one closed lane and one new coffee window at a time.',
+          photo: {
+            src: '/images/world/vietnam/01-arrival-saigon-cathedral.webp',
+            city: 'HO CHI MINH CITY', moment: 'NOTRE-DAME', position: 'center 42%',
+            alt: 'Notre-Dame Cathedral of Saigon wrapped in restoration scaffolding above passing traffic',
+          },
         },
         {
-          src: '/images/world/vietnam/deep-02-hoi-an-flower-vendor.webp', city: 'HỘI AN', moment: 'MORNING MARKET', position: 'center 45%',
-          alt: 'Flower vendors arranging yellow and pink blossoms on stone steps in Hội An',
+          kind: 'wide', role: 'AFTER DARK', eyebrow: 'HO CHI MINH CITY',
+          copy: 'By night the city stops pretending to rest. Bến Thành throws its light across the roundabout, the traffic knots and loosens, and the whole junction moves like one patient animal.',
+          photo: {
+            src: '/images/world/vietnam/15-departure-saigon-night-traffic.webp',
+            city: 'HO CHI MINH CITY', moment: 'BẾN THÀNH', position: 'center 72%',
+            alt: 'Motorbikes and cars crossing the roundabout in front of the illuminated Bến Thành Market at night',
+          },
         },
         {
-          src: '/images/world/vietnam/deep-03-hoi-an-lantern-detail.webp', city: 'HỘI AN', moment: 'LANTERN DETAIL', position: 'center',
-          alt: 'Rows of colourful silk lanterns hanging closely together in Hội An',
+          kind: 'split', role: 'MORNING LIGHT', eyebrow: 'ĐÀ NẴNG · SƠN TRÀ',
+          title: 'The coast keeps<br /><em>a calmer watch.</em>',
+          copy: 'Six hours north the noise thins to surf. The Lady Buddha stands over Sơn Trà with the mountains at her back and the sea in front of her — the first real quiet of the whole road.',
+          photo: {
+            src: '/images/world/vietnam/05-morning-light-da-nang-lady-buddha.webp',
+            city: 'ĐÀ NẴNG', moment: 'LADY BUDDHA', position: 'center 32%',
+            alt: 'The white Lady Buddha statue of Đà Nẵng rising over a laughing Buddha against heavy clouds',
+          },
         },
         {
-          src: '/images/world/vietnam/deep-04-hoi-an-river-market.webp', city: 'HỘI AN', moment: 'RIVER MARKET', position: 'center 52%',
-          alt: 'Vendors and visitors gathered beneath hanging lanterns at Hội An river market',
+          kind: 'diptych', detailRole: 'WILD EDGE', streetRole: 'SHORELINE',
+          copy: 'The peninsula still belongs to the monkeys; the beach belongs to whoever left their shoes in the sand.',
+          detail: {
+            src: '/images/world/vietnam/11-weather-study-da-nang-macaque.webp',
+            city: 'ĐÀ NẴNG', moment: 'SƠN TRÀ', position: 'center 45%',
+            alt: 'A macaque sitting beneath a tree and a stormy sky on the Sơn Trà Peninsula',
+          },
+          street: {
+            src: '/images/world/vietnam/14-small-rituals-da-nang-beach.webp',
+            city: 'ĐÀ NẴNG', moment: 'MỸ KHÊ', position: 'center 58%',
+            alt: 'Shoes, clothes and a football left on the sand beside the sea in Đà Nẵng',
+          },
         },
         {
-          src: '/images/world/vietnam/deep-05-mui-ne-dunes.webp', city: 'MŨI NÉ', moment: 'DEPARTURE', position: 'center',
-          alt: 'Tiny travellers and an orange jeep crossing a broad sand dune at Mũi Né',
+          kind: 'wide', role: 'AFTERNOON', eyebrow: 'HỘI AN',
+          copy: 'Then the map softens into old town — mustard walls, tiled awnings, bougainvillea over every second doorway. Nothing here is in a hurry, and it asks you not to be either.',
+          photo: {
+            src: '/images/world/vietnam/deep-01-hoi-an-old-town.webp',
+            city: 'HỘI AN', moment: 'OLD TOWN', position: 'center 45%',
+            alt: 'A Hội An old-town shopfront framed by mustard-yellow walls and flowering bougainvillea',
+          },
+        },
+        {
+          kind: 'split', role: 'MORNING MARKET', eyebrow: 'HỘI AN · MORNING',
+          title: 'The market opens<br /><em>one flower at a time.</em>',
+          copy: 'On the stone steps, yellow chrysanthemums and pink blossoms turn an ordinary morning into a small ceremony of colour.',
+          photo: {
+            src: '/images/world/vietnam/deep-02-hoi-an-flower-vendor.webp',
+            city: 'HỘI AN', moment: 'FLOWER MARKET', position: 'center 52%',
+            alt: 'A flower vendor in a conical hat seated among yellow and pink blossoms on the steps of the Hội An market',
+          },
+        },
+        {
+          kind: 'diptych', detailRole: 'HANDMADE', streetRole: 'RIVER',
+          copy: 'Colour made by hand, one lantern at a time — then the river gathers all of it into a single warm crowd.',
+          detail: {
+            src: '/images/world/vietnam/deep-03-hoi-an-lantern-detail.webp',
+            city: 'HỘI AN', moment: 'LANTERNS', position: 'center',
+            alt: 'Rows of colourful silk lanterns hanging closely together in Hội An',
+          },
+          street: {
+            src: '/images/world/vietnam/deep-04-hoi-an-river-market.webp',
+            city: 'HỘI AN', moment: 'RIVER MARKET', position: 'center 52%',
+            alt: 'Vendors and visitors gathered beneath hanging lanterns at the Hội An river market',
+          },
+        },
+        {
+          kind: 'closing', role: 'DEPARTURE',
+          copy: 'And then the road gives way to sand. At Mũi Né people become small marks on the ridge, the jeeps shrink to bright dots, and the horizon does the rest of the remembering.',
+          photo: {
+            src: '/images/world/vietnam/deep-05-mui-ne-dunes.webp',
+            city: 'MŨI NÉ', moment: 'DEPARTURE', position: 'center',
+            alt: 'Tiny travellers and an orange jeep crossing a broad sand dune at Mũi Né',
+          },
         },
       ],
     },
