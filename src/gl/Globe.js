@@ -2,6 +2,7 @@ import * as THREE from 'three';
 
 const RADIUS = 1;
 const DEG = Math.PI / 180;
+const COMPOSITION_YAW = -45 * DEG;
 
 function latLngToVector(lat, lng) {
   const latR = lat * DEG;
@@ -96,7 +97,7 @@ export default class Globe {
     this.pointer = new THREE.Vector2(-10, -10);
     this.targetQuaternion = new THREE.Quaternion();
     this.currentQuaternion = new THREE.Quaternion();
-    this.targetQuaternion.setFromEuler(new THREE.Euler(-0.12, -0.38, 0.02));
+    this.targetQuaternion.setFromEuler(new THREE.Euler(-0.12, -0.38 + COMPOSITION_YAW, 0.02));
     this.currentQuaternion.copy(this.targetQuaternion);
     this.lastPointer = { x: 0, y: 0 };
 
@@ -277,7 +278,10 @@ export default class Globe {
     const place = this.places.find((item) => item.id === placeId);
     if (!place) return;
     const direction = latLngToVector(place.lat, place.lng);
-    this.targetQuaternion.copy(new THREE.Quaternion().setFromUnitVectors(direction, new THREE.Vector3(0.12, 0.04, 1).normalize()));
+    const target = new THREE.Vector3(0.12, 0.04, 1)
+      .normalize()
+      .applyAxisAngle(new THREE.Vector3(0, 1, 0), COMPOSITION_YAW);
+    this.targetQuaternion.copy(new THREE.Quaternion().setFromUnitVectors(direction, target));
     this.focusSpeed = options.speed || 0.055;
     if (options.immediate) {
       this.currentQuaternion.copy(this.targetQuaternion);
