@@ -7,13 +7,13 @@ World / Country Discovery** and each **Country Deep Dive**.
 
 | Scope | Explore My World gallery | Country Deep Dive | Files to prepare |
 | --- | ---: | ---: | ---: |
-| One country | 15 placements | 6 placements | 15 minimum / 21 fully unique |
-| All 5 countries | 75 placements | 30 placements | 75 minimum / 105 fully unique |
+| One country | 15+ placements | 6+ placements | 15 minimum; grouped archives can expand freely |
+| All 5 countries | 75+ placements | 30+ placements | Curate per country rather than forcing equal counts |
 
-The recommended approach is **15 strong photographs per country** and reuse six
-of them in the Deep Dive. This keeps the story coherent and avoids shipping 21
-large files per country. Prepare 21 only when every Deep Dive placement needs a
-different photograph.
+The recommended baseline is **15 strong photographs per country** and reuse
+them in the Deep Dive. Countries with a larger body of work can continue into
+location-based collection sections. Short films count as placements too, but
+keep the opening load restrained and defer the larger collections.
 
 The numeric `photos` value in `src/data/places.js` is display copy (for example,
 "48 PHOTOS"); it does not control how many files the page renders.
@@ -54,10 +54,11 @@ every country:
 15-departure.webp
 ```
 
-## Explore My World gallery: 15 photographs per country
+## Explore My World gallery: 15+ media placements per country
 
-The gallery is the Country Discovery state inside `world.html`. It uses all 15
-images in three scenes.
+The gallery is the Country Discovery state inside `world.html`. It uses 15
+baseline images in three scenes; a country with `discoveryGroups` can continue
+with any number of grouped collection sections.
 
 | # | Scene | Editorial role | Display ratio | Recommended export | Shooting / crop guidance |
 | ---: | --- | --- | --- | --- | --- |
@@ -121,10 +122,10 @@ do not place essential content near its far left or right edges.
 
 ## Vietnam: integrated September 2026
 
-Vietnam uses all 20 unique iPhone photographs supplied. The duplicate
+Vietnam uses all 21 unique iPhone photographs supplied. The duplicate
 `hoi_an_five copy.jpeg` is preserved with the masters but is not published.
 
-- Explore My World: 15 unique images.
+- Explore My World: 16 unique images.
 - Country Deep Dive: a four-city arc — The Long Way cover plus ten published
   gallery photos reused across eight chapters (no extra files).
 - Cover: `08-the-long-way-mui-ne-coast.webp`.
@@ -151,6 +152,7 @@ Vietnam uses all 20 unique iPhone photographs supplied. The duplicate
 | 13 | `13-night-walk-saigon-lantern-alley.webp` | Ho Chi Minh City | Night Walk |
 | 14 | `14-small-rituals-da-nang-beach.webp` | Đà Nẵng | Small Rituals |
 | 15 | `15-departure-saigon-night-traffic.webp` | Ho Chi Minh City | Departure |
+| 16 | `16-night-study-hoi-an-photographer.webp` | Hội An | Night Study |
 
 ### Vietnam Deep Dive sequence
 
@@ -171,7 +173,44 @@ needs no extra files.
 | 7 | diptych | `deep-03-hoi-an-lantern-detail.webp` + `deep-04-hoi-an-river-market.webp` | Hội An | Lanterns · River Market |
 | 8 | closing | `deep-05-mui-ne-dunes.webp` | Mũi Né | Departure |
 
-## Adding the 15 gallery paths
+## Thailand: integrated September 2026
+
+Thailand is a places-first archive: the friend and girlfriend portraits are
+intentionally unpublished, leaving 21 published photographs and all seven films.
+Discovery presents 28 memories; the Deep Dive presents 27 media in six
+location-based chapters. The single Bangkok night-market still is relocated into
+Discovery's "fragments" scene and sits outside the Deep Dive arc.
+
+- Cover: `sathorn-01-first-view.webp`.
+- Locations represented: Bangkok, Ayutthaya, Nakhon Pathom, Ko Lan and Hua Hin.
+- Published stills and poster frames: optimized WebP with private metadata
+  removed.
+- Published films: silent-by-default, eight-second `.m4v` loops at 960×540.
+- Films only load and play near the viewport. Reduced-motion visitors see the
+  poster frame instead.
+
+### Thailand story groups
+
+| Group | Photographs | Films | Discovery | Deep Dive |
+| --- | ---: | ---: | ---: | ---: |
+| Sathorn — where it started | 5 | 4 | 9 | 9 |
+| Ayutthaya — old stone | 2 | 0 | 2 | 2 |
+| Bangkok — night market | 1 | 0 | 1 | 0 |
+| Ko Lan — the island shore | 6 | 0 | 6 | 6 |
+| Hua Hin | 1 | 0 | 1 | 1 |
+| Nakhon Pathom — home days | 4 | 3 | 7 | 7 |
+| Small companions | 2 | 0 | 2 | 2 |
+
+The friend, girlfriend and self-portrait photographs — `ayutthaya-01-friends`,
+`bangkok-02-night-market`, `bangkok-03-cat-terrace`,
+`ko-lan-01/02/03/06/10/11/13`, `nakhon-pathom-01-garden-portrait` and
+`companions-01-dog-walk` — are no longer published. Their source files still
+sit in the folder, unreferenced.
+
+Every published film has a matching `-poster.webp` file in the same folder.
+When replacing a film, update both files while keeping their public filenames.
+
+## Adding gallery paths
 
 Edit the matching country in `src/data/places.js`:
 
@@ -242,9 +281,23 @@ different photograph in the slot, update `src/data/places.js` as well:
 
 - Explore images are in the country's `gallery` array.
 - Deep Dive cover is in `deepDive.cover`.
-- The five Deep Dive story images are in `deepDive.photos`.
+- Authored Deep Dive media are in `deepDive.chapters`.
 - `position` controls the responsive crop, such as `center 45%`.
 - `alt` describes the visible photograph for screen-reader users.
+
+For a video entry, keep a separate still poster and add `type: 'video'`:
+
+```js
+{
+  type: 'video',
+  src: '/images/world/thailand/sathorn-09-monsoon.m4v',
+  poster: '/images/world/thailand/sathorn-09-monsoon-poster.webp',
+  city: 'SATHORN',
+  moment: 'MONSOON',
+  aspect: 'landscape',
+  alt: 'Storm clouds moving over the Bangkok riverfront',
+}
+```
 
 Vietnam's cover path appears in both gallery slot 08 and `deepDive.cover`. If
 you keep the existing filename, replacing the one public WebP updates both
