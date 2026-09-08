@@ -6,8 +6,8 @@ import { initLiquidTrail } from './modules/liquidTrail.js';
 import { initHeaderWave } from './modules/headerWave.js';
 import { initCountryDiscovery } from './modules/countryDiscovery.js';
 
-const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const params = new URLSearchParams(window.location.search);
+const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches || params.has('static');
 const requestedDiscovery = params.get('view') === 'discovery' || window.history.state?.pazView === 'countryDiscovery';
 const requestedId = params.get('place') || window.history.state?.place || params.get('focus');
 const requestedPlace = places.find((place) => place.id === requestedId);

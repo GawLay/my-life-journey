@@ -21,7 +21,7 @@ const palettes = [
   ['#a44935', '#cf9b67', '#4a5f5b'],
 ];
 const [accent, warm, cool] = palettes[index] || palettes[0];
-const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches || params.has('static');
 let storedHandoff = null;
 try {
   const candidate = JSON.parse(sessionStorage.getItem('paz-country-handoff'));
@@ -37,19 +37,21 @@ const storyPhotos = Array.from({ length: 5 }, (_, photoIndex) => deepDive.photos
 
 function journalPhoto(photo, modifier, topLabel, bottomLabel, { eager = false } = {}) {
   const extraClass = modifier === 'hero' ? ' country-hero__photo' : '';
-  const image = photo?.src
-    ? `<img class="journal-photo__image" src="${photo.src}" alt="${photo.alt}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" style="object-position:${photo.position || 'center'}" />`
+  const aspectClass = modifier === 'tile' ? ` journal-photo--tile-${photo?.aspect || 'landscape'}` : '';
+  const media = photo?.src
+    ? photo.type === 'video'
+      ? `<video class="journal-photo__image" src="${photo.src}" poster="${photo.poster || ''}" aria-label="${photo.alt}" muted loop playsinline preload="none" data-story-video style="object-position:${photo.position || 'center'}"></video>`
+      : `<img class="journal-photo__image" src="${photo.src}" alt="${photo.alt}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" style="object-position:${photo.position || 'center'}" />`
     : '';
   const accessibility = photo?.src ? '' : `role="img" aria-label="Photograph placeholder for ${place.country}"`;
-  return `<div class="journal-photo journal-photo--${modifier}${extraClass}" ${accessibility}>
-    ${image}<span>${topLabel}</span><b>${bottomLabel}</b>
+  return `<div class="journal-photo journal-photo--${modifier}${extraClass}${aspectClass}" ${accessibility}>
+    ${media}<span>${topLabel}</span><b>${bottomLabel}</b>
   </div>`;
 }
 
-// A deep dive is a list of photo chapters. Vietnam supplies an explicit
-// `deepDive.chapters` arc (Ho Chi Minh City → Đà Nẵng → Hội An → Mũi Né); every
-// other country falls back to the original five-photo default, so its generated
-// journal is unchanged. Both feed the same four layout kinds below.
+// A deep dive can supply an authored `deepDive.chapters` arc with stills or
+// short films. Countries without one keep the original five-photo fallback.
+// Both feed the same four layout kinds below.
 const defaultChapters = [
   { kind: 'wide', role: 'OPENING', eyebrow: storyPhotos[0]?.city || cities[0], photo: storyPhotos[0],
     copy: deepDive.opening || 'The first walk without a destination. Light changing on unfamiliar streets; the city beginning to explain itself.' },
@@ -72,6 +74,15 @@ const photoSub = (photo, fallback) => {
 
 function storyChapter(chapter) {
   switch (chapter.kind) {
+    case 'collection':
+      return `
+    <article class="photo-chapter photo-chapter--collection">
+      <header><span>${chapter.eyebrow || chapter.role}</span><time>${chapter.role || place.year}</time></header>
+      <div class="photo-collection__intro"><h2>${chapter.title || ''}</h2><p>${chapter.copy || ''}</p></div>
+      <div class="photo-collection">
+        ${(chapter.media || []).map((photo) => journalPhoto(photo, 'tile', plateLabel(photo.type === 'video' ? 'MOVING IMAGE' : 'PHOTOGRAPH'), photoSub(photo, chapter.role || 'FIELD NOTE'))).join('')}
+      </div>
+    </article>`;
     case 'split':
       return `
     <article class="photo-chapter photo-chapter--split">
@@ -132,9 +143,10 @@ content.innerHTML = `
   <section class="country-intro">
     <p class="country-intro__label">A PERSONAL FIELD NOTE</p>
     <blockquote>“${deepDive.intro || place.note}”</blockquote>
-    <dl>
+    <dl style="--country-stat-count:${place.videos ? 5 : 4}">
       <div><dt>CHAPTER</dt><dd>${String(index + 1).padStart(2, '0')} / ${String(places.length).padStart(2, '0')}</dd></div>
       <div><dt>PHOTOGRAPHS</dt><dd>${String(place.photos).padStart(2, '0')}</dd></div>
+      ${place.videos ? `<div><dt>SHORT FILMS</dt><dd>${String(place.videos).padStart(2, '0')}</dd></div>` : ''}
       <div><dt>STORIES</dt><dd>${String(place.stories).padStart(2, '0')}</dd></div>
       <div><dt>COORDINATES</dt><dd>${place.coordinates}</dd></div>
     </dl>
@@ -183,13 +195,25 @@ function setupMotion() {
 
   document.querySelectorAll('.photo-chapter').forEach((chapter) => {
     const photos = chapter.querySelectorAll('.journal-photo');
-    gsap.from(photos, {
-      clipPath: 'inset(100% 0 0 0)',
-      duration: 1.2,
-      stagger: .12,
-      ease: 'power3.out',
-      scrollTrigger: { trigger: chapter, start: 'top 78%' },
-    });
+    // Photos settle in with a soft fade and a gentle scale — no upward wipe.
+    if (chapter.classList.contains('photo-chapter--collection')) {
+      photos.forEach((photo) => gsap.from(photo, {
+        autoAlpha: 0,
+        scale: .96,
+        duration: 1.1,
+        ease: 'power2.out',
+        scrollTrigger: { trigger: photo, start: 'top 86%', once: true },
+      }));
+    } else {
+      gsap.from(photos, {
+        autoAlpha: 0,
+        scale: .96,
+        duration: 1.2,
+        stagger: .12,
+        ease: 'power2.out',
+        scrollTrigger: { trigger: chapter, start: 'top 78%' },
+      });
+    }
     gsap.from(chapter.querySelectorAll('h2, p, blockquote'), {
       y: 35,
       autoAlpha: 0,
@@ -210,6 +234,18 @@ function setupMotion() {
       gsap.to(entry, { clipPath: 'circle(150% at 50% 50%)', duration: 1, ease: 'power3.inOut', onComplete: () => { window.location.href = link.href; } });
     });
   });
+}
+
+function setupStoryMedia() {
+  const videos = [...document.querySelectorAll('video[data-story-video]')];
+  if (reduced || !videos.length) return;
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) entry.target.play().catch(() => {});
+      else entry.target.pause();
+    });
+  }, { rootMargin: '15% 0px', threshold: .18 });
+  videos.forEach((video) => observer.observe(video));
 }
 
 function setupReturnNavigation() {
@@ -235,6 +271,7 @@ initHeaderWave();
 initSound();
 initLiquidTrail();
 setupMotion();
+setupStoryMedia();
 setupReturnNavigation();
 requestAnimationFrame(() => ScrollTrigger.refresh());
 

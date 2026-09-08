@@ -26,10 +26,18 @@ const archiveLayouts = [
   { x: '61vw', y: '8vh', w: '19vw', r: '2.1deg', d: .18, z: 4 },
   { x: '69vw', y: '74vh', w: '28vw', r: '-1.1deg', d: -.22, z: 2 },
   { x: '23vw', y: '98vh', w: '23vw', r: '1.8deg', d: .3, z: 4 },
+  { x: '51vw', y: '130vh', w: '24vw', r: '-1.6deg', d: -.18, z: 3 },
+  { x: '7vw', y: '160vh', w: '28vw', r: '1.1deg', d: .2, z: 4 },
+  { x: '70vw', y: '184vh', w: '22vw', r: '2.3deg', d: -.24, z: 2 },
+  { x: '36vw', y: '220vh', w: '30vw', r: '-.8deg', d: .16, z: 3 },
+  { x: '5vw', y: '255vh', w: '22vw', r: '1.9deg', d: -.12, z: 4 },
 ];
 
 function photoSurface(memory) {
   if (memory.src) {
+    if (memory.type === 'video') {
+      return `<video class="memory-photo__surface" src="${memory.src}" poster="${memory.poster || ''}" aria-label="${memory.alt}" muted loop playsinline preload="none" data-auto-play style="object-position:${memory.position || 'center'}"></video>`;
+    }
     return `<img class="memory-photo__surface" src="${memory.src}" alt="${memory.alt}" loading="lazy" decoding="async" style="object-position:${memory.position || 'center'}" />`;
   }
   return '<span class="memory-photo__surface memory-photo__placeholder" aria-hidden="true"></span>';
@@ -52,6 +60,36 @@ function photoMarkup(memory, layout, scene) {
 
 function renderScene(memories, layouts, scene) {
   return memories.map((memory, index) => photoMarkup(memory, layouts[index], scene)).join('');
+}
+
+function collectionPhotoMarkup(memory, group) {
+  const [colorA, colorB, colorC] = memory.palette;
+  return `
+    <button class="memory-photo memory-photo--collection memory-photo--${memory.aspect}" type="button" data-memory="${memory.id}" data-depth="0" data-scene="${group}"
+      aria-label="View ${memory.city}, ${memory.moment}"
+      style="--photo-a:${colorA};--photo-b:${colorB};--photo-c:${colorC}">
+      <figure class="memory-photo__frame">
+        ${photoSurface(memory)}
+        <figcaption><span>${String(memory.index).padStart(2, '0')}</span><b>${memory.city}<i>${memory.moment}</i></b></figcaption>
+        <em aria-hidden="true">VIEW</em>
+      </figure>
+    </button>`;
+}
+
+function renderDiscoveryGroups(place, memories) {
+  return (place.discoveryGroups || []).map((group, index) => {
+    const groupMemories = memories.filter((memory) => memory.group === group.id);
+    if (!groupMemories.length) return '';
+    return `
+      <section class="memory-group memory-group--${index % 2 ? 'dark' : 'light'}" aria-labelledby="memory-group-${group.id}">
+        <header class="memory-group__heading">
+          <span>SCENE ${String(index + 4).padStart(2, '0')} / ${group.eyebrow}</span>
+          <h2 id="memory-group-${group.id}">${group.title}</h2>
+          <p>${group.copy}</p>
+        </header>
+        <div class="memory-group__grid">${groupMemories.map((memory) => collectionPhotoMarkup(memory, group.id)).join('')}</div>
+      </section>`;
+  }).join('');
 }
 
 function updateWave(element, label) {
@@ -88,9 +126,14 @@ export function initCountryDiscovery({ globe, globeMount, places, reduced = fals
 
   function renderCountry(place) {
     const placeIndex = places.findIndex((item) => item.id === place.id);
-    const orbitMemories = place.memories.slice(0, orbitLayouts.length);
-    const featureMemories = place.memories.slice(orbitLayouts.length, orbitLayouts.length + featureLayouts.length);
-    const archiveMemories = place.memories.slice(orbitLayouts.length + featureLayouts.length, orbitLayouts.length + featureLayouts.length + archiveLayouts.length);
+    const discoveryMemories = place.memories.filter((memory) => memory.discovery);
+    const orbitMemories = discoveryMemories.slice(0, orbitLayouts.length);
+    const featureMemories = discoveryMemories.slice(orbitLayouts.length, orbitLayouts.length + featureLayouts.length);
+    const archiveLimit = place.discoveryGroups?.length ? 4 : archiveLayouts.length;
+    const archiveStart = orbitLayouts.length + featureLayouts.length;
+    const archiveMemories = discoveryMemories.slice(archiveStart, archiveStart + archiveLimit);
+    const groupedMemories = place.discoveryGroups?.length ? discoveryMemories.slice(archiveStart + archiveLimit) : [];
+    const archiveHeight = 185 + Math.max(0, archiveMemories.length - 4) * 31;
     const cityList = place.cities.split(' / ').map((city) => city.trim());
 
     if (place.deepDive?.cover?.src) {
@@ -118,7 +161,7 @@ export function initCountryDiscovery({ globe, globeMount, places, reduced = fals
           </div>
           <div class="discovery-hero__meta">
             <span>${place.cities}</span>
-            <b>${String(place.photos).padStart(2, '0')} PHOTOS&nbsp;&nbsp;&nbsp;${String(place.stories).padStart(2, '0')} STORIES</b>
+            <b>${String(place.photos).padStart(2, '0')} PHOTOS${place.videos ? `&nbsp;&nbsp;&nbsp;${String(place.videos).padStart(2, '0')} FILMS` : ''}&nbsp;&nbsp;&nbsp;${String(place.stories).padStart(2, '0')} STORIES</b>
           </div>
           <div class="discovery-orbit" aria-label="First memories from ${place.country}">
             ${renderScene(orbitMemories, orbitLayouts, 'orbit')}
@@ -139,7 +182,7 @@ export function initCountryDiscovery({ globe, globeMount, places, reduced = fals
         </div>
       </section>
 
-      <section class="memory-scene memory-scene--archive" aria-labelledby="archive-scene-title">
+      <section class="memory-scene memory-scene--archive" aria-labelledby="archive-scene-title" style="--archive-height:${archiveHeight}svh">
         <div class="memory-scene__watermark" aria-hidden="true">${place.country}</div>
         <header class="memory-scene__heading">
           <span>SCENE 03 / SMALL EVIDENCE</span>
@@ -150,6 +193,8 @@ export function initCountryDiscovery({ globe, globeMount, places, reduced = fals
           ${renderScene(archiveMemories, archiveLayouts, 'archive')}
         </div>
       </section>
+
+      ${renderDiscoveryGroups(place, groupedMemories)}
 
       <section class="discovery-finale" aria-labelledby="deep-dive-title">
         <div class="shared-globe-spacer" aria-hidden="true"></div>
@@ -186,7 +231,8 @@ export function initCountryDiscovery({ globe, globeMount, places, reduced = fals
     root.querySelectorAll('.memory-photo').forEach((photo) => {
       const depth = Number(photo.dataset.depth || 0);
       const scene = photo.closest('.memory-scene');
-      if (scene) {
+      const group = photo.closest('.memory-group');
+      if (scene || group) {
         const reveal = gsap.from(photo, {
           autoAlpha: 0,
           y: 55,
@@ -195,10 +241,13 @@ export function initCountryDiscovery({ globe, globeMount, places, reduced = fals
           ease: 'power3.out',
           scrollTrigger: { trigger: photo, start: 'top 88%', once: true },
         });
-        const parallax = gsap.fromTo(photo,
-          { yPercent: depth * -24 },
-          { yPercent: depth * 24, ease: 'none', scrollTrigger: { trigger: scene, start: 'top bottom', end: 'bottom top', scrub: 1.2 } });
-        sceneAnimations.push(reveal, parallax);
+        sceneAnimations.push(reveal);
+        if (scene) {
+          const parallax = gsap.fromTo(photo,
+            { yPercent: depth * -24 },
+            { yPercent: depth * 24, ease: 'none', scrollTrigger: { trigger: scene, start: 'top bottom', end: 'bottom top', scrub: 1.2 } });
+          sceneAnimations.push(parallax);
+        }
       } else if (!mobileLayout) {
         const orbitParallax = gsap.to(photo, {
           yPercent: depth * 40,
@@ -209,7 +258,7 @@ export function initCountryDiscovery({ globe, globeMount, places, reduced = fals
       }
     });
 
-    root.querySelectorAll('.memory-scene__heading').forEach((heading) => {
+    root.querySelectorAll('.memory-scene__heading, .memory-group__heading').forEach((heading) => {
       sceneAnimations.push(gsap.from(heading.children, {
         y: 42,
         autoAlpha: 0,
@@ -236,6 +285,21 @@ export function initCountryDiscovery({ globe, globeMount, places, reduced = fals
       onLeaveBack: () => gsap.to(globeMount, { xPercent: -17, scale: .98, opacity: .72, duration: .8, ease: 'power3.out' }),
     });
     sceneAnimations.push(finaleTrigger);
+  }
+
+  let mediaObserver = null;
+  function setupMediaPlayback() {
+    mediaObserver?.disconnect();
+    mediaObserver = null;
+    const videos = [...root.querySelectorAll('video[data-auto-play]')];
+    if (reduced || !videos.length) return;
+    mediaObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) entry.target.play().catch(() => {});
+        else entry.target.pause();
+      });
+    }, { rootMargin: '20% 0px', threshold: .12 });
+    videos.forEach((video) => mediaObserver.observe(video));
   }
 
   function setWorldInteractive(enabled) {
@@ -285,6 +349,7 @@ export function initCountryDiscovery({ globe, globeMount, places, reduced = fals
     gsap.set(root, { autoAlpha: 1 });
 
     setupScrollMotion();
+    setupMediaPlayback();
     requestAnimationFrame(() => ScrollTrigger.refresh());
 
     if (instant || reduced) {
@@ -339,6 +404,8 @@ export function initCountryDiscovery({ globe, globeMount, places, reduced = fals
   function closeViewer({ instant = false } = {}) {
     if (viewer.hidden) return;
     const finish = () => {
+      const video = viewer.querySelector('video');
+      if (video) video.pause();
       viewer.hidden = true;
       document.body.classList.remove('has-memory-open');
     };
@@ -354,6 +421,8 @@ export function initCountryDiscovery({ globe, globeMount, places, reduced = fals
 
     const finish = () => {
       killSceneAnimations();
+      mediaObserver?.disconnect();
+      mediaObserver = null;
       root.setAttribute('aria-hidden', 'true');
       header.setAttribute('aria-hidden', 'true');
       document.documentElement.classList.remove('is-discovery');
@@ -393,10 +462,26 @@ export function initCountryDiscovery({ globe, globeMount, places, reduced = fals
     surface.style.setProperty('--photo-a', colorA);
     surface.style.setProperty('--photo-b', colorB);
     surface.style.setProperty('--photo-c', colorC);
-    surface.style.backgroundImage = memory.src
-      ? `url("${memory.src}")`
+    surface.replaceChildren();
+    const viewerImage = memory.type === 'video' ? memory.poster : memory.src;
+    surface.style.backgroundImage = viewerImage
+      ? `url("${viewerImage}")`
       : 'linear-gradient(135deg, var(--photo-a), var(--photo-b) 52%, var(--photo-c))';
     surface.style.backgroundPosition = memory.position || 'center';
+    if (memory.type === 'video' && memory.src) {
+      const video = document.createElement('video');
+      video.className = 'memory-viewer__video';
+      video.src = memory.src;
+      video.poster = memory.poster || '';
+      video.muted = true;
+      video.loop = true;
+      video.playsInline = true;
+      video.preload = 'metadata';
+      video.setAttribute('aria-label', memory.alt);
+      video.style.objectPosition = memory.position || 'center';
+      surface.appendChild(video);
+      if (!reduced) video.play().catch(() => {});
+    }
     document.getElementById('memory-viewer-index').textContent = String(memory.index).padStart(2, '0');
     document.getElementById('memory-viewer-title').textContent = memory.city;
     document.getElementById('memory-viewer-note').textContent = memory.moment;
