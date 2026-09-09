@@ -1,6 +1,6 @@
 .project-page { --case-accent: #c65b3c; --case-warm: #d9b184; background: var(--cream); color: var(--charcoal); }
 .project-page[data-project="mab"] { --case-accent: #547572; --case-warm: #b8c8be; }
-.project-page[data-project="tiger-kpi"] { --case-accent: #b06c39; --case-warm: #d4bc8d; }
+.project-page[data-project="beehive"] { --case-accent: #c98f2b; --case-warm: #e0c78d; }
 .project-page[data-project="aether"] { --case-accent: #7693a8; --case-warm: #b8c5ca; }
 .project-page[data-project="portfolio"] { --case-accent: #d2673f; --case-warm: #e0b47f; }
 
@@ -214,4 +214,123 @@
 @media (prefers-reduced-motion: reduce) {
   .weather-atmosphere, .kpi-pulse { display: none; }
   .project-transition { display: none; }
+}
+
+/* ===========================================================================
+   Extra case sections (product flows / technical highlights / outcome)
+   Structure is theme-agnostic; the skin comes from each project's scope.
+   =========================================================================== */
+.case-flows { padding: var(--section) var(--gutter); }
+.case-flows__head { display: grid; grid-template-columns: .55fr 1.65fr; gap: 2rem; margin-bottom: clamp(2.5rem, 5vw, 5rem); align-items: end; }
+.case-flows__head h2 { grid-column: 2; font: 400 clamp(2.2rem, 5vw, 4.4rem)/.98 var(--display); letter-spacing: -.03em; }
+.case-flows__rows { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); }
+.case-flows__rows article { padding: clamp(1.6rem, 3vw, 2.4rem) clamp(1.4rem, 2vw, 2rem); display: flex; flex-direction: column; gap: .8rem; min-height: 190px; border-bottom: 1px solid var(--line); }
+.case-flows__rows article + article { border-left: 1px solid var(--line); }
+.case-flows__rows span { font: 500 .64rem/1 var(--mono); color: var(--case-accent); }
+.case-flows__rows h3 { font: 400 clamp(1.5rem, 2.6vw, 2.3rem)/1 var(--display); }
+.case-flows__rows p { color: var(--charcoal-soft); font-size: .9rem; line-height: 1.5; margin-top: auto; }
+
+.case-tech { padding: var(--section) var(--gutter); }
+.case-tech__head { margin-bottom: clamp(2rem, 4vw, 3.5rem); }
+.case-tech__grid { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--line); }
+.case-tech__grid article { padding: clamp(1.6rem, 3vw, 2.6rem); border-bottom: 1px solid var(--line); }
+.case-tech__grid article:nth-child(odd) { border-right: 1px solid var(--line); }
+.case-tech__grid h3 { font: 500 .66rem/1.3 var(--mono); letter-spacing: .07em; color: var(--case-accent); margin-bottom: .9rem; }
+.case-tech__grid p { max-width: 40ch; color: var(--charcoal-soft); font-size: .92rem; line-height: 1.5; }
+
+.case-outcome { padding: var(--section) var(--gutter); display: grid; grid-template-columns: .55fr 1.65fr; gap: 2rem; }
+.case-outcome .case-label { grid-column: 1; }
+.case-outcome__copy { grid-column: 2; }
+.case-outcome__copy h2 { font: italic 400 clamp(2.4rem, 5.5vw, 5.2rem)/1 var(--display); letter-spacing: -.03em; max-width: 16ch; }
+.case-outcome__copy p { max-width: 48ch; margin-top: clamp(1.5rem, 3vw, 2.5rem); color: var(--charcoal-soft); line-height: 1.6; }
+
+/* Beehive — order-journey placeholder (deepened in a later pass) */
+.system-stage--journey { background: #191713; }
+.journey-map { display: flex; align-items: center; flex-wrap: wrap; justify-content: center; gap: .5rem; width: min(92%, 880px); }
+.journey-node { padding: 1rem 1.2rem; min-width: 96px; display: flex; flex-direction: column; gap: .4rem; border: 1px solid rgba(242,237,227,.2); background: rgba(201,143,43,.12); }
+.journey-node span { font: 400 .56rem/1 var(--mono); letter-spacing: .06em; color: rgba(242,237,227,.5); }
+.journey-node b { font: 400 clamp(1rem, 2vw, 1.45rem)/1 var(--display); }
+.journey-link { width: 26px; height: 1px; background: rgba(242,237,227,.32); }
+
+/* ===========================================================================
+   Aether — page-wide weather experience (scoped to the aether project only)
+   A fixed canvas paints the whole-page atmosphere; reading content sits on
+   dark glass so it stays legible under every sky. See modules/aetherWeather.js
+   =========================================================================== */
+/* Canvas sits ABOVE the body background (z-index:0) but below content (z-index:1).
+   A negative z-index would be painted over by the opaque body/html background. */
+.aether-sky { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.project-page[data-project="aether"] { background: #070c16; color: var(--cream); --case-accent: var(--wx-accent, #8fb0c9); }
+.project-page[data-project="aether"] #project-content { position: relative; z-index: 1; }
+
+/* open-sky sections — the atmosphere shows through directly */
+[data-project="aether"] .case-hero { background: transparent; }
+[data-project="aether"] .case-hero::after, [data-project="aether"] .case-hero__wash { display: none; }
+[data-project="aether"] .case-showcase,
+[data-project="aether"] .case-statement,
+[data-project="aether"] .case-outcome { background: transparent; }
+
+/* dark-glass reading panels — sky blurs through, text stays constant */
+[data-project="aether"] .case-overview,
+[data-project="aether"] .case-flows,
+[data-project="aether"] .case-contribution,
+[data-project="aether"] .case-tech {
+  background: rgba(9, 14, 24, .62);
+  backdrop-filter: blur(26px) saturate(1.2);
+  -webkit-backdrop-filter: blur(26px) saturate(1.2);
+  border-block: 1px solid rgba(255, 255, 255, .08);
+}
+[data-project="aether"] .case-facts dt,
+[data-project="aether"] .case-flows__rows p,
+[data-project="aether"] .case-tech__grid p,
+[data-project="aether"] .case-contribution__rows p,
+[data-project="aether"] .case-outcome__copy p { color: rgba(242, 237, 227, .62); }
+[data-project="aether"] .case-facts,
+[data-project="aether"] .case-facts > div + div,
+[data-project="aether"] .case-flows__rows,
+[data-project="aether"] .case-flows__rows article,
+[data-project="aether"] .case-flows__rows article + article,
+[data-project="aether"] .case-tech__grid,
+[data-project="aether"] .case-tech__grid article,
+[data-project="aether"] .case-tech__grid article:nth-child(odd),
+[data-project="aether"] .case-contribution__rows,
+[data-project="aether"] .case-contribution__rows article { border-color: rgba(255, 255, 255, .12); }
+[data-project="aether"] .case-links a { border-color: rgba(242, 237, 227, .4); color: var(--cream); }
+[data-project="aether"] .case-links a:hover { background: var(--cream); color: var(--charcoal); }
+[data-project="aether"] .next-project { background: rgba(9, 14, 24, .6); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); border-top: 1px solid rgba(255, 255, 255, .1); }
+
+/* the phone showcase, floating in open sky */
+.aether-showcase { position: relative; min-height: min(70vw, 760px); display: grid; place-items: center; padding: clamp(2rem, 5vw, 4rem); }
+.aether-showcase .device { z-index: 2; box-shadow: 0 50px 90px rgba(0, 0, 0, .5); transition: transform 700ms var(--ease); }
+.aether-showcase:hover .device { transform: translateY(-1.5%); }
+.aether-showcase__copy { position: absolute; left: clamp(1rem, 4vw, 3rem); top: clamp(1rem, 4vw, 2.5rem); z-index: 3; max-width: 24ch; }
+.aether-showcase__copy > span { font: 400 .61rem/1.5 var(--mono); letter-spacing: .07em; color: rgba(255, 255, 255, .6); }
+.aether-showcase__copy b { color: #fff; }
+.aether-showcase__copy p { margin-top: 1rem; font: 400 .61rem/1.65 var(--mono); color: rgba(255, 255, 255, .52); }
+.aether-showcase__hint { position: absolute; right: clamp(1rem, 4vw, 3rem); bottom: clamp(1rem, 4vw, 2.5rem); z-index: 3; text-align: right; font: 500 .6rem/1.4 var(--mono); letter-spacing: .06em; color: rgba(255, 255, 255, .5); }
+.aether-showcase__hint span { color: var(--wx-accent, #cdd9e3); }
+
+/* the persistent weather switcher */
+.aether-switch { position: fixed; left: 50%; bottom: clamp(1rem, 2.5vw, 1.8rem); transform: translateX(-50%); z-index: 90; display: flex; align-items: center; gap: .15rem; padding: .4rem; max-width: calc(100vw - 1.6rem); background: rgba(8, 13, 22, .62); border: 1px solid rgba(255, 255, 255, .16); border-radius: 999px; backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); box-shadow: 0 20px 50px rgba(0, 0, 0, .42); }
+.aether-switch__live { padding: 0 .55rem 0 .7rem; font: 500 .55rem/1 var(--mono); letter-spacing: .16em; color: rgba(255, 255, 255, .4); }
+.aether-switch button { display: inline-flex; align-items: center; gap: .42rem; padding: .55rem .8rem; border: 0; border-radius: 999px; background: transparent; color: rgba(255, 255, 255, .62); cursor: pointer; font: 500 .62rem/1 var(--mono); letter-spacing: .04em; text-transform: uppercase; transition: color .3s var(--ease), background .3s var(--ease); }
+.aether-switch button:hover { color: #fff; }
+.aether-switch button[aria-pressed="true"] { color: #0a1018; background: var(--wx-accent, #cdd9e3); }
+.aether-switch__ic { width: 15px; height: 15px; display: inline-flex; }
+.aether-switch__ic svg { width: 100%; height: 100%; }
+
+@media (max-width: 900px) {
+  .case-flows__head, .case-outcome { grid-template-columns: 1fr; }
+  .case-flows__head h2, .case-outcome__copy, .case-outcome .case-label { grid-column: 1; }
+}
+@media (max-width: 700px) {
+  .case-flows__rows, .case-tech__grid { grid-template-columns: 1fr; }
+  .case-flows__rows article + article { border-left: 0; }
+  .case-tech__grid article:nth-child(odd) { border-right: 0; }
+  .aether-showcase__copy { max-width: 58%; }
+  .aether-switch { gap: 0; overflow-x: auto; justify-content: flex-start; scrollbar-width: none; }
+  .aether-switch::-webkit-scrollbar { display: none; }
+  .aether-switch__live { display: none; }
+  .aether-switch button { padding: .55rem .66rem; }
+  .aether-switch button b { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); }
 }

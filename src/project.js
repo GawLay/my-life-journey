@@ -4,6 +4,7 @@ import { projects, projectDetails } from './data/projects.js';
 import { initHeaderWave } from './modules/headerWave.js';
 import { initLiquidWarp } from './modules/liquidWarp.js';
 import { initSound } from './modules/sound.js';
+import { initAetherWeather } from './modules/aetherWeather.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -14,27 +15,48 @@ const currentIndex = projects.findIndex((item) => item.id === project.id);
 const next = projects[(currentIndex + 1) % projects.length];
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches || params.has('static');
 
+const AETHER_INITIAL = 'rain';
+
 const phoneFrame = (media, className = '') => `
   <div class="device ${className}">
     <span class="device__speaker" aria-hidden="true"></span>
     <div class="device__screen">${media}</div>
   </div>`;
 
-function weatherVisual() {
-  const states = [
-    ['clear', 'Clear', './images/projects/aether/home.png'],
-    ['rain', 'Rain', './images/projects/aether/rain.png'],
-    ['snow', 'Snow', './images/projects/aether/snow.png'],
-    ['starry', 'Starry', './images/projects/aether/starry.png'],
-  ];
+const maybe = (html) => html || '';
+
+// ---- Per-project showcase visuals -------------------------------------------
+
+const WX_ICONS = {
+  sunny: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="4.2"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.5 5.5l1.4 1.4M17.1 17.1l1.4 1.4M18.5 5.5l-1.4 1.4M6.9 17.1l-1.4 1.4"/></svg>',
+  cloudy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 18a4 4 0 0 1 0-8 5 5 0 0 1 9.6-1.3A3.8 3.8 0 0 1 17.5 18Z"/></svg>',
+  rain: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 15a4 4 0 0 1 0-8 5 5 0 0 1 9.6-1.3A3.8 3.8 0 0 1 17.5 15Z"/><path d="M8 18l-1 2M12 18l-1 2M16 18l-1 2"/></svg>',
+  snow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 14a4 4 0 0 1 0-8 5 5 0 0 1 9.6-1.3A3.8 3.8 0 0 1 17.5 14Z"/><path d="M9 18h.01M12 20h.01M15 18h.01"/></svg>',
+  storm: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 14a4 4 0 0 1 0-8 5 5 0 0 1 9.6-1.3A3.8 3.8 0 0 1 17.5 14Z"/><path d="M12 15l-2 3.5h3L11 22"/></svg>',
+  night: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 14.5A7.5 7.5 0 0 1 9.5 4a7.5 7.5 0 1 0 10.5 10.5Z"/></svg>',
+};
+
+function weatherSwitcher() {
+  const states = [['sunny', 'Sunny'], ['cloudy', 'Cloudy'], ['rain', 'Rain'], ['snow', 'Snow'], ['storm', 'Storm'], ['night', 'Night']];
   return `
-    <div class="weather-stage is-rain" data-weather-stage>
-      <div class="weather-atmosphere" aria-hidden="true" data-weather-atmosphere></div>
-      <div class="weather-stage__copy"><span>LIVE SCENE / <b data-weather-label>RAIN</b></span><p>Real app capture<br />with a responsive atmosphere.</p></div>
-      ${phoneFrame('<img src="./images/projects/aether/rain.png" alt="Aether Android app showing the rainy weather scene" data-weather-screen />', 'device--weather')}
-      <div class="weather-picker" role="group" aria-label="Aether weather scene">
-        ${states.map(([id, label, src]) => `<button type="button" data-weather="${id}" data-src="${src}" aria-pressed="${id === 'rain'}"><i aria-hidden="true"></i>${label}</button>`).join('')}
+    <div class="aether-switch" data-aether-switch role="group" aria-label="Aether weather scene">
+      <span class="aether-switch__live" aria-hidden="true">SCENE</span>
+      ${states.map(([id, name]) => `
+        <button type="button" data-weather="${id}" aria-pressed="${id === AETHER_INITIAL}">
+          <span class="aether-switch__ic" aria-hidden="true">${WX_ICONS[id]}</span><b>${name}</b>
+        </button>`).join('')}
+    </div>`;
+}
+
+function weatherVisual() {
+  return `
+    <div class="aether-showcase">
+      <div class="aether-showcase__copy">
+        <span>LIVE SCENE / <b data-aether-scene-label>RAIN</b></span>
+        <p>Real Android capture, held inside the same weather the page is showing. Try another scene — the whole screen changes with it.</p>
       </div>
+      ${phoneFrame(`<img src="./images/projects/aether/rain.png" alt="Aether Android app in the rain scene" data-aether-screen />`, 'device--weather')}
+      <p class="aether-showcase__hint" aria-hidden="true">CURRENT / <span data-aether-readout>Rain</span></p>
     </div>`;
 }
 
@@ -73,20 +95,14 @@ function layersVisual() {
     </div>`;
 }
 
-function hierarchyVisual() {
+function journeyVisual() {
+  const steps = ['Browse', 'Order', 'Preparing', 'Pickup', 'Delivering', 'Delivered'];
   return `
-    <div class="system-stage system-stage--hierarchy">
-      <div class="kpi-map" aria-label="Diagram of the Tiger KPI organisation hierarchy">
-        <div class="kpi-node kpi-node--root"><span>ORGANISATION</span><b>84.2</b><i>ROLLED-UP SCORE</i></div>
-        <div class="kpi-branches" aria-hidden="true"><i></i><i></i><i></i></div>
-        <div class="kpi-teams">
-          <div><span>PRODUCT</span><b>91</b><i>APPROVED</i></div>
-          <div><span>OPERATIONS</span><b>82</b><i>IN REVIEW</i></div>
-          <div><span>DELIVERY</span><b>79</b><i>LOCKED</i></div>
-        </div>
-        <div class="kpi-pulse" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="system-stage system-stage--journey">
+      <div class="journey-map" aria-label="Diagram of the Beehive order journey">
+        ${steps.map((s, i) => `<div class="journey-node"><span>0${i + 1}</span><b>${s}</b></div>`).join('<i class="journey-link" aria-hidden="true"></i>')}
       </div>
-      <p class="system-stage__key">SYSTEM MAP <span>HIERARCHY / APPROVALS / LIVE RECALCULATION</span></p>
+      <p class="system-stage__key">ORDER LIFECYCLE <span>CUSTOMER / BIKER — ONE ECOSYSTEM</span></p>
     </div>`;
 }
 
@@ -95,8 +111,82 @@ function projectVisual() {
   if (detail.visual === 'portfolio') return portfolioVisual();
   if (detail.visual === 'network') return networkVisual();
   if (detail.visual === 'layers') return layersVisual();
-  return hierarchyVisual();
+  return journeyVisual();
 }
+
+// ---- Section builders -------------------------------------------------------
+
+const heroSection = () => `
+  <section class="case-hero" aria-labelledby="case-title">
+    <div class="case-hero__wash" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="case-hero__meta">
+      <span>${project.eyebrow}</span><span>${detail.period}</span><span>${detail.location}</span>
+    </div>
+    <div class="case-hero__title">
+      <p>${detail.role}</p>
+      <h1 id="case-title">${project.title}</h1>
+      <em>${project.subtitle}</em>
+    </div>
+    <a class="case-hero__scroll" href="#overview"><span>CASE STUDY / ${project.index}</span><b>SCROLL TO EXPLORE ↓</b></a>
+  </section>`;
+
+const overviewSection = () => `
+  <section class="case-overview" id="overview">
+    <p class="case-label">01 / CONTEXT</p>
+    <div class="case-overview__copy"><h2>${detail.intro}</h2></div>
+    <dl class="case-facts">
+      ${detail.facts.map(([value, label]) => `<div><dt>${label}</dt><dd>${value}</dd></div>`).join('')}
+    </dl>
+  </section>`;
+
+const showcaseSection = () => `
+  <section class="case-showcase">
+    <header><span>02 / PRODUCT VIEW</span><p>${detail.mediaNote}</p></header>
+    ${projectVisual()}
+  </section>`;
+
+const flowsSection = () => maybe(detail.flows && `
+  <section class="case-flows">
+    <div class="case-flows__head"><p class="case-label">03 / PRODUCT FLOWS</p><h2>${detail.flowsTitle || 'What it does.'}</h2></div>
+    <div class="case-flows__rows">
+      ${detail.flows.map(([num, title, copy]) => `<article><span>${num}</span><h3>${title}</h3><p>${copy}</p></article>`).join('')}
+    </div>
+  </section>`);
+
+const statementSection = () => `
+  <section class="case-statement">
+    <p>${detail.flows ? '04' : '03'} / PRINCIPLE</p>
+    <blockquote>${detail.statement}</blockquote>
+  </section>`;
+
+const contributionSection = () => `
+  <section class="case-contribution">
+    <div class="case-contribution__head"><p>${detail.flows ? '05' : '04'} / CONTRIBUTION</p><h2>The work<br /><em>behind the screen.</em></h2></div>
+    <div class="case-contribution__rows">
+      ${detail.contributions.map(([number, title, copy]) => `<article><span>${number}</span><h3>${title}</h3><p>${copy}</p></article>`).join('')}
+    </div>
+    ${detail.links.length ? `<div class="case-links">${detail.links.map(([label, href]) => `<a href="${href}" target="_blank" rel="noreferrer">${label} <span>↗</span></a>`).join('')}</div>` : ''}
+  </section>`;
+
+const techSection = () => maybe(detail.tech && `
+  <section class="case-tech">
+    <div class="case-tech__head"><p class="case-label">06 / TECHNICAL HIGHLIGHTS</p></div>
+    <div class="case-tech__grid">
+      ${detail.tech.map(([label, copy]) => `<article><h3>${label}</h3><p>${copy}</p></article>`).join('')}
+    </div>
+  </section>`);
+
+const outcomeSection = () => maybe(detail.outcome && `
+  <section class="case-outcome">
+    <p class="case-label">07 / WHAT I LEARNED</p>
+    <div class="case-outcome__copy"><h2>${detail.outcome.lead}</h2><p>${detail.outcome.copy}</p></div>
+  </section>`);
+
+const navFooter = () => `
+  <a class="next-project" href="${next.href}">
+    <span>NEXT PROJECT / ${next.index}</span><h2>${next.title}</h2><b>CONTINUE ↗</b>
+  </a>
+  <footer class="project-footer"><span>PHYO AUNG ZAW © 2026</span><a href="mailto:phyoaz14@gmail.com">PHYOAZ14@GMAIL.COM ↗</a></footer>`;
 
 function render() {
   document.title = `${project.title} — Phyo Aung Zaw`;
@@ -104,85 +194,12 @@ function render() {
   document.getElementById('project-header-index').textContent = `${project.index} / ${String(projects.length).padStart(2, '0')}`;
   document.getElementById('project-header-name').textContent = project.title;
 
-  document.getElementById('project-content').innerHTML = `
-    <section class="case-hero" aria-labelledby="case-title">
-      <div class="case-hero__wash" aria-hidden="true"><i></i><i></i><i></i></div>
-      <div class="case-hero__meta">
-        <span>${project.eyebrow}</span><span>${detail.period}</span><span>${detail.location}</span>
-      </div>
-      <div class="case-hero__title">
-        <p>${detail.role}</p>
-        <h1 id="case-title">${project.title}</h1>
-        <em>${project.subtitle}</em>
-      </div>
-      <a class="case-hero__scroll" href="#overview"><span>CASE STUDY / ${project.index}</span><b>SCROLL TO EXPLORE ↓</b></a>
-    </section>
-
-    <section class="case-overview" id="overview">
-      <p class="case-label">01 / CONTEXT</p>
-      <div class="case-overview__copy"><h2>${detail.intro}</h2></div>
-      <dl class="case-facts">
-        ${detail.facts.map(([value, label]) => `<div><dt>${label}</dt><dd>${value}</dd></div>`).join('')}
-      </dl>
-    </section>
-
-    <section class="case-showcase">
-      <header><span>02 / PRODUCT VIEW</span><p>${detail.mediaNote}</p></header>
-      ${projectVisual()}
-    </section>
-
-    <section class="case-statement">
-      <p>03 / PRINCIPLE</p>
-      <blockquote>${detail.statement}</blockquote>
-    </section>
-
-    <section class="case-contribution">
-      <div class="case-contribution__head"><p>04 / CONTRIBUTION</p><h2>The work<br /><em>behind the screen.</em></h2></div>
-      <div class="case-contribution__rows">
-        ${detail.contributions.map(([number, title, copy]) => `<article><span>${number}</span><h3>${title}</h3><p>${copy}</p></article>`).join('')}
-      </div>
-      ${detail.links.length ? `<div class="case-links">${detail.links.map(([label, href]) => `<a href="${href}" target="_blank" rel="noreferrer">${label} <span>↗</span></a>`).join('')}</div>` : ''}
-    </section>
-
-    <a class="next-project" href="${next.href}">
-      <span>NEXT PROJECT / ${next.index}</span><h2>${next.title}</h2><b>CONTINUE ↗</b>
-    </a>
-    <footer class="project-footer"><span>PHYO AUNG ZAW © 2026</span><a href="mailto:phyoaz14@gmail.com">PHYOAZ14@GMAIL.COM ↗</a></footer>`;
-}
-
-function populateAtmosphere(stage, state) {
-  const atmosphere = stage.querySelector('[data-weather-atmosphere]');
-  if (!atmosphere) return;
-  atmosphere.textContent = '';
-  if (state === 'clear') return;
-  const amount = state === 'starry' ? 52 : 42;
-  for (let index = 0; index < amount; index += 1) {
-    const particle = document.createElement('i');
-    particle.style.setProperty('--x', `${(index * 37 + 11) % 101}%`);
-    particle.style.setProperty('--y', `${(index * 53 + 7) % 96}%`);
-    particle.style.setProperty('--delay', `${-((index * 0.17) % 3.4)}s`);
-    particle.style.setProperty('--duration', `${1.15 + (index % 7) * 0.16}s`);
-    particle.style.setProperty('--size', `${2 + (index % 5)}px`);
-    atmosphere.appendChild(particle);
-  }
-}
-
-function setupWeather() {
-  const stage = document.querySelector('[data-weather-stage]');
-  if (!stage) return;
-  const screen = stage.querySelector('[data-weather-screen]');
-  const label = stage.querySelector('[data-weather-label]');
-  const setState = (button) => {
-    const state = button.dataset.weather;
-    stage.className = `weather-stage is-${state}`;
-    screen.src = button.dataset.src;
-    screen.alt = `Aether Android app showing the ${button.textContent.trim().toLowerCase()} weather scene`;
-    label.textContent = button.textContent.trim().toUpperCase();
-    stage.querySelectorAll('[data-weather]').forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
-    if (!reduced) populateAtmosphere(stage, state);
-  };
-  stage.querySelectorAll('[data-weather]').forEach((button) => button.addEventListener('click', () => setState(button)));
-  if (!reduced) populateAtmosphere(stage, 'rain');
+  document.getElementById('project-content').innerHTML = [
+    heroSection(), overviewSection(), showcaseSection(), flowsSection(),
+    statementSection(), contributionSection(), techSection(), outcomeSection(),
+    navFooter(),
+    project.id === 'aether' ? weatherSwitcher() : '',
+  ].join('');
 }
 
 function setupMotion() {
@@ -192,11 +209,11 @@ function setupMotion() {
     .from('.case-hero__title > *', { autoAlpha: 0, y: 46, duration: 1.15, stagger: .12 }, .28)
     .from('.case-hero__scroll', { autoAlpha: 0, y: 16, duration: .8 }, .72);
   gsap.to('.case-hero__wash i:first-child', { xPercent: 12, yPercent: 8, ease: 'none', scrollTrigger: { trigger: '.case-hero', start: 'top top', end: 'bottom top', scrub: 1 } });
-  document.querySelectorAll('.case-overview__copy, .case-facts, .case-showcase > header, .case-showcase > :last-child, .case-statement blockquote, .case-contribution__head').forEach((element) => {
+  document.querySelectorAll('.case-overview__copy, .case-facts, .case-showcase > header, .case-showcase > :last-child, .case-flows__head, .case-statement blockquote, .case-contribution__head, .case-tech__head, .case-outcome__copy').forEach((element) => {
     gsap.from(element, { autoAlpha: 0, y: 42, duration: 1.05, ease: 'power3.out', scrollTrigger: { trigger: element, start: 'top 82%' } });
   });
-  document.querySelectorAll('.case-contribution__rows article').forEach((element, index) => {
-    gsap.from(element, { autoAlpha: 0, y: 30, duration: .9, delay: index * .06, ease: 'power3.out', scrollTrigger: { trigger: element, start: 'top 88%' } });
+  document.querySelectorAll('.case-contribution__rows article, .case-flows__rows article, .case-tech__grid article').forEach((element, index) => {
+    gsap.from(element, { autoAlpha: 0, y: 30, duration: .9, delay: (index % 3) * .06, ease: 'power3.out', scrollTrigger: { trigger: element, start: 'top 88%' } });
   });
 }
 
@@ -218,7 +235,7 @@ async function boot() {
   try { await document.fonts.ready; } catch (_) { /* non-critical */ }
   initHeaderWave();
   initSound();
-  setupWeather();
+  if (project.id === 'aether') initAetherWeather(AETHER_INITIAL);
   setupMotion();
   setupNavigation();
   initLiquidWarp();
