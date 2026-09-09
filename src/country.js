@@ -2,7 +2,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { places } from './data/places.js';
 import { initSound } from './modules/sound.js';
-import { initLiquidTrail } from './modules/liquidTrail.js';
+import { initLiquidWarp } from './modules/liquidWarp.js';
 import { initHeaderWave } from './modules/headerWave.js';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -269,7 +269,7 @@ function setupReturnNavigation() {
 
 initHeaderWave();
 initSound();
-initLiquidTrail();
+initLiquidWarp();
 setupMotion();
 setupStoryMedia();
 setupReturnNavigation();

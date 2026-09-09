@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#282722" />
+    <title>Project — Phyo Aung Zaw</title>
+    <meta name="description" content="A selected mobile product case study by Phyo Aung Zaw." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/styles/main.css" />
+    <link rel="stylesheet" href="/src/styles/project.css" />
+  </head>
+  <body class="project-page">
+    <a class="skip-link" href="#project-content">Skip to project</a>
+
+    <header class="project-header" id="project-header">
+      <a class="project-header__back" href="./index.html#work" aria-label="Back to selected work">
+        <span aria-hidden="true">←</span><b data-wave>Selected work</b>
+      </a>
+      <p class="project-header__identity"><span id="project-header-index">00 / 00</span><b id="project-header-name" data-wave>Project</b></p>
+      <button class="nav__sound" type="button" aria-pressed="false" aria-label="Turn on the lo-fi soundscape">
+        <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <span class="nav__sound-label" data-wave>Lo-fi off</span>
+      </button>
+    </header>
+
+    <main id="project-content"></main>
+    <div class="project-transition" aria-hidden="true"><span>SELECTED WORK</span></div>
+    <script type="module" src="/src/project.js"></script>
+  </body>
+</html>

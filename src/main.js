@@ -2,12 +2,13 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { renderWork } from './modules/work.js';
 import { initSound } from './modules/sound.js';
-import { initLiquidTrail } from './modules/liquidTrail.js';
+import { initLiquidWarp } from './modules/liquidWarp.js';
 import { initHeaderWave } from './modules/headerWave.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  || new URLSearchParams(window.location.search).has('static');
 // Set by index.html's head script when we arrive back from "Explore my world":
 // the page paints under a charcoal cover that we iris open on load.
 const entering = !reduced && document.documentElement.classList.contains('is-entering');
@@ -24,7 +25,7 @@ function setupHeader() {
 
 function setupMotion() {
   if (reduced) {
-    gsap.set('[data-reveal], [data-hero-line], .project__content, .project__visual', { autoAlpha: 1, clearProps: 'all' });
+    gsap.set('[data-reveal], [data-hero-line], .project__content, .project__visual', { autoAlpha: 1 });
     return;
   }
 
@@ -165,7 +166,7 @@ async function boot() {
   setupMotion();
   playEntryReveal();
   setupLiquidPointer();
-  initLiquidTrail();
+  initLiquidWarp();
   initSound();
   setupWorldLinks();
   requestAnimationFrame(() => ScrollTrigger.refresh());

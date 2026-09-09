@@ -55,7 +55,7 @@ export checklist, see [PHOTO_CONTENT_GUIDE.md](./PHOTO_CONTENT_GUIDE.md).
 | Fonts | `<link>` in `index.html` + `--font-*` in `src/styles/main.css` |
 | Palette / accent / spacing / easing | `:root` variables in `src/styles/main.css` |
 
-> **Contact email:** currently `kyrie.paz@vietpay.com` in `index.html`. Your resume
+> **Contact email:** currently `phyoaz14@gmail.com` in `index.html`. Your resume
 > also lists `phyoaz14@gmail.com` — swap if you'd rather visitors use that. Phone
 > number is intentionally left off a public page.
 

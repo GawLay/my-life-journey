@@ -2,7 +2,7 @@ import gsap from 'gsap';
 import Globe from './gl/Globe.js';
 import { places } from './data/places.js';
 import { initSound } from './modules/sound.js';
-import { initLiquidTrail } from './modules/liquidTrail.js';
+import { initLiquidWarp } from './modules/liquidWarp.js';
 import { initHeaderWave } from './modules/headerWave.js';
 import { initCountryDiscovery } from './modules/countryDiscovery.js';
 
@@ -160,7 +160,7 @@ function restoreWorldState() {
 
 initHeaderWave();
 initSound();
-initLiquidTrail({ dark: true });
+initLiquidWarp();
 setupSceneParallax();
 setupBackToWork();
 

@@ -36,7 +36,6 @@
     <link rel="stylesheet" href="/src/styles/world-discovery.css" />
   </head>
   <body class="world-page">
-    <canvas class="liquid-trail" id="liquid-trail" aria-hidden="true"></canvas>
     <div class="world-entry" aria-hidden="true">
       <span class="world-entry__default">EXPLORE MY WORLD</span>
       <div class="world-entry__discovery">
@@ -48,9 +47,9 @@
     <header class="world-header">
       <a class="world-header__back" href="./index.html"><span aria-hidden="true">←</span><span data-wave>Work / PAZ</span></a>
       <p data-wave>PLACES / PHOTOGRAPHY / MEMORY</p>
-      <button class="nav__sound is-on" type="button" aria-pressed="true" aria-label="Turn off the lo-fi soundscape">
+      <button class="nav__sound" type="button" aria-pressed="false" aria-label="Turn on the lo-fi soundscape">
         <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-        <span class="nav__sound-label" data-wave>Lo-fi on</span>
+        <span class="nav__sound-label" data-wave>Lo-fi off</span>
       </button>
     </header>
 

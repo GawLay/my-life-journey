@@ -19,7 +19,13 @@ export default class Ambient {
     this.lookahead = 0.12; // seconds scheduled ahead
     this.tickMs = 25;
     this._timer = null;
+    this._request = 0;
+    this.onStateChange = null;
     this.volume = 0.3; // master target when on
+  }
+
+  get isPlaying() {
+    return this.enabled && this.ctx?.state === 'running';
   }
 
   get sixteenth() {
@@ -47,6 +53,7 @@ export default class Ambient {
   _build() {
     const Ctx = window.AudioContext || window.webkitAudioContext;
     const ctx = (this.ctx = new Ctx());
+    ctx.addEventListener('statechange', () => this.onStateChange?.(this.isPlaying));
 
     const master = (this.master = ctx.createGain());
     master.gain.value = 0;
@@ -230,27 +237,37 @@ export default class Ambient {
 
   /** Set sound on/off with a smooth fade. Returns the resulting enabled state. */
   async setEnabled(enabled) {
+    const request = ++this._request;
+    const nextEnabled = Boolean(enabled);
+    if (!nextEnabled && !this.built) {
+      this.enabled = false;
+      return false;
+    }
     if (!this.built) this._build();
-    if (this.ctx.state === 'suspended') {
+    if (nextEnabled && this.ctx.state === 'suspended') {
       try { await this.ctx.resume(); } catch (_) { /* waits for a trusted gesture */ }
     }
+    if (request !== this._request) return this.isPlaying;
 
-    this.enabled = Boolean(enabled);
+    this.enabled = nextEnabled;
     const now = this.ctx.currentTime;
     const g = this.master.gain;
     g.cancelScheduledValues(now);
     g.setValueAtTime(g.value, now);
     g.linearRampToValueAtTime(this.enabled ? this.volume : 0.0, now + (this.enabled ? 1.6 : 0.9));
 
-    if (this.enabled && !this._timer) {
-      this.step = 0;
-      this.nextTime = this.ctx.currentTime + 0.15;
-      this._timer = setInterval(() => this._scheduler(), this.tickMs);
+    if (this.enabled) {
+      if (!this._timer) {
+        this.step = 0;
+        this.nextTime = this.ctx.currentTime + 0.15;
+        this._timer = setInterval(() => this._scheduler(), this.tickMs);
+      }
     } else if (this._timer) {
       clearInterval(this._timer);
       this._timer = null;
     }
-    return this.enabled;
+    this.onStateChange?.(this.isPlaying);
+    return this.isPlaying;
   }
 
   /** Toggle sound on/off with a smooth fade. Returns the new enabled state. */

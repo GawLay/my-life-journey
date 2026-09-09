@@ -18,6 +18,7 @@ export default defineConfig({
         world: resolve(import.meta.dirname, 'world.html'),
         discovery: resolve(import.meta.dirname, 'discovery.html'),
         country: resolve(import.meta.dirname, 'country.html'),
+        project: resolve(import.meta.dirname, 'project.html'),
       },
     },
   },

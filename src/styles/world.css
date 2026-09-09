@@ -40,8 +40,8 @@ body.world-page { color: var(--cream); }
 .world-country { border: 0; border-right: 1px solid rgba(242,237,227,.14); background: transparent; color: rgba(242,237,227,.63); cursor: pointer; padding: .7rem 1rem; display: grid; grid-template-columns: auto 1fr; gap: .7rem; align-items: center; text-align: left; transition: color 300ms var(--ease), background-color 300ms var(--ease); }
 .world-country:last-child { border-right: 0; }
 .world-country:hover, .world-country:focus-visible { color: var(--cream); background: rgba(242,237,227,.05); }
-.world-country span { font: 400 .54rem/1 var(--mono); color: #d97858; }
-.world-country b { font: 400 clamp(.9rem, 1.4vw, 1.3rem)/1 var(--display); }
+.world-country > span { font: 400 .54rem/1 var(--mono); color: #d97858; }
+.world-country > b { font: 400 clamp(.9rem, 1.4vw, 1.3rem)/1 var(--display); }
 
 .world-entry { position: fixed; inset: 0; z-index: 10000; isolation: isolate; background: var(--charcoal); display: grid; place-items: center; clip-path: circle(150% at 50% 50%); pointer-events: none; }
 .world-entry span { font: 400 .68rem/1 var(--mono); letter-spacing: .12em; }

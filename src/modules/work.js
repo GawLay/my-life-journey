@@ -14,10 +14,11 @@ function projectVisual(project) {
 }
 
 function projectCard(project) {
+  const total = String(projects.length).padStart(2, '0');
   return `
     <article class="project project--${project.layout}" data-project>
       <div class="project__content">
-        <span class="project__index">${project.index} / 04</span>
+        <span class="project__index">${project.index} / ${total}</span>
         <p class="project__eyebrow">${project.eyebrow}</p>
         <h3 class="project__title">${project.title}</h3>
         <p class="project__subtitle">${project.subtitle}</p>

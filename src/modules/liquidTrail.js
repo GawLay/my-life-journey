@@ -15,15 +15,20 @@ export function initLiquidTrail({ dark = false } = {}) {
   const palette = dark
     ? [[216, 105, 70], [221, 160, 94], [113, 139, 126]]
     : [[185, 76, 49], [205, 145, 73], [109, 137, 119]];
-  const target = { x: 0, y: 0 };
-  const pools = Array.from({ length: 7 }, () => ({ x: 0, y: 0 }));
-  let active = false;
+
+  // Rings on water: the pointer drops ripples as it travels, each expanding and
+  // fading out. A faint pool follows the cursor so movement still feels "wet".
+  const ripples = [];
+  const maxRipples = 16;
+  const spawnStep = 50;            // px of travel between ripples — keeps it sparse
+  const pointer = { x: 0, y: 0, seen: false };
+  let travel = 0;                  // distance since the last ripple was dropped
+  let speed = 0;                   // decaying pointer speed → drives the pool glow
+  let colorTick = 0;
   let width = 1;
   let height = 1;
   let frame = 0;
-  let phase = 0;
-  let pointerSpeed = 0;
-  let lastPointer = { x: 0, y: 0 };
+  let last = null;
 
   const resize = () => {
     const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
@@ -36,89 +41,91 @@ export function initLiquidTrail({ dark = false } = {}) {
     context.setTransform(dpr, 0, 0, dpr, 0, 0);
   };
 
-  const move = (event) => {
-    if (!active) {
-      active = true;
-      pools.forEach((pool) => { pool.x = event.clientX; pool.y = event.clientY; });
-      lastPointer = { x: event.clientX, y: event.clientY };
-    }
-    pointerSpeed = Math.min(80, Math.hypot(event.clientX - lastPointer.x, event.clientY - lastPointer.y));
-    lastPointer = { x: event.clientX, y: event.clientY };
-    target.x = event.clientX;
-    target.y = event.clientY;
-  };
-
-  const drawPool = (x, y, radius, index, alpha) => {
-    const wobble = 0.08 + Math.min(pointerSpeed / 850, 0.07);
-    const pointCount = 28;
-    const edge = [];
-    for (let point = 0; point < pointCount; point += 1) {
-      const angle = (point / pointCount) * TAU;
-      const variation = 1
-        + Math.sin(angle * 3 + phase * 1.1 + index) * wobble
-        + Math.sin(angle * 5 - phase * .74 + index * .8) * wobble * .55;
-      edge.push({
-        x: x + Math.cos(angle) * radius * variation,
-        y: y + Math.sin(angle) * radius * variation,
-      });
-    }
-
-    context.beginPath();
-    context.moveTo((edge[0].x + edge[1].x) * .5, (edge[0].y + edge[1].y) * .5);
-    for (let point = 1; point <= pointCount; point += 1) {
-      const current = edge[point % pointCount];
-      const next = edge[(point + 1) % pointCount];
-      context.quadraticCurveTo(current.x, current.y, (current.x + next.x) * .5, (current.y + next.y) * .5);
-    }
-    context.closePath();
-
-    const color = palette[index % palette.length];
-    const gradient = context.createRadialGradient(
-      x - radius * .18,
-      y - radius * .22,
-      radius * .04,
+  const spawn = (x, y, strength) => {
+    ripples.push({
       x,
       y,
-      radius
-    );
-    gradient.addColorStop(0, rgba(color, alpha));
-    gradient.addColorStop(.48, rgba(color, alpha * .72));
-    gradient.addColorStop(1, rgba(color, 0));
-    context.fillStyle = gradient;
-    context.fill();
+      maxRadius: 58 + strength * 44,
+      life: 0,
+      duration: 58 + Math.random() * 14,
+      color: palette[colorTick % palette.length],
+      lineWidth: 1 + Math.random() * .5,
+    });
+    colorTick += 1;
+    if (ripples.length > maxRipples) ripples.shift();
+  };
+
+  const move = (event) => {
+    const { clientX: x, clientY: y } = event;
+    pointer.x = x;
+    pointer.y = y;
+    pointer.seen = true;
+    if (!last) { last = { x, y }; return; }
+    const distance = Math.hypot(x - last.x, y - last.y);
+    speed = Math.min(20, speed + distance);
+    travel += distance;
+    if (travel >= spawnStep) {
+      travel = 0;
+      spawn(x, y, Math.min(1, distance / 24));
+    }
+    last = { x, y };
   };
 
   const render = () => {
     context.clearRect(0, 0, width, height);
-    phase += .025;
-    pointerSpeed *= .9;
+    speed *= .9;
 
-    if (active) {
-      pools[0].x += (target.x - pools[0].x) * .2;
-      pools[0].y += (target.y - pools[0].y) * .2;
-      for (let index = 1; index < pools.length; index += 1) {
-        const follow = .19 - index * .012;
-        pools[index].x += (pools[index - 1].x - pools[index].x) * follow;
-        pools[index].y += (pools[index - 1].y - pools[index].y) * follow;
-      }
-
-      context.save();
-      context.filter = `blur(${dark ? 17 : 22}px)`;
-      for (let index = pools.length - 1; index >= 0; index -= 1) {
-        const progress = index / (pools.length - 1);
-        const radius = 220 - progress * 118 + Math.sin(phase * 1.7 + index) * 10;
-        drawPool(pools[index].x, pools[index].y, radius, index, .24 - progress * .085);
-      }
-      context.restore();
-
-      // Nearby satellite pools keep the field broad and asymmetrical instead
-      // of resolving into a narrow line during a fast pointer movement.
-      context.save();
-      context.filter = 'blur(28px)';
-      drawPool(pools[0].x + Math.sin(phase) * 58, pools[0].y + Math.cos(phase * .8) * 46, 142, 1, .14);
-      drawPool(pools[1].x - Math.cos(phase * .7) * 64, pools[1].y + Math.sin(phase * .9) * 52, 116, 2, .12);
-      context.restore();
+    // Soft pool at the cursor — present while moving, gone at rest.
+    if (pointer.seen && speed > .4) {
+      const radius = 44;
+      const glowAlpha = Math.min(1, speed / 12) * (dark ? .09 : .06);
+      const pool = context.createRadialGradient(pointer.x, pointer.y, 0, pointer.x, pointer.y, radius);
+      pool.addColorStop(0, rgba(palette[0], glowAlpha));
+      pool.addColorStop(1, rgba(palette[0], 0));
+      context.fillStyle = pool;
+      context.beginPath();
+      context.arc(pointer.x, pointer.y, radius, 0, TAU);
+      context.fill();
     }
+
+    context.save();
+    context.filter = 'blur(.7px)';                  // soften the rings into water
+    for (let index = ripples.length - 1; index >= 0; index -= 1) {
+      const ripple = ripples[index];
+      ripple.life += 1;
+      const progress = ripple.life / ripple.duration;
+      if (progress >= 1) { ripples.splice(index, 1); continue; }
+
+      const ease = 1 - Math.pow(1 - progress, 3);   // expand fast, then settle
+      const radius = 6 + (ripple.maxRadius - 6) * ease;
+      const alpha = (1 - progress) * (dark ? .2 : .16);
+
+      context.strokeStyle = rgba(ripple.color, alpha);
+      context.lineWidth = ripple.lineWidth;
+      context.beginPath();
+      context.arc(ripple.x, ripple.y, radius, 0, TAU);
+      context.stroke();
+
+      // A trailing inner ring reads as refraction under the surface.
+      context.strokeStyle = rgba(ripple.color, alpha * .5);
+      context.lineWidth = ripple.lineWidth * .8;
+      context.beginPath();
+      context.arc(ripple.x, ripple.y, radius * .66, 0, TAU);
+      context.stroke();
+
+      // A brief soft core marks the drop point before the ring takes over.
+      if (progress < .35) {
+        const coreAlpha = (1 - progress / .35) * (dark ? .09 : .07);
+        const core = context.createRadialGradient(ripple.x, ripple.y, 0, ripple.x, ripple.y, 14);
+        core.addColorStop(0, rgba(ripple.color, coreAlpha));
+        core.addColorStop(1, rgba(ripple.color, 0));
+        context.fillStyle = core;
+        context.beginPath();
+        context.arc(ripple.x, ripple.y, 14, 0, TAU);
+        context.fill();
+      }
+    }
+    context.restore();
 
     frame = requestAnimationFrame(render);
   };

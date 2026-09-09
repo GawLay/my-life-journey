@@ -20,7 +20,7 @@ html, body.country-page { background: var(--cream); }
 .country-hero__photo { position: absolute !important; inset: 0; width: 100%; height: 100%; }
 .country-hero__photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(23,23,19,.15), rgba(23,23,19,.18) 50%, rgba(23,23,19,.75)); }
 .country-hero__copy { position: absolute; z-index: 3; inset: auto var(--gutter) 9vh; display: grid; grid-template-columns: auto 1fr auto; align-items: end; gap: 2rem; }
-.country-hero__copy span, .country-hero__copy p { font: 400 .69rem/1 var(--mono); letter-spacing: .1em; }
+.country-hero__copy > span, .country-hero__copy > p { font: 400 .69rem/1 var(--mono); letter-spacing: .1em; }
 .country-hero__copy h1 { font: 400 clamp(6rem, 18vw, 20rem)/.67 var(--display); letter-spacing: -.055em; text-align: center; }
 .country-hero__copy p { color: #ef9a76; }
 .country-hero__route { position: absolute; z-index: 3; top: 13vh; right: var(--gutter); text-align: right; display: grid; gap: .6rem; }
