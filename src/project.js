@@ -1,7 +1,7 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { projects, projectDetails } from './data/projects.js';
-import { initHeaderWave } from './modules/headerWave.js';
+import { initHeaderWave, setWaveText } from './modules/headerWave.js';
 import { initLiquidWarp } from './modules/liquidWarp.js';
 import { initSound } from './modules/sound.js';
 import { initAetherWeather } from './modules/aetherWeather.js';
@@ -22,6 +22,7 @@ const AETHER_INITIAL = 'rain';
 // Set by project.html's head script when arriving from the work list or a sibling
 // project: the page paints under the charcoal cover, which we iris open on load.
 const projectEntering = !reduced && document.documentElement.classList.contains('is-project-entering');
+const waveEntering = !reduced && document.documentElement.classList.contains('is-wave-entering');
 
 const phoneFrame = (media, className = '') => `
   <div class="device ${className}">
@@ -306,15 +307,23 @@ function render() {
     navFooter(),
     project.id === 'aether' ? weatherSwitcher() : '',
   ].join('');
+  if (waveEntering) {
+    const title = document.getElementById('case-title');
+    setWaveText(title);
+    title.classList.remove('wave-text');
+    title.classList.add('wave-arrival');
+  }
 }
 
 function setupMotion() {
   if (reduced) return;
   // when arriving under the cover, hold the hero a beat so it reveals as the iris opens
-  gsap.timeline({ defaults: { ease: 'power3.out' }, delay: projectEntering ? .32 : 0 })
-    .from('.case-hero__meta span', { autoAlpha: 0, y: 15, duration: .8, stagger: .08 }, .15)
-    .from('.case-hero__title > *', { autoAlpha: 0, y: 46, duration: 1.15, stagger: .12 }, .28)
-    .from('.case-hero__scroll', { autoAlpha: 0, y: 16, duration: .8 }, .72);
+  if (!waveEntering) {
+    gsap.timeline({ defaults: { ease: 'power3.out' }, delay: projectEntering ? .32 : 0 })
+      .from('.case-hero__meta span', { autoAlpha: 0, y: 15, duration: .8, stagger: .08 }, .15)
+      .from('.case-hero__title > *', { autoAlpha: 0, y: 46, duration: 1.15, stagger: .12 }, .28)
+      .from('.case-hero__scroll', { autoAlpha: 0, y: 16, duration: .8 }, .72);
+  }
   gsap.to('.case-hero__wash i:first-child', { xPercent: 12, yPercent: 8, ease: 'none', scrollTrigger: { trigger: '.case-hero', start: 'top top', end: 'bottom top', scrub: 1 } });
   document.querySelectorAll('.case-overview__copy, .case-facts, .case-showcase > header, .case-showcase > :last-child, .case-flows__head, .case-statement blockquote, .case-contribution__head, .case-tech__head, .case-outcome__copy').forEach((element) => {
     gsap.from(element, { autoAlpha: 0, y: 42, duration: 1.05, ease: 'power3.out', scrollTrigger: { trigger: element, start: 'top 82%' } });
@@ -329,6 +338,7 @@ function setupNavigation() {
   document.querySelectorAll('a[href^="./"]').forEach((link) => {
     link.addEventListener('click', (event) => {
       if (reduced || event.metaKey || event.ctrlKey) return;
+      if (window.__PAZ_WAVE_LINK__?.(link.href)) return;
       event.preventDefault();
       // hand the incoming page a matching cover to iris open (work list vs. sibling project)
       try { sessionStorage.setItem('paz-entry', link.getAttribute('href').includes('index.html') ? 'work' : 'project'); } catch { /* storage unavailable */ }
@@ -348,6 +358,8 @@ function revealFromCover() {
 
 async function boot() {
   render();
+  if (waveEntering) initHeaderWave();
+  if (waveEntering) window.__PAZ_WAVE_CONTENT_READY__?.();
   try { await document.fonts.ready; } catch (_) { /* non-critical */ }
   initHeaderWave();
   const ambient = initSound();

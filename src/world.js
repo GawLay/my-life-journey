@@ -3,11 +3,19 @@ import Globe from './gl/Globe.js';
 import { places, dreams } from './data/places.js';
 import { initSound } from './modules/sound.js';
 import { initLiquidWarp } from './modules/liquidWarp.js';
-import { initHeaderWave } from './modules/headerWave.js';
+import { initHeaderWave, setWaveText } from './modules/headerWave.js';
 import { initCountryDiscovery } from './modules/countryDiscovery.js';
 
 const params = new URLSearchParams(window.location.search);
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches || params.has('static');
+const waveEntering = !reduced && document.documentElement.classList.contains('is-wave-entering');
+if (waveEntering) document.querySelectorAll('.world__intro h1 > span, .world__intro h1 > em').forEach((part) => {
+  setWaveText(part);
+  part.classList.remove('wave-text');
+  part.classList.add('wave-arrival');
+});
+if (waveEntering) initHeaderWave();
+if (waveEntering) window.__PAZ_WAVE_CONTENT_READY__?.();
 const requestedDiscovery = params.get('view') === 'discovery' || window.history.state?.pazView === 'countryDiscovery';
 const requestedId = params.get('place') || window.history.state?.place || params.get('focus');
 const requestedPlace = places.find((place) => place.id === requestedId);
@@ -57,6 +65,10 @@ nav.addEventListener('click', (event) => {
 });
 
 function animateWorldEntrance() {
+  if (waveEntering) {
+    gsap.set('.world-entry', { clipPath: 'circle(0% at 50% 50%)' });
+    return;
+  }
   if (reduced) {
     document.querySelector('.world-entry').remove();
     return;
@@ -134,6 +146,7 @@ function setupBackToWork() {
   const back = document.querySelector('.world-header__back');
   if (!back || reduced) return;
   back.addEventListener('click', (event) => {
+    if (window.__PAZ_WAVE_LINK__?.(back.href) && discovery.viewMode === 'world') return;
     event.preventDefault();
     if (returningToWork || discovery.viewMode !== 'world') return;
     returningToWork = true;

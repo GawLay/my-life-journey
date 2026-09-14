@@ -8,6 +8,12 @@
     <meta name="description" content="An interactive atlas of places, photographs and memories from Phyo Aung Zaw." />
     <script>
       (() => {
+        try {
+          if (sessionStorage.getItem('paz-wave-entry') === location.pathname + location.search) {
+            sessionStorage.removeItem('paz-wave-entry');
+            document.documentElement.classList.add('is-wave-entering', 'has-wave-arrived');
+          }
+        } catch { /* storage can be unavailable */ }
         const entryParams = new URLSearchParams(window.location.search);
         const placeId = entryParams.get('place');
         if (entryParams.get('view') !== 'discovery' || !placeId) return;
@@ -34,6 +40,9 @@
     <link rel="stylesheet" href="/src/styles/world.css" />
     <link rel="stylesheet" href="/src/styles/discovery.css" />
     <link rel="stylesheet" href="/src/styles/world-discovery.css" />
+    <link rel="stylesheet" href="/src/styles/page-wave.css" />
+    <script src="/page-wave.js"></script>
+    <script type="module" src="/src/world.js"></script>
   </head>
   <body class="world-page">
     <div class="world-entry" aria-hidden="true">
@@ -56,7 +65,7 @@
     <main class="world" id="world">
       <div class="world__intro">
         <p>AN INTERACTIVE ATLAS / 05 CHAPTERS</p>
-        <h1>Explore my <em>world.</em></h1>
+        <h1><span>Explore my</span> <em>world.</em></h1>
         <span>Drag the globe. Select a warm country.</span>
       </div>
 
@@ -96,6 +105,5 @@
       </div>
     </div>
 
-    <script type="module" src="/src/world.js"></script>
   </body>
 </html>

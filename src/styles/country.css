@@ -14,6 +14,7 @@ html, body.country-page { background: var(--cream); }
 .country-entry span { font: 400 .62rem/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; }
 .country-entry span i { font-style: normal; }
 .country-entry strong { margin-top: 1rem; font: 400 clamp(5rem, 14vw, 15rem)/.75 var(--display); letter-spacing: -.05em; }
+.country-shared-title { position: fixed; z-index: 10001; display: block; margin: 0; color: var(--cream); text-align: center; white-space: nowrap; pointer-events: none; }
 .from-discovery .country-entry { background-color: var(--handoff-a, #344b48); background-image: var(--handoff-image, linear-gradient(135deg, var(--handoff-a, #344b48), var(--handoff-b, #d0a66d) 52%, var(--handoff-c, #9f4935))); background-position: var(--handoff-position, center); background-size: cover; background-repeat: no-repeat; }
 
 .country-hero { min-height: 100svh; position: relative; overflow: hidden; background: var(--charcoal); color: var(--cream); }

@@ -169,14 +169,43 @@ function setupMotion() {
 
   if (fromDiscovery) {
     const entryElement = document.getElementById('country-entry');
+    const entryName = document.getElementById('country-entry-name');
+    const heroTitle = document.querySelector('.country-hero__copy h1');
+    const start = entryName.getBoundingClientRect();
+    const end = heroTitle.getBoundingClientRect();
+    const startType = getComputedStyle(entryName);
+    const endType = getComputedStyle(heroTitle);
+    const sharedTitle = entryName.cloneNode(true);
+    sharedTitle.removeAttribute('id');
+    sharedTitle.className = 'country-shared-title';
+    sharedTitle.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(sharedTitle);
+    gsap.set(sharedTitle, {
+      autoRound: false,
+      left: start.left, top: start.top, width: start.width, height: start.height,
+      fontFamily: startType.fontFamily, fontSize: startType.fontSize,
+      fontWeight: startType.fontWeight, lineHeight: startType.lineHeight,
+      letterSpacing: startType.letterSpacing, textAlign: endType.textAlign,
+    });
+    gsap.set(entryName, { autoAlpha: 0 });
+    gsap.set(heroTitle, { opacity: 0 });
     gsap.timeline({
       onComplete: () => {
+        gsap.set(heroTitle, { clearProps: 'opacity' });
+        sharedTitle.remove();
         gsap.set(entryElement, { clipPath: 'circle(0% at 50% 50%)', clearProps: 'opacity,visibility' });
       },
     })
       .fromTo('.country-hero__photo', { scale: 1.025 }, { scale: 1, duration: 1.05, ease: 'power3.out' }, 0)
       .to(entryElement, { autoAlpha: 0, duration: .62, ease: 'power2.inOut' }, .08)
-      .from('.country-hero__copy > *', { y: 35, autoAlpha: 0, stagger: .09, duration: .82, ease: 'power3.out' }, .5)
+      .to(sharedTitle, {
+        autoRound: false,
+        left: end.left, top: end.top, width: end.width, height: end.height,
+        fontSize: endType.fontSize, lineHeight: endType.lineHeight,
+        letterSpacing: endType.letterSpacing,
+        duration: 1.08, ease: 'power3.inOut',
+      }, .18)
+      .from('.country-hero__copy > span, .country-hero__copy > p', { y: 35, autoAlpha: 0, stagger: .09, duration: .82, ease: 'power3.out' }, .5)
       .from('.country-hero__route', { autoAlpha: 0, duration: .7 }, .66);
   } else {
     gsap.timeline()
@@ -270,7 +299,8 @@ function setupReturnNavigation() {
 initHeaderWave();
 initSound();
 initLiquidWarp();
-setupMotion();
+if (fromDiscovery && !reduced) document.fonts.ready.then(setupMotion);
+else setupMotion();
 setupStoryMedia();
 setupReturnNavigation();
 requestAnimationFrame(() => ScrollTrigger.refresh());

@@ -9,6 +9,11 @@
     <script>
       (() => {
         try {
+          if (sessionStorage.getItem('paz-wave-entry') === location.pathname + location.search) {
+            sessionStorage.removeItem('paz-wave-entry');
+            document.documentElement.classList.add('is-wave-entering', 'has-wave-arrived');
+            return;
+          }
           if (sessionStorage.getItem('paz-entry') === 'project') {
             sessionStorage.removeItem('paz-entry');
             document.documentElement.classList.add('is-project-entering');
@@ -21,6 +26,9 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="/src/styles/main.css" />
     <link rel="stylesheet" href="/src/styles/project.css" />
+    <link rel="stylesheet" href="/src/styles/page-wave.css" />
+    <script src="/page-wave.js"></script>
+    <script type="module" src="/src/project.js"></script>
   </head>
   <body class="project-page">
     <a class="skip-link" href="#project-content">Skip to project</a>
@@ -38,6 +46,5 @@
 
     <main id="project-content"></main>
     <div class="project-transition" aria-hidden="true"><span>SELECTED WORK</span></div>
-    <script type="module" src="/src/project.js"></script>
   </body>
 </html>

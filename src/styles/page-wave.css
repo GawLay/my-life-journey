@@ -1,0 +1,25 @@
+/* The old page stays still while the new page is uncovered by one soft wave. */
+@view-transition { navigation: auto; }
+
+::view-transition-image-pair(root) { isolation: auto; }
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-new(root) { clip-path: inset(0 100% 0 0); }
+
+html.has-wave-arrived .work-entry,
+html.has-wave-arrived .world-entry,
+html.has-wave-arrived .project-transition { display: none; }
+html.has-wave-arrived .hero [data-hero-line],
+html.has-wave-arrived .hero [data-reveal] { opacity: 1; visibility: visible; }
+
+/* Split only the arriving headline. Preserve its original line breaks and color. */
+html.has-wave-arrived .world__intro h1 > span,
+html.has-wave-arrived .world__intro h1 > em { display: inline-block; }
+html.has-wave-arrived .wave-arrival .wave-letter { transform-origin: 50% 85%; }
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-new(root) { clip-path: none; }
+}

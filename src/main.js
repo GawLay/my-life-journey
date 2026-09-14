@@ -3,7 +3,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { renderWork } from './modules/work.js';
 import { initSound } from './modules/sound.js';
 import { initLiquidWarp } from './modules/liquidWarp.js';
-import { initHeaderWave } from './modules/headerWave.js';
+import { initHeaderWave, setWaveText } from './modules/headerWave.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -12,9 +12,17 @@ const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 // Set by index.html's head script when we arrive back from "Explore my world":
 // the page paints under a charcoal cover that we iris open on load.
 const entering = !reduced && document.documentElement.classList.contains('is-entering');
+const waveEntering = !reduced && document.documentElement.classList.contains('is-wave-entering');
 document.documentElement.classList.add('js');
 
 renderWork();
+if (waveEntering) document.querySelectorAll('[data-hero-line]').forEach((line) => {
+  setWaveText(line);
+  line.classList.remove('wave-text');
+  line.classList.add('wave-arrival');
+});
+if (waveEntering) initHeaderWave();
+if (waveEntering) window.__PAZ_WAVE_CONTENT_READY__?.();
 
 function setupHeader() {
   const header = document.getElementById('site-header');
@@ -31,11 +39,15 @@ function setupMotion() {
 
   const ease = 'power3.out';
   // When returning under the cover, hold the hero a beat so it reveals as the iris opens.
-  const intro = gsap.timeline({ defaults: { ease }, delay: entering ? .22 : 0 });
-  intro
-    .fromTo('[data-hero-line]', { autoAlpha: 0, y: 48 }, { autoAlpha: 1, y: 0, duration: 1.25, stagger: 0.16 }, 0.15)
-    .fromTo('.hero [data-reveal]', { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.9, stagger: 0.12 }, 0.45)
-    .fromTo('.hero__footer > *', { clipPath: 'inset(0 0 100% 0)' }, { clipPath: 'inset(0 0 0% 0)', duration: 1.15, stagger: 0.08 }, 0.55);
+  if (waveEntering) {
+    gsap.set('[data-hero-line], .hero [data-reveal]', { autoAlpha: 1, y: 0 });
+    gsap.set('.hero__footer > *', { clipPath: 'inset(0 0 0% 0)' });
+  } else {
+    gsap.timeline({ defaults: { ease }, delay: entering ? .22 : 0 })
+      .fromTo('[data-hero-line]', { autoAlpha: 0, y: 48 }, { autoAlpha: 1, y: 0, duration: 1.25, stagger: 0.16 }, 0.15)
+      .fromTo('.hero [data-reveal]', { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.9, stagger: 0.12 }, 0.45)
+      .fromTo('.hero__footer > *', { clipPath: 'inset(0 0 100% 0)' }, { clipPath: 'inset(0 0 0% 0)', duration: 1.15, stagger: 0.08 }, 0.55);
+  }
 
   gsap.to('.hero__title > span:first-child', {
     xPercent: -8,
@@ -147,6 +159,7 @@ function setupWorldLinks() {
   if (reduced) return;
   document.querySelectorAll('a[href$="world.html"]').forEach((link) => {
     link.addEventListener('click', (event) => {
+      if (window.__PAZ_WAVE_LINK__?.(link.href)) return;
       event.preventDefault();
       if (document.querySelector('.world-page-transition')) return;
       const overlay = document.createElement('div');
@@ -170,6 +183,7 @@ function setupProjectLinks() {
   document.querySelectorAll('a[href*="project.html"]').forEach((link) => {
     link.addEventListener('click', (event) => {
       if (event.metaKey || event.ctrlKey || event.shiftKey || leaving) return;
+      if (window.__PAZ_WAVE_LINK__?.(link.href)) return;
       event.preventDefault();
       leaving = true;
       try { sessionStorage.setItem('paz-entry', 'project'); } catch { /* storage unavailable */ }
