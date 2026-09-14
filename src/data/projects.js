@@ -1,44 +1,37 @@
 export const projects = [
   {
-    id: 'truemoney', index: '01', eyebrow: 'FINTECH / FIELD OPERATIONS', title: 'TrueMoney Agent App',
-    subtitle: 'Financial services built for the people behind the counter.',
-    description: 'A production Android platform for agents managing remittance, bill payment, top-up and everyday customer transactions across Myanmar.',
-    tags: ['Android', 'Kotlin', 'Fintech'], year: '2023—2026', screen: 'wallet', tint: '#b94f35', surface: '#d9b07a', layout: 'phone',
-    href: './project.html?project=truemoney',
-  },
-  {
-    id: 'mab', index: '02', eyebrow: 'DIGITAL BANKING / MOBILE', title: 'MAB Mobile',
-    subtitle: 'Everyday banking shaped around confidence and clarity.',
-    description: 'The customer app evolved from TrueMoney Myanmar into MAB Mobile, pairing secure transaction flows with a maintainable Android foundation.',
-    tags: ['Android', 'Architecture', 'Security'], year: '2023—2026', screen: 'bank', tint: '#496c68', surface: '#b9c6b6', layout: 'split',
-    href: './project.html?project=mab',
-  },
-  {
-    id: 'beehive', index: '03', eyebrow: 'E-COMMERCE / DELIVERY', title: 'Beehive',
-    subtitle: 'One order, from browse to doorstep.',
-    description: 'A two-sided commerce and delivery product — a customer shopping app and a biker delivery app — connected around the lifecycle of a single order.',
-    tags: ['Android', 'E-commerce', 'Logistics'], year: '2020—2023', screen: 'shop', tint: '#d19a2e', surface: '#e2c98f', layout: 'phone',
-    href: './project.html?project=beehive',
-  },
-  {
-    id: 'aether', index: '04', eyebrow: 'EXPERIMENT / ATMOSPHERE', title: 'Aether Weather',
+    id: 'aether', index: '01', eyebrow: 'EXPERIMENT / ATMOSPHERE', title: 'Aether Weather',
     subtitle: 'Forecasting designed as a sense of place.',
-    description: 'A native Android weather experiment where AGSL shaders and particle systems turn rain, snow and night skies into part of the interface.',
-    tags: ['Android', 'AGSL shaders', 'Motion'], year: '2025', image: './images/projects/aether/rain.png', tint: '#536a83', surface: '#aebbc5', layout: 'offset',
+    description: 'A weather experiment built in native Android and then Flutter, where GPU shaders and particle systems turn rain, snow and night skies into part of the interface.',
+    tags: ['Android', 'Flutter', 'Motion'], year: '2025', image: './images/projects/aether/rain.png', tint: '#536a83', surface: '#aebbc5', layout: 'offset',
     href: './project.html?project=aether',
   },
   {
-    id: 'portfolio', index: '05', eyebrow: 'PERSONAL PRODUCT / STORYTELLING', title: 'Portfolio App',
+    id: 'truemoney', index: '02', eyebrow: 'FINTECH / FIELD OPERATIONS', title: 'TrueMoney Agent App',
+    subtitle: 'Financial services built for the people behind the counter.',
+    description: 'A production Android platform for agents managing remittance, bill payment, top-up and everyday customer transactions across Myanmar.',
+    tags: ['Android', 'Kotlin', 'Fintech'], year: '2023–2026', screen: 'wallet', tint: '#b94f35', surface: '#d9b07a', layout: 'phone',
+    href: './project.html?project=truemoney',
+  },
+  {
+    id: 'portfolio', index: '03', eyebrow: 'PERSONAL PRODUCT / STORYTELLING', title: 'Portfolio App',
     subtitle: 'A résumé that moves like a product, not a document.',
     description: 'A native Android portfolio built around expressive transitions, a focused information hierarchy and direct access to work, skills and experience.',
-    tags: ['Android', 'Kotlin', 'Transitions'], year: '2024', image: './images/projects/portfolio/home.png', tint: '#cc5f36', surface: '#dac3ab', layout: 'phone',
+    tags: ['Android', 'Kotlin', 'Transitions'], year: '2024', image: './images/projects/portfolio/about.png', tint: '#cc5f36', surface: '#dac3ab', layout: 'phone',
     href: './project.html?project=portfolio',
+  },
+  {
+    id: 'beehive', index: '04', eyebrow: 'E-COMMERCE / DELIVERY', title: 'Beehive',
+    subtitle: 'One order, from browse to doorstep.',
+    description: 'A two-sided commerce and delivery product (a customer shopping app and a biker delivery app) connected around the lifecycle of a single order.',
+    tags: ['Android', 'E-commerce', 'Logistics'], year: '2020–2023', screen: 'shop', tint: '#d19a2e', surface: '#e2c98f', layout: 'phone',
+    href: './project.html?project=beehive',
   },
 ];
 
 export const projectDetails = {
   truemoney: {
-    role: 'Senior Android Developer', period: 'APR 2023 — APR 2026', location: 'YANGON, MYANMAR',
+    role: 'Senior Android Developer', period: 'APR 2023 – APR 2026', location: 'YANGON, MYANMAR',
     intro: 'The Agent App supports the people who turn a broad financial network into a local service. The work centred on dependable transaction flows, security hardening and a codebase that could keep changing safely.',
     statement: 'At field scale, calm software is part of the financial infrastructure.',
     contributions: [
@@ -47,11 +40,24 @@ export const projectDetails = {
       ['03', 'A healthier codebase', 'Refactored legacy Java, removed unused libraries and introduced repository-based boundaries for stronger maintenance and testing.'],
     ],
     facts: [['500K+', 'PLAY STORE DOWNLOADS'], ['23,000', 'AGENTS NATIONWIDE'], ['4.4', 'PLAY STORE RATING']], visual: 'network',
-    mediaNote: 'Live access requires the company network. This view maps the public product footprint without reproducing private screens.',
+    mediaNote: 'Live access needs the company network, so this is a live diagram of the public product footprint (the services an agent runs), not a private screen. Tap a service to trace it through the network.',
+    flowsTitle: 'What an agent runs at the counter.',
+    flows: [
+      ['01', 'Serve a customer', 'Remittance, mobile top-up, bill payment and cash in and out: the everyday transactions an agent runs for the people at the counter.'],
+      ['02', 'Know every state', 'Each transaction resolves to one unambiguous state (pending, success or failure), so an agent always knows what happened to a customer’s money.'],
+      ['03', 'Stay accountable', 'Balances, history and receipts keep the counter reconciled at the end of every day.'],
+    ],
+    tech: [
+      ['NETWORK-SECURITY CONFIG', 'Android network-security configuration hardens the transport carrying sensitive customer data and transactions.'],
+      ['REPOSITORY BOUNDARIES', 'A repository layer draws testable seams around data access, so flows can change without churning the whole app.'],
+      ['LEGACY JAVA, REFACTORED', 'Ageing Java was refactored and unused libraries removed: less surface area, less risk, easier change.'],
+      ['BUILT FOR FIELD SCALE', 'Choices made for a codebase that keeps shipping while 23,000 agents depend on it every day.'],
+    ],
+    outcome: { lead: 'Calm is infrastructure.', copy: 'When thousands of agents move real money every day, the interface that works best is the one nobody has to think about. The craft lived in the states you rarely see (the timeout, the failed transfer, the retry), making each one unambiguous, and in keeping the codebase disciplined enough to change without ever putting that trust at risk.' },
     links: [['VIEW ON GOOGLE PLAY', 'https://play.google.com/store/apps/details?id=com.truemoney.myanmar.agentapp']],
   },
   mab: {
-    role: 'Senior Android Developer', period: 'APR 2023 — APR 2026', location: 'YANGON, MYANMAR',
+    role: 'Senior Android Developer', period: 'APR 2023 – APR 2026', location: 'YANGON, MYANMAR',
     intro: 'The customer-facing TrueMoney Myanmar app became MAB Mobile after its acquisition by Myanmar Apex Bank. My contribution focused on dependable customer transactions, security and the long-term health of the Android codebase.',
     statement: 'Trust grows when every state is clear, especially when money is moving.',
     contributions: [
@@ -63,16 +69,30 @@ export const projectDetails = {
     mediaNote: 'The original product is no longer available to me. The visual shows the engineering layers behind the work rather than invented UI.', links: [],
   },
   beehive: {
-    role: 'Android Developer', period: 'DEC 2020 — JAN 2023', location: 'YANGON, MYANMAR',
-    intro: 'Beehive paired a customer shopping app with a biker delivery app around one shared idea: the life of an order. Customers browse, add to cart and track; bikers accept jobs, pick up and deliver — two experiences moving the same order from tap to doorstep.',
+    role: 'Android Developer', period: 'DEC 2020 – JAN 2023', location: 'YANGON, MYANMAR',
+    intro: 'Beehive paired a customer shopping app with a biker delivery app around one shared idea: the life of an order. Customers browse, add to cart and track; bikers accept jobs, pick up and deliver. Two experiences moving the same order from tap to doorstep.',
     statement: 'A good delivery product makes one order legible to everyone who touches it.',
     contributions: [
-      ['01', 'Two connected apps', 'Built customer and biker Android flows that share an order model — cart and checkout on one side, job acceptance and delivery updates on the other.'],
+      ['01', 'Two connected apps', 'Built customer and biker Android flows that share an order model: cart and checkout on one side, job acceptance and delivery updates on the other.'],
       ['02', 'Order lifecycle', 'Modelled the status progression from placed through preparing, pickup, delivering and delivered, kept in sync across both apps.'],
       ['03', 'Delivery in practice', 'Handled job assignment, live status updates and the day-to-day states a rider hits in the field.'],
     ],
     facts: [['2 APPS', 'CUSTOMER + BIKER'], ['1 ORDER', 'SHARED LIFECYCLE'], ['ANDROID', 'PLATFORM']], visual: 'journey',
-    mediaNote: 'The company has since closed and the original app is no longer available, so these flows are reconstructed from the product to show how the two sides worked as one.', links: [],
+    mediaNote: 'The company has since closed and the original app is gone, so this is a reconstruction of how the two sides worked as one. Follow one order along the honeycomb (or tap any stage) to see what the customer and the biker each do.',
+    flowsTitle: 'Two apps, one order.',
+    flows: [
+      ['01', 'Customer side', 'Browse products, food and shops, build a cart, check out, then watch the order move in real time to the door.'],
+      ['02', 'Shop & handoff', 'The order lands at the shop to be prepared, then passes to an available biker, the moment the two apps meet.'],
+      ['03', 'Biker side', 'Bikers accept jobs, pick up and deliver, pushing live status the customer sees the instant it changes.'],
+    ],
+    tech: [
+      ['SHARED ORDER MODEL', 'One order model spans both apps, so a change on one side is the same order seen from the other.'],
+      ['LIFECYCLE STATE MACHINE', 'A defined progression (placed → preparing → pickup → delivering → delivered) keeps every screen truthful.'],
+      ['LIVE STATUS SYNC', 'Status and location updates propagate between customer and biker in near real time.'],
+      ['TWO ANDROID APPS', 'Customer and biker apps built on a shared foundation of models, networking and order logic.'],
+    ],
+    outcome: { lead: 'One order, made legible.', copy: 'The hard part of a delivery product is not either app on its own: it is keeping a single order honest across both. When the customer’s “preparing” and the biker’s “pick up now” are the same fact seen from two sides, the whole thing feels calm. Model the order once, let each side render its own view, and the doorstep takes care of itself.' },
+    links: [],
   },
   aether: {
     role: 'Designer & Android Engineer', period: 'PERSONAL PROJECT · 2025', location: 'HO CHI MINH CITY, VIET NAM',
@@ -84,7 +104,7 @@ export const projectDetails = {
       ['03', 'Motion with purpose', 'Kept weather effects behind the information hierarchy so temperature and forecast data remain readable.'],
     ],
     facts: [['04', 'IMPLEMENTED SCENES'], ['AGSL', 'SHADER LANGUAGE'], ['OPEN-METEO', 'FORECAST DATA']], visual: 'weather',
-    mediaNote: 'Real Android captures inside a responsive, page-wide atmosphere. Switch the scene and the whole page — sky, light and particles — moves with it, not just this frame.',
+    mediaNote: 'Real Android captures inside a responsive, page-wide atmosphere. Switch the scene and the whole page (sky, light and particles) moves with it, not just this frame.',
     flowsTitle: 'Weather you can read.',
     flows: [
       ['01', 'Now', 'Temperature, condition and high/low read at a glance over the live scene.'],
@@ -93,11 +113,11 @@ export const projectDetails = {
     ],
     tech: [
       ['AGSL SHADERS', 'Per-condition GPU shaders paint sky, droplets and glass directly on the canvas.'],
-      ['BATCHED PARTICLES', 'Rain and snow draw as a single drawAtlas call — hundreds of sprites at O(n) cost.'],
+      ['BATCHED PARTICLES', 'Rain and snow draw as a single drawAtlas call: hundreds of sprites at O(n) cost.'],
       ['CONDITION THEME', 'A WeatherTheme derives every colour from the live condition, so the interface recolours as one.'],
-      ['CLEAN ARCHITECTURE', 'Feature-first modules — weather, cities, ai — split cleanly across data, domain and presentation.'],
+      ['CLEAN ARCHITECTURE', 'Feature-first modules (weather, cities, ai) split cleanly across data, domain and presentation.'],
     ],
-    outcome: { lead: 'Atmosphere is a feature.', copy: 'When the interface quietly reflects the weather, a forecast stops being a table of numbers and becomes a place. The discipline was restraint — keep the motion behind the data so the screen stays calm, and let temperature and hours always win.' },
+    outcome: { lead: 'Atmosphere is a feature.', copy: 'When the interface quietly reflects the weather, a forecast stops being a table of numbers and becomes a place. The discipline was restraint: keep the motion behind the data so the screen stays calm, and let temperature and hours always win.' },
     links: [['VIEW ANDROID SOURCE', 'https://github.com/GawLay/Aether'], ['VIEW FLUTTER MIGRATION', 'https://github.com/GawLay/Aether-Flutter']],
   },
   portfolio: {
@@ -110,7 +130,20 @@ export const projectDetails = {
       ['03', 'Production foundation', 'Built with Kotlin, Coroutines and Flow, Koin, WorkManager and Firebase in a clean architecture.'],
     ],
     facts: [['KOTLIN', 'LANGUAGE'], ['FIREBASE', 'CONTENT'], ['CLEAN', 'ARCHITECTURE']], visual: 'portfolio',
-    mediaNote: 'Real emulator captures and a live recording of the section transition.',
+    mediaNote: 'Explore the app: open the menu and step between Home, Skill, Experience and Résumé. Each change plays the app’s own circular reveal, on real screens recreated from the emulator and held behind a soft blur so the phone stays the focus.',
+    flowsTitle: 'A résumé that moves.',
+    flows: [
+      ['01', 'Home & résumé', 'A profile card and a full résumé detail: avatar, contact and bio in one place.'],
+      ['02', 'Skills & experience', 'A skills grid and a role timeline; each role opens its own detail screen.'],
+      ['03', 'One tap away', 'Every section sits behind an extended-FAB menu, so the whole résumé is one moving app.'],
+    ],
+    tech: [
+      ['EXTENDED FAB', 'A speed-dial FAB expands into the section menu; choosing a section plays a circular reveal to it.'],
+      ['CIRCULAR REVEAL', 'Every screen change animates a clip-path circle, so sections feel continuous, not swapped.'],
+      ['SHARED ELEMENTS', 'The selected role card is a shared element that flies between the list and its detail.'],
+      ['KOTLIN + CLEAN ARCH', 'Coroutines/Flow, Koin, WorkManager and Firebase behind a feature-first clean architecture.'],
+    ],
+    outcome: { lead: 'Motion can be structure.', copy: 'Treating a résumé as a product (where every section change is a deliberate transition) makes the information easier to hold in your head, not harder. The craft was keeping movement meaningful: it should reveal the hierarchy, never just decorate it.' },
     links: [['VIEW SOURCE', 'https://github.com/GawLay/My-Portfolio'], ['VIEW ON GOOGLE PLAY', 'https://play.google.com/store/apps/details?id=com.kyrie.myportfolio']],
   },
 };

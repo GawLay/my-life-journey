@@ -260,14 +260,13 @@ export default class Globe {
     for (const [candidate, feature] of this.visitedFeatures) {
       if (pointInFeature([lng, lat], feature)) { iso = candidate; break; }
     }
-    // Small island states (notably Singapore) receive invisible hit slop so
-    // their real rendered region remains practical to select without a pin.
+    // A click just outside a country's rendered border still selects it, so the
+    // warm regions stay easy to hit without pixel-perfect aim.
     if (!iso) {
       const nearby = this.places.find((place) => {
-        const threshold = place.iso === 'SGP' ? 3.5 : 1.15;
         const dx = (lng - place.lng) * Math.cos(lat * DEG);
         const dy = lat - place.lat;
-        return Math.hypot(dx, dy) < threshold;
+        return Math.hypot(dx, dy) < 1.15;
       });
       iso = nearby?.iso || null;
     }

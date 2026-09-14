@@ -47,9 +47,9 @@
 .device { position: relative; width: min(24vw, 300px); aspect-ratio: 1080 / 2424; padding: 7px; border-radius: 38px; background: #111; box-shadow: 0 40px 70px rgba(0,0,0,.35); overflow: hidden; }
 .device__speaker { position: absolute; z-index: 2; width: 25%; height: 5px; border-radius: 99px; left: 37.5%; top: 11px; background: rgba(255,255,255,.18); }
 .device__screen { width: 100%; height: 100%; overflow: hidden; border-radius: 32px; background: #111; }
-.device__screen img, .device__screen video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.device__screen img, .device__screen video { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: inherit; }
 
-.weather-stage, .portfolio-stage, .system-stage { min-height: min(76vw, 900px); position: relative; overflow: hidden; border: 1px solid rgba(242,237,227,.18); }
+.weather-stage, .pf-stage, .system-stage { min-height: min(76vw, 900px); position: relative; overflow: hidden; border: 1px solid rgba(242,237,227,.18); }
 .weather-stage { display: grid; place-items: center; isolation: isolate; transition: background 900ms var(--ease); }
 .weather-stage.is-clear { background: radial-gradient(circle at 30% 20%, #b7e3ec, transparent 38%), #77c6e3; }
 .weather-stage.is-rain { background: radial-gradient(circle at 30% 18%, #3b5272, transparent 40%), #172640; }
@@ -74,25 +74,77 @@
 @keyframes weatherSnow { from { transform: translate3d(-2vw,-20%,0); } 50% { transform: translate3d(3vw,470%,0); } to { transform: translate3d(-1vw,940%,0); } }
 @keyframes weatherStar { 0%, 100% { opacity: .2; transform: scale(.65); } 50% { opacity: 1; transform: scale(1.25); } }
 
-.portfolio-stage { min-height: min(72vw, 840px); background: radial-gradient(circle at 36% 42%, rgba(215,99,60,.42), transparent 27%), linear-gradient(135deg, #5b2e25, #17191a 58%, #202524); }
-.portfolio-stage .device { position: absolute; }
-.device--portfolio-home { left: 17%; top: 12%; transform: rotate(-5deg); }
-.device--portfolio-motion { right: 18%; bottom: -8%; transform: rotate(5deg); }
-.portfolio-stage__caption { position: absolute; left: 3rem; bottom: 2.5rem; max-width: 18ch; font: 400 .61rem/1.5 var(--mono); color: rgba(242,237,227,.55); }
-.portfolio-stage__caption p { margin-top: 1rem; }
-.portfolio-stage__motion-label { position: absolute; right: 3rem; top: 2.5rem; font: 500 .61rem/1.5 var(--mono); text-align: right; }
-.portfolio-stage__motion-label span { color: rgba(242,237,227,.5); }
+/* Portfolio — a mini, playable recreation of the app inside one phone.
+   Screens are clip-path layers; a recreated extended FAB drives circular-reveal
+   transitions between them. See modules/portfolioMotion.js */
+.pf-stage { min-height: min(72vw, 780px); display: grid; grid-template-columns: 1fr auto; align-items: center; gap: clamp(2rem, 5vw, 5rem); padding: clamp(3rem, 7vw, 6rem) clamp(2rem, 6vw, 5.5rem); background: radial-gradient(circle at 26% 24%, rgba(215,99,60,.42), transparent 46%), linear-gradient(150deg, #55271f, #17191a 60%, #202524); }
+.pf-side { position: relative; z-index: 6; max-width: 40ch; }
+.pf-intro > span { font: 500 .68rem/1.4 var(--mono); letter-spacing: .07em; color: #f0b89e; }
+.pf-intro p { margin-top: 1.1rem; font: 400 1rem/1.65 var(--body); color: rgba(242,237,227,.92); }
+.pf-steps { display: flex; align-items: center; gap: .5rem; margin-top: 1.6rem; flex-wrap: wrap; }
+.pf-steps button { padding: .5rem .7rem; border: 0; border-radius: 8px; background: transparent; cursor: pointer; font: 500 .58rem/1 var(--mono); letter-spacing: .04em; text-transform: uppercase; color: rgba(242,237,227,.45); transition: color .3s var(--ease), background .3s var(--ease); }
+.pf-steps button:hover { color: rgba(255,255,255,.85); }
+.pf-steps button.is-on { color: #fff; background: rgba(255,255,255,.12); }
+.pf-steps i { width: 12px; height: 1px; background: rgba(242,237,227,.26); }
+.pf-tag { margin-top: clamp(2rem, 5vw, 3.4rem); font: 500 .58rem/1.4 var(--mono); letter-spacing: .06em; color: rgba(242,237,227,.42); }
+
+.device--pf { position: relative; z-index: 3; justify-self: center; width: min(25vw, 300px); box-shadow: 0 50px 90px rgba(0,0,0,.5); }
+.device--pf .device__screen { position: relative; overflow: hidden; background: #fff; }
+.pf-scr { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; clip-path: circle(0% at 86% 90%); -webkit-clip-path: circle(0% at 86% 90%); }
+.pf-scr[data-screen="home"] { clip-path: circle(150% at 86% 90%); -webkit-clip-path: circle(150% at 86% 90%); }
+
+/* persistent blurred backdrop — spotlights the phone from the start */
+.pf-backdrop { position: absolute; inset: -8%; width: 116%; height: 116%; z-index: 0; object-fit: cover; filter: blur(34px) brightness(.42) saturate(1.2); transform: scale(1.06); opacity: .8; }
+
+/* list → detail affordances */
+.pf-hotspot, .pf-back { position: absolute; z-index: 4; border: 0; cursor: pointer; font: 500 .55rem/1 var(--mono); letter-spacing: .03em; }
+.pf-hotspot { right: 7%; bottom: 15%; padding: .55rem .8rem; border-radius: 999px; background: #1f2733; color: #fff; box-shadow: 0 8px 18px rgba(0,0,0,.35); }
+.pf-back { left: 6%; top: 3.5%; padding: .45rem .7rem; border-radius: 999px; background: rgba(255,255,255,.92); color: #1f2733; }
+/* shared-element "flying card": a clone of the tapped role card that morphs
+   from its list position up into the detail header (see portfolioMotion.js) */
+.pf-flycard { position: absolute; z-index: 6; background-size: 100% 100%; background-repeat: no-repeat; border-radius: 14px; box-shadow: 0 16px 34px rgba(0,0,0,.16); }
+
+.pf-fab { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
+.pf-fab__toggle { position: absolute; right: 5%; bottom: 4%; width: 16%; aspect-ratio: 1; z-index: 2; border: 0; border-radius: 50%; background: #ee7f3a; box-shadow: 0 8px 20px rgba(0,0,0,.4); cursor: pointer; pointer-events: auto; display: grid; place-items: center; }
+.pf-fab__toggle > span, .pf-fab__toggle > span::before, .pf-fab__toggle > span::after { content: ""; display: block; width: 15px; height: 2px; border-radius: 2px; background: #fff; transition: transform .3s var(--ease), opacity .2s var(--ease); }
+.pf-fab__toggle > span { position: relative; }
+.pf-fab__toggle > span::before { position: absolute; left: 0; top: -5px; }
+.pf-fab__toggle > span::after { position: absolute; left: 0; top: 5px; }
+.pf-fab.is-open .pf-fab__toggle > span { background: transparent; }
+.pf-fab.is-open .pf-fab__toggle > span::before { transform: translateY(5px) rotate(45deg); }
+.pf-fab.is-open .pf-fab__toggle > span::after { transform: translateY(-5px) rotate(-45deg); }
+.pf-fab__bar { position: absolute; left: 6%; right: 6%; bottom: 15%; display: grid; grid-template-columns: repeat(4, 1fr); gap: 2%; padding: 5% 3%; border-radius: 20px; background: #ee7f3a; box-shadow: 0 14px 34px rgba(0,0,0,.45); transform-origin: 88% 130%; transform: translateY(24%) scale(.85); opacity: 0; pointer-events: none; transition: transform .4s var(--ease), opacity .3s var(--ease); }
+.pf-fab.is-open .pf-fab__bar { transform: none; opacity: 1; pointer-events: auto; }
+.pf-fab__bar button { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 5px 0; border: 0; background: transparent; color: #fff; cursor: pointer; font: 600 .5rem/1 var(--mono); letter-spacing: .02em; border-radius: 12px; transition: transform .3s var(--ease), background .3s var(--ease); }
+.pf-fab__bar button svg { width: 19px; height: 19px; }
+.pf-fab__bar button.is-pick, .pf-fab__bar button:hover { background: rgba(255,255,255,.22); transform: translateY(-3px); }
 
 .system-stage { min-height: min(68vw, 790px); padding: clamp(2rem, 5vw, 5rem); background: #1f201d; display: grid; place-items: center; }
 .system-stage::before { content: ""; position: absolute; inset: 8%; border: 1px solid rgba(242,237,227,.12); }
 .system-stage__key { position: absolute; inset: auto 1.5rem 1.4rem; display: flex; justify-content: space-between; font: 400 .58rem/1 var(--mono); letter-spacing: .06em; color: rgba(242,237,227,.45); }
-.network-map { position: relative; width: min(55vw, 650px); aspect-ratio: 1; display: grid; place-items: center; }
-.network-map__ring { position: absolute; inset: 5%; border: 1px solid rgba(229,139,103,.35); border-radius: 50%; }
-.network-map__ring--two { inset: 21%; border-color: rgba(242,237,227,.22); }
-.network-map__core { width: 35%; aspect-ratio: 1; border-radius: 50%; background: var(--case-accent); display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 0 90px rgba(198,91,60,.3); }
-.network-map__core small, .network-map__core span, .network-map > i { font: 400 .58rem/1 var(--mono); letter-spacing: .06em; font-style: normal; }
-.network-map__core strong { font: 400 clamp(3rem, 7vw, 6.5rem)/.8 var(--display); margin: .55rem 0; }
-.network-map > i { position: absolute; left: var(--x); top: var(--y); transform: translate(-50%,-50%); padding: .75rem; color: #e99b78; border: 1px solid rgba(242,237,227,.18); background: #1f201d; }
+/* TrueMoney — a live agent service network (see modules/truemoneyMotion.js).
+   No private screens: transactions stream from the core out to four services;
+   selecting one traces its spoke and names it in the readout. */
+.tm-network { position: relative; width: min(58vw, 660px); aspect-ratio: 1; }
+.tm-wires { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.tm-wires__ring { fill: none; stroke: rgba(242,237,227,.14); stroke-width: .3; }
+.tm-spoke { stroke: rgba(229,139,103,.22); stroke-width: .4; transition: stroke .4s var(--ease), stroke-width .4s var(--ease); }
+.tm-spoke.is-active { stroke: var(--case-accent); stroke-width: .8; }
+.tm-pulse { fill: #e99b78; }
+.tm-pulse.is-active { fill: var(--cream); }
+.tm-core { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 34%; aspect-ratio: 1; border-radius: 50%; background: var(--case-accent); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; box-shadow: 0 0 90px rgba(198,91,60,.35); }
+.tm-core small, .tm-core span { font: 400 .58rem/1 var(--mono); letter-spacing: .06em; color: rgba(255,255,255,.82); }
+.tm-core strong { font: 400 clamp(2.6rem, 6vw, 5.5rem)/.8 var(--display); color: var(--cream); margin: .5rem 0; }
+.tm-node { position: absolute; left: var(--x); top: var(--y); transform: translate(-50%,-50%); display: inline-flex; align-items: center; gap: .5rem; padding: .7rem .95rem; border: 1px solid rgba(242,237,227,.18); background: #1f201d; color: #e99b78; cursor: pointer; font: 400 .62rem/1 var(--mono); letter-spacing: .04em; white-space: nowrap; transition: border-color .35s var(--ease), color .35s var(--ease), background .35s var(--ease); }
+.tm-node__dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.tm-node:hover { color: var(--cream); border-color: rgba(242,237,227,.5); }
+.tm-node.is-active { color: #12100d; background: var(--case-accent); border-color: var(--case-accent); }
+.tm-node:focus-visible { outline: 2px solid var(--cream); outline-offset: 3px; }
+.tm-readout { position: absolute; left: clamp(1.5rem, 4vw, 3rem); top: clamp(1.5rem, 4vw, 3rem); z-index: 3; max-width: 26ch; }
+.tm-readout > span { font: 400 .6rem/1 var(--mono); letter-spacing: .07em; color: rgba(242,237,227,.5); }
+.tm-readout > span b { color: var(--case-accent); font-weight: 400; }
+.tm-readout h3 { margin: .9rem 0 .6rem; font: 400 clamp(1.6rem, 3vw, 2.6rem)/1 var(--display); color: var(--cream); }
+.tm-readout p { font: 400 .82rem/1.55 var(--body); color: rgba(242,237,227,.6); }
 
 .architecture-stack { width: min(76vw, 860px); perspective: 900px; }
 .architecture-stack > div { position: relative; margin-top: -1px; padding: 1.5rem 2rem; display: grid; grid-template-columns: 3rem 1fr auto; gap: 1rem; align-items: center; border: 1px solid rgba(242,237,227,.2); background: rgba(84,117,114,.12); transform: rotateX(2deg); }
@@ -145,6 +197,10 @@
 .project-transition span { font: 400 .66rem/1 var(--mono); letter-spacing: .12em; opacity: 0; transition: opacity 300ms 180ms var(--ease); }
 .project-transition.is-active { clip-path: circle(150% at 50% 50%); }
 .project-transition.is-active span { opacity: 1; }
+/* arriving from the work list / a sibling project: paint the cover before first
+   paint, then project.js irises it open (the CSS transition drives the reveal) */
+html.is-project-entering .project-transition { clip-path: circle(150% at 50% 50%); }
+html.is-project-entering .project-transition span { opacity: 1; }
 
 @media (max-width: 900px) {
   .case-hero__title em { width: min(34ch, 65%); }
@@ -174,7 +230,7 @@
   .case-facts > div + div { border-left: 0; border-top: 1px solid var(--line); padding-left: 0; }
   .case-showcase { padding-inline: 0; }
   .case-showcase > header { grid-template-columns: 1fr; padding-inline: var(--gutter); }
-  .weather-stage, .portfolio-stage, .system-stage { min-height: 142vw; border-inline: 0; }
+  .weather-stage, .pf-stage, .system-stage { min-height: 142vw; border-inline: 0; }
   .device { width: 46vw; border-radius: 26px; padding: 5px; }
   .device__screen { border-radius: 22px; }
   .device__speaker { top: 8px; height: 3px; }
@@ -182,14 +238,16 @@
   .weather-stage__copy p { display: none; }
   .weather-picker { width: calc(100% - 2rem); justify-content: center; bottom: 1rem; }
   .weather-picker button { flex: 1; justify-content: center; padding: .6rem .25rem; font-size: .52rem; }
-  .portfolio-stage .device { width: 43vw; }
-  .device--portfolio-home { left: 7%; top: 13%; }
-  .device--portfolio-motion { right: 6%; bottom: 6%; }
-  .portfolio-stage__caption { left: var(--gutter); bottom: 1.2rem; }
-  .portfolio-stage__motion-label { right: var(--gutter); top: 1.3rem; }
+  .pf-stage { grid-template-columns: 1fr; justify-items: start; gap: 1.8rem; padding: 2.4rem var(--gutter) 3rem; }
+  .pf-side { max-width: none; }
+  .pf-intro p { font-size: .82rem; }
+  .device--pf { width: 62vw; justify-self: center; }
+  .pf-tag { display: none; }
   .system-stage { padding-inline: var(--gutter); }
-  .network-map { width: 92vw; }
-  .network-map__core { width: 40%; }
+  .tm-network { width: 84vw; }
+  .tm-core { width: 40%; }
+  .tm-readout { left: var(--gutter); top: var(--gutter); max-width: 62%; }
+  .tm-readout p { display: none; }
   .architecture-stack { width: 96vw; }
   .architecture-stack > div { grid-template-columns: 2rem 1fr; padding: 1.15rem; }
   .architecture-stack i { grid-column: 2; }
@@ -244,13 +302,47 @@
 .case-outcome__copy h2 { font: italic 400 clamp(2.4rem, 5.5vw, 5.2rem)/1 var(--display); letter-spacing: -.03em; max-width: 16ch; }
 .case-outcome__copy p { max-width: 48ch; margin-top: clamp(1.5rem, 3vw, 2.5rem); color: var(--charcoal-soft); line-height: 1.6; }
 
-/* Beehive — order-journey placeholder (deepened in a later pass) */
-.system-stage--journey { background: #191713; }
-.journey-map { display: flex; align-items: center; flex-wrap: wrap; justify-content: center; gap: .5rem; width: min(92%, 880px); }
-.journey-node { padding: 1rem 1.2rem; min-width: 96px; display: flex; flex-direction: column; gap: .4rem; border: 1px solid rgba(242,237,227,.2); background: rgba(201,143,43,.12); }
-.journey-node span { font: 400 .56rem/1 var(--mono); letter-spacing: .06em; color: rgba(242,237,227,.5); }
-.journey-node b { font: 400 clamp(1rem, 2vw, 1.45rem)/1 var(--display); }
-.journey-link { width: 26px; height: 1px; background: rgba(242,237,227,.32); }
+/* Beehive — a live, interactive order journey (see modules/beehiveMotion.js).
+   One order hops the honeycomb from browse to doorstep; the traveled links light
+   up and the readout names who is acting (customer / shop / biker). */
+.system-stage--journey { background: #17140e; }
+.bee-journey { position: relative; width: min(90vw, 1000px); aspect-ratio: 100 / 46; }
+.bee-track { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.bee-link { stroke: rgba(226,180,110,.16); stroke-width: .5; stroke-dasharray: 2 2; transition: stroke .5s var(--ease); }
+.bee-link.is-done { stroke: var(--case-accent); stroke-dasharray: none; }
+.bee-hex { position: absolute; left: var(--x); top: var(--y); transform: translate(-50%,-50%); display: grid; justify-items: center; gap: .6rem; padding: 0; border: 0; background: none; cursor: pointer; }
+.bee-hex__cell { position: relative; width: clamp(48px, 7vw, 76px); aspect-ratio: 1 / 1.15; clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); background: rgba(201,143,43,.14); color: #e8b567; display: grid; place-items: center; transition: background .35s var(--ease), color .35s var(--ease), transform .35s var(--ease); }
+.bee-hex.is-shop .bee-hex__cell { color: #d68a3a; }
+.bee-hex.is-biker .bee-hex__cell { color: #f0cd8a; }
+.bee-hex__ic { width: clamp(20px, 2.4vw, 27px); height: auto; display: block; }
+.bee-hex__ic svg { width: 100%; height: 100%; }
+.bee-hex__cell em { position: absolute; bottom: 13%; font: 400 .5rem/1 var(--mono); font-style: normal; letter-spacing: .04em; opacity: .55; }
+.bee-hex__label { font: 400 .6rem/1 var(--mono); letter-spacing: .05em; text-transform: uppercase; white-space: nowrap; color: rgba(242,237,227,.55); transition: color .35s var(--ease); }
+.bee-hex:hover .bee-hex__cell { background: rgba(201,143,43,.28); }
+.bee-hex:hover .bee-hex__label { color: var(--cream); }
+.bee-hex.is-active .bee-hex__cell { background: var(--case-accent); color: #241a08; transform: scale(1.08); }
+.bee-hex.is-active .bee-hex__label { color: var(--cream); }
+.bee-hex:focus-visible { outline: 2px solid var(--cream); outline-offset: 3px; border-radius: 4px; }
+/* The order in transit — a glowing chip whose icon becomes what the order is at
+   each phase (cart → package → scooter). GSAP centres it (xPercent/yPercent) and
+   flies it along the connectors; the scooter bobs like it's riding. */
+.bee-token { position: absolute; left: 8%; top: 34%; width: clamp(30px, 3.4vw, 42px); height: clamp(30px, 3.4vw, 42px); display: grid; place-items: center; border-radius: 50%; background: var(--cream); box-shadow: 0 0 18px 3px rgba(226,180,110,.7); z-index: 3; pointer-events: none; opacity: 0; visibility: hidden; }
+.bee-token svg { width: 60%; height: 60%; fill: none; stroke: #17140e; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.bee-token.is-riding svg { animation: beeRide .45s ease-in-out infinite; }
+@keyframes beeRide { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-2px) rotate(3deg); } }
+.bee-readout { position: absolute; left: clamp(1.5rem, 4vw, 3rem); top: clamp(1.5rem, 4vw, 2.5rem); z-index: 4; max-width: 30ch; }
+.bee-readout > span { font: 400 .6rem/1 var(--mono); letter-spacing: .07em; color: rgba(242,237,227,.5); }
+.bee-readout > span b { color: var(--case-accent); font-weight: 400; }
+.bee-readout > span i { font-style: normal; text-transform: uppercase; color: rgba(242,237,227,.72); }
+.bee-readout h3 { margin: .9rem 0 .6rem; font: 400 clamp(1.6rem, 3vw, 2.6rem)/1 var(--display); color: var(--cream); }
+.bee-readout p { font: 400 .82rem/1.55 var(--body); color: rgba(242,237,227,.6); }
+@media (max-width: 700px) {
+  .bee-journey { width: 92vw; aspect-ratio: 100 / 78; }
+  .bee-hex__cell { width: clamp(40px, 13vw, 62px); }
+  .bee-hex__label { display: none; }
+  .bee-readout { left: var(--gutter); top: var(--gutter); max-width: 66%; }
+  .bee-readout p { display: none; }
+}
 
 /* ===========================================================================
    Aether — page-wide weather experience (scoped to the aether project only)

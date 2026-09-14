@@ -64,6 +64,9 @@ Climb from the top every time. Most tasks are answered by rungs 1–4.
   hand-edit it and don't let a verification build leak into a commit.
 - **Verify what you can see.** If a change is visible in the browser, check it in
   the preview before calling it done — never ask the user to check for you.
+- **No em dashes.** Never write an em dash (the long dash, U+2014) in copy, data
+  strings or UI text. Use a comma, colon, parentheses or a period; ranges take an
+  en dash (`–`), label separators a middot (`·`). Code comments are exempt.
 
 > When in doubt, do less. The best diff is often the one that deletes a rung
 > someone else climbed too far up.

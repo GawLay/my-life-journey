@@ -159,6 +159,27 @@ function setupWorldLinks() {
   });
 }
 
+// Leaving to a project detail page: iris the charcoal cover shut from the tapped
+// card, then navigate. The project page paints under a matching cover and irises
+// it open — one continuous charcoal hand-off (see project.js).
+function setupProjectLinks() {
+  if (reduced) return;
+  const cover = document.querySelector('.work-entry');
+  if (!cover) return;
+  let leaving = false;
+  document.querySelectorAll('a[href*="project.html"]').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      if (event.metaKey || event.ctrlKey || event.shiftKey || leaving) return;
+      event.preventDefault();
+      leaving = true;
+      try { sessionStorage.setItem('paz-entry', 'project'); } catch { /* storage unavailable */ }
+      gsap.fromTo(cover,
+        { clipPath: 'circle(0% at 50% 50%)' },
+        { clipPath: 'circle(150% at 50% 50%)', duration: 0.72, ease: 'power3.inOut', onComplete: () => window.location.assign(link.href) });
+    });
+  });
+}
+
 async function boot() {
   try { await document.fonts.ready; } catch (_) { /* font loading is non-critical */ }
   initHeaderWave();
@@ -169,6 +190,7 @@ async function boot() {
   initLiquidWarp();
   initSound();
   setupWorldLinks();
+  setupProjectLinks();
   requestAnimationFrame(() => ScrollTrigger.refresh());
 }
 

@@ -73,3 +73,7 @@ npm run preview   # preview the production build
 - Respect `prefers-reduced-motion` on every animation path.
 - Keep the three pages visually one system — shared header/footer rhythm, shared tokens.
 - Verify visible changes in the browser preview before saying they're done.
+- **Never use em dashes (the long dash, U+2014) in copy or UI text.** Rewrite with a
+  comma, colon, parentheses, or a period; for date or number ranges use an en dash
+  (`–`), and for label separators use a middot (`·`). Applies to all site copy, data
+  strings, and any new writing.

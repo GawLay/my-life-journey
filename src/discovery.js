@@ -76,7 +76,7 @@ const featureMemories = place.memories.slice(orbitLayouts.length, orbitLayouts.l
 const archiveMemories = place.memories.slice(orbitLayouts.length + featureLayouts.length, orbitLayouts.length + featureLayouts.length + archiveLayouts.length);
 const cityList = place.cities.split(' / ').map((city) => city.trim());
 
-document.title = `${place.country} Discovery — Explore My World / Phyo Aung Zaw`;
+document.title = `${place.country} Discovery · Explore My World / Phyo Aung Zaw`;
 document.body.style.setProperty('--discovery-accent', place.memories[0].palette[2]);
 document.body.style.setProperty('--discovery-warm', place.memories[1].palette[1]);
 document.body.style.setProperty('--discovery-cool', place.memories[2].palette[0]);
@@ -115,7 +115,7 @@ content.innerHTML = `
     </header>
     <div class="memory-scene__canvas">
       ${renderScene(featureMemories, featureLayouts, 'feature')}
-      <p class="memory-scene__aside">${place.coordinates}<br />${cityList.join(' — ')}</p>
+      <p class="memory-scene__aside">${place.coordinates}<br />${cityList.join(' · ')}</p>
     </div>
   </section>
 
@@ -124,7 +124,7 @@ content.innerHTML = `
     <header class="memory-scene__heading">
       <span>SCENE 03 / SMALL EVIDENCE</span>
       <h2 id="archive-scene-title">A place returns<br /><em>in fragments.</em></h2>
-      <p>Light, weather, movement—the images that stay after the itinerary disappears.</p>
+      <p>Light, weather, movement: the images that stay after the itinerary disappears.</p>
     </header>
     <div class="memory-scene__canvas memory-scene__canvas--archive">
       ${renderScene(archiveMemories, archiveLayouts, 'archive')}

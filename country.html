@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#f0eadf" />
-    <title>Country Journal — Phyo Aung Zaw</title>
+    <title>Country Journal · Phyo Aung Zaw</title>
     <meta name="description" content="A photographic country journal from the world of Phyo Aung Zaw." />
     <script>
       (() => {
@@ -41,12 +41,12 @@
   </head>
   <body class="country-page">
     <div class="country-entry" id="country-entry" aria-hidden="true">
-      <span>DEEP DIVE / <i id="country-entry-label">JAPAN</i></span>
-      <strong id="country-entry-name">Japan</strong>
+      <span>DEEP DIVE / <i id="country-entry-label">VIETNAM</i></span>
+      <strong id="country-entry-name">Vietnam</strong>
     </div>
     <script>
       if (document.documentElement.classList.contains('from-discovery')) {
-        const id = new URLSearchParams(window.location.search).get('place') || 'japan';
+        const id = new URLSearchParams(window.location.search).get('place') || 'vietnam';
         const country = window.__PAZ_COUNTRY_HANDOFF__?.country || id.charAt(0).toUpperCase() + id.slice(1);
         document.getElementById('country-entry-label').textContent = country.toUpperCase();
         document.getElementById('country-entry-name').textContent = country;
@@ -55,12 +55,12 @@
 
     <header class="country-header">
       <div class="country-header__routes">
-        <a class="country-header__back" id="country-back-discovery" href="./world.html?view=discovery&amp;place=japan" data-return-label="DISCOVERY" aria-label="Back to country discovery">
+        <a class="country-header__back" id="country-back-discovery" href="./world.html?view=discovery&amp;place=vietnam" data-return-label="DISCOVERY" aria-label="Back to country discovery">
           <span aria-hidden="true">←</span><span data-wave>Back to discovery</span>
         </a>
-        <a class="country-header__world" id="country-back-world" href="./world.html?focus=japan" data-return-label="THE WORLD" data-wave>World</a>
+        <a class="country-header__world" id="country-back-world" href="./world.html?focus=vietnam" data-return-label="THE WORLD" data-wave>World</a>
       </div>
-      <span id="country-header-label" data-wave>JAPAN / 2025</span>
+      <span id="country-header-label" data-wave>VIETNAM / NOW</span>
       <button class="nav__sound" type="button" aria-pressed="false" aria-label="Turn on the lo-fi soundscape">
         <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
         <span class="nav__sound-label" data-wave>Lo-fi off</span>

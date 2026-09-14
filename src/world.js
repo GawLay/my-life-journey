@@ -1,6 +1,6 @@
 import gsap from 'gsap';
 import Globe from './gl/Globe.js';
-import { places } from './data/places.js';
+import { places, dreams } from './data/places.js';
 import { initSound } from './modules/sound.js';
 import { initLiquidWarp } from './modules/liquidWarp.js';
 import { initHeaderWave } from './modules/headerWave.js';
@@ -31,10 +31,21 @@ const globe = new Globe(mount, {
 
 discovery = initCountryDiscovery({ globe, globeMount: mount, places, reduced });
 
-nav.innerHTML = places.map((place, index) => `
+// Visited countries are selectable; the bucket-list dreams are a quiet "someday"
+// group at the end, non-interactive until the photographs exist.
+const visitedNav = places.map((place, index) => `
   <button class="world-country" type="button" data-place="${place.id}">
     <span>${String(index + 1).padStart(2, '0')}</span><b>${place.country}</b>
   </button>`).join('');
+const dreamsNav = dreams.map((dream) => `
+  <div class="world-country world-country--dream">
+    <span aria-hidden="true">✦</span><b>${dream.place}<i>${dream.note}</i></b>
+  </div>`).join('');
+nav.style.setProperty('--country-cols', places.length + dreams.length);
+nav.innerHTML = visitedNav + dreamsNav;
+
+const introMeta = document.querySelector('.world__intro > p');
+if (introMeta) introMeta.textContent = `AN INTERACTIVE ATLAS / ${String(places.length).padStart(2, '0')} CHAPTERS`;
 
 nav.addEventListener('click', (event) => {
   const button = event.target.closest('[data-place]');

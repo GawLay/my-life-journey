@@ -90,10 +90,52 @@ const thailandGallery = [
 
 const placeData = [
   {
+    // Home. No gallery yet, on purpose: these are the frames I never thought to
+    // fill. The copy leans into that, and the placeholders wait for the photos I
+    // will bring back. `photos: 0` keeps the counts honest until then.
     id: 'myanmar', iso: 'MMR', country: 'Myanmar', year: '2016', cities: 'YANGON / MANDALAY',
-    coordinates: '16.8409° N / 96.1735° E', lat: 16.84, lng: 96.17, photos: 18, stories: 4,
-    note: 'Where the story began — familiar streets, monsoon air and the instinct to keep making things.',
+    coordinates: '16.8409° N / 96.1735° E', lat: 16.84, lng: 96.17, photos: 0, stories: 6,
+    note: 'It felt like home, so I never thought to photograph it. Myanmar is where everything began: my family, my street, the small world that made me. I was too busy living inside those days to hold up a camera, and the ordinary moments I never kept are the ones I miss most. These frames are still empty. Someday soon I will go home and fill them.',
     images: [],
+    deepDive: {
+      cover: { city: 'YANGON', moment: 'HOME', palette: ['#7a3b2e', '#d8a866', '#3f5148'] },
+      intro: 'Some places you visit. One place makes you. Myanmar is where my footprints first meant something, and where my family, my whole world, still is. I never imagined I could miss a place this much. I have almost no pictures of it, because when you are home you never believe the ordinary will one day be the thing you ache for.',
+      chapters: [
+        {
+          kind: 'wide', role: 'WHERE IT BEGAN', eyebrow: 'YANGON', time: '2016',
+          photo: { city: 'YANGON', moment: 'HOME STREETS' },
+          copy: 'This is where it all began. Monsoon air on warm pavement, the smell of the first rain, familiar streets that knew my name before I did. It is the first place my footprints ever left a mark, and everything I have made since still starts from here. I thought it would always be there, exactly the way I left it, waiting for whenever I chose to come back.',
+        },
+        {
+          kind: 'split', role: 'MY WHOLE WORLD', eyebrow: 'FAMILY',
+          title: 'My family,<br /><em>my whole world.</em>',
+          photo: { city: 'YANGON', moment: 'THE TABLE' },
+          copy: 'Home was never the skyline or the landmarks. It was the people around the table, the tea going cold while we talked, the small rituals of an ordinary evening. It was my family, who are, and always will be, my whole world. I did not know then that I was already living inside the memory I would one day miss the most.',
+        },
+        {
+          kind: 'diptych', detailRole: 'THE EVERYDAY', streetRole: 'THE ORDINARY',
+          detail: { city: 'YANGON', moment: 'SMALL THINGS' },
+          street: { city: 'MANDALAY', moment: 'A PASSING DAY' },
+          copy: 'The ordinary days I never thought to photograph: a corner, a light, a face I passed every morning, the particular way the afternoon fell across the floor. I did not value them enough to keep them. Now I would give almost anything for one honest frame of a day I was so sure would repeat forever.',
+        },
+        {
+          kind: 'wide', role: 'FROM FAR AWAY', eyebrow: 'HOMESICK',
+          photo: { city: 'YANGON', moment: 'LONGING' },
+          copy: 'I never imagined I would have to miss my hometown this much. From far away the smallest things turn into poetry: a song, a smell, a word in my own language, the sound of home in someone else&rsquo;s voice. The longing does not shout. It just lingers, quiet and constant, underneath everything. You do not understand how much a place is a part of you until you are standing somewhere it is not.',
+        },
+        {
+          kind: 'split', role: 'ONE PHOTOGRAPH', eyebrow: 'WHAT I LEARNED',
+          title: 'One photograph,<br /><em>a whole world back.</em>',
+          photo: { city: 'HOME', moment: 'IF ONLY' },
+          copy: 'I never understood how a single photograph could become the most valuable thing you own. Now I do. One ordinary frame can hand you back a whole afternoon: a voice, a laugh, a version of the people you love that will never come again. I learned it a little too late for some of them. I am trying to learn it in time for the rest.',
+        },
+        {
+          kind: 'closing', role: 'PHOTOS TO COME',
+          photo: { city: 'YANGON', moment: 'SOMEDAY' },
+          copy: 'So this chapter waits, honestly, with more blank space than pictures. I did not capture enough of home the first time around, and I have made my peace with letting that ache show here. But I am going back, and this time I will hold up the camera. Someday soon these frames will hold my family, my streets and my whole world: the photographs they have always deserved.',
+        },
+      ],
+    },
   },
   {
     id: 'thailand', iso: 'THA', country: 'Thailand', year: '2019', cities: 'BANGKOK / AYUTTHAYA / NAKHON PATHOM / KO LAN / HUA HIN',
@@ -101,29 +143,23 @@ const placeData = [
     note: 'Sathorn was the beginning: river weather outside the window, then old brick, island shores and the home days that followed.',
     gallery: thailandGallery,
     discoveryGroups: [
-      { id: 'ko-lan', eyebrow: 'KO LAN / THE ISLAND SHORE', title: 'Across the water,<br /><em>to the shore.</em>', copy: 'The island stayed with me as weather and water—empty loungers waiting out the heat, a bright boat crossing the bay, and palm shadows falling long across the sand.' },
+      { id: 'ko-lan', eyebrow: 'KO LAN / THE ISLAND SHORE', title: 'Across the water,<br /><em>to the shore.</em>', copy: 'The island stayed with me as weather and water: empty loungers waiting out the heat, a bright boat crossing the bay, and palm shadows falling long across the sand.' },
       { id: 'hua-hin', eyebrow: 'HUA HIN / SHORELINE', title: 'A quieter<br /><em>edge.</em>', copy: 'One long beach, low waves and the slow traffic of people and horses along the water.' },
-      { id: 'nakhon-pathom', eyebrow: 'NAKHON PATHOM / HOME DAYS', title: 'The days became<br /><em>familiar.</em>', copy: 'Garden paths, evening rides, cooking and firelight—the ordinary pieces that made a place feel lived in.' },
-      { id: 'companions', eyebrow: 'SMALL COMPANIONS', title: 'The softest<br /><em>footnotes.</em>', copy: 'Mico and Milo—two small dogs who quietly ran the household and kept turning up in the camera roll.' },
+      { id: 'nakhon-pathom', eyebrow: 'NAKHON PATHOM / HOME DAYS', title: 'The days became<br /><em>familiar.</em>', copy: 'Garden paths, evening rides, cooking and firelight: the ordinary pieces that made a place feel lived in.' },
+      { id: 'companions', eyebrow: 'SMALL COMPANIONS', title: 'The softest<br /><em>footnotes.</em>', copy: 'Mico and Milo, two small dogs who quietly ran the household and kept turning up in the camera roll.' },
     ],
     deepDive: {
       cover: { ...thailandGallery[0], moment: 'FIRST ADDRESS', palette: ['#2f4245', '#c9a779', '#a64d39'] },
       intro: 'Thailand began for me in Sathorn: river weather outside the window, ferries below and a skyline changing by the hour. The map widened from there, but that first address still holds the beginning.',
       chapters: [
         { kind: 'collection', role: 'FIRST ADDRESS', eyebrow: 'SATHORN · WHERE IT STARTED', title: 'The first view<br /><em>became a beginning.</em>', copy: 'Sathorn was my first place in Thailand. Morning entered through the window; boats and storms crossed the river; the skyline taught me the changing pace of Bangkok.', media: thailandGallery.filter((item) => item.group === 'sathorn') },
-        { kind: 'collection', role: 'OLD CAPITAL', eyebrow: 'AYUTTHAYA · OLD STONE', title: 'Time held<br /><em>in warm brick.</em>', copy: 'Ayutthaya slowed the journey down—weathered prangs holding the afternoon heat, and brick foundations that have outlasted everything once built on them.', media: thailandGallery.filter((item) => item.group === 'ayutthaya') },
+        { kind: 'collection', role: 'OLD CAPITAL', eyebrow: 'AYUTTHAYA · OLD STONE', title: 'Time held<br /><em>in warm brick.</em>', copy: 'Ayutthaya slowed the journey down: weathered prangs holding the afternoon heat, and brick foundations that have outlasted everything once built on them.', media: thailandGallery.filter((item) => item.group === 'ayutthaya') },
         { kind: 'collection', role: 'ISLAND DAYS', eyebrow: 'KO LAN · THE ISLAND SHORE', title: 'Across the water,<br /><em>to the shore.</em>', copy: 'Ko Lan is mostly weather and water: a speedboat cutting the bay, storm light gathering over the loungers, empty chairs on the sand and palm shadows in the afternoon.', media: thailandGallery.filter((item) => item.group === 'ko-lan') },
-        { kind: 'collection', role: 'SHORELINE', eyebrow: 'HUA HIN · A QUIETER EDGE', title: 'One long beach,<br /><em>one slower afternoon.</em>', copy: 'Hua Hin appears as a single long shoreline—people, horses and low waves passing through the same pale frame.', media: thailandGallery.filter((item) => item.group === 'hua-hin') },
-        { kind: 'collection', role: 'HOME DAYS', eyebrow: 'NAKHON PATHOM · LIVED IN', title: 'The ordinary days<br /><em>held the longest.</em>', copy: 'All the Nakhon Pathom memories belong together: garden paths, watering plants, evening rides, cooking and firelight. Not landmarks—just the details that made Thailand feel lived in.', media: thailandGallery.filter((item) => item.group === 'nakhon-pathom') },
+        { kind: 'collection', role: 'SHORELINE', eyebrow: 'HUA HIN · A QUIETER EDGE', title: 'One long beach,<br /><em>one slower afternoon.</em>', copy: 'Hua Hin appears as a single long shoreline: people, horses and low waves passing through the same pale frame.', media: thailandGallery.filter((item) => item.group === 'hua-hin') },
+        { kind: 'collection', role: 'HOME DAYS', eyebrow: 'NAKHON PATHOM · LIVED IN', title: 'The ordinary days<br /><em>held the longest.</em>', copy: 'All the Nakhon Pathom memories belong together: garden paths, watering plants, evening rides, cooking and firelight. Not landmarks, just the details that made Thailand feel lived in.', media: thailandGallery.filter((item) => item.group === 'nakhon-pathom') },
         { kind: 'collection', role: 'FOOTNOTES', eyebrow: 'SMALL COMPANIONS', title: 'The softest<br /><em>part of the archive.</em>', copy: 'Mico and Milo: the two small dogs who quietly ran the household and stayed in the camera roll long after.', media: thailandGallery.filter((item) => item.group === 'companions') },
       ],
     },
-  },
-  {
-    id: 'singapore', iso: 'SGP', country: 'Singapore', year: '2021', cities: 'SINGAPORE',
-    coordinates: '1.3521° N / 103.8198° E', lat: 1.35, lng: 103.82, photos: 14, stories: 3,
-    note: 'Small distances, sharp contrasts and an enduring lesson in precision at city scale.',
-    images: [],
   },
   {
     id: 'vietnam', iso: 'VNM', country: 'Vietnam', year: 'NOW', cities: 'HO CHI MINH CITY / ĐÀ NẴNG / HỘI AN / MŨI NÉ',
@@ -244,7 +280,7 @@ const placeData = [
         {
           kind: 'split', role: 'MORNING LIGHT', eyebrow: 'ĐÀ NẴNG · SƠN TRÀ',
           title: 'The coast keeps<br /><em>a calmer watch.</em>',
-          copy: 'Six hours north the noise thins to surf. The Lady Buddha stands over Sơn Trà with the mountains at her back and the sea in front of her — the first real quiet of the whole road.',
+          copy: 'Six hours north the noise thins to surf. The Lady Buddha stands over Sơn Trà with the mountains at her back and the sea in front of her, the first real quiet of the whole road.',
           photo: {
             src: '/images/world/vietnam/05-morning-light-da-nang-lady-buddha.webp',
             city: 'ĐÀ NẴNG', moment: 'LADY BUDDHA', position: 'center 32%',
@@ -267,7 +303,7 @@ const placeData = [
         },
         {
           kind: 'wide', role: 'AFTERNOON', eyebrow: 'HỘI AN',
-          copy: 'Then the map softens into old town — mustard walls, tiled awnings, bougainvillea over every second doorway. Nothing here is in a hurry, and it asks you not to be either.',
+          copy: 'Then the map softens into old town: mustard walls, tiled awnings, bougainvillea over every second doorway. Nothing here is in a hurry, and it asks you not to be either.',
           photo: {
             src: '/images/world/vietnam/deep-01-hoi-an-old-town.webp',
             city: 'HỘI AN', moment: 'OLD TOWN', position: 'center 45%',
@@ -286,7 +322,7 @@ const placeData = [
         },
         {
           kind: 'diptych', detailRole: 'HANDMADE', streetRole: 'RIVER',
-          copy: 'Colour made by hand, one lantern at a time — then the river gathers all of it into a single warm crowd.',
+          copy: 'Colour made by hand, one lantern at a time, then the river gathers all of it into a single warm crowd.',
           detail: {
             src: '/images/world/vietnam/deep-03-hoi-an-lantern-detail.webp',
             city: 'HỘI AN', moment: 'LANTERNS', position: 'center',
@@ -310,15 +346,18 @@ const placeData = [
       ],
     },
   },
-  {
-    id: 'japan', iso: 'JPN', country: 'Japan', year: '2025', cities: 'TOKYO / KYOTO / OSAKA',
-    coordinates: '35.6762° N / 139.6503° E', lat: 35.68, lng: 139.65, photos: 24, stories: 3,
-    note: 'I arrived expecting one city and found a thousand small worlds, each moving at its own tempo.',
-    images: [],
-  },
 ];
 
 export const places = placeData.map((place, index) => ({
   ...place,
   memories: createMemories(place, index),
 }));
+
+// Not visited yet: the bucket list. These are aspirations, not archives, so they
+// live outside `places` (no globe pin, no discovery) and render as a quiet
+// "someday" group in the world nav. Add more here as the list grows.
+export const dreams = [
+  { place: 'Switzerland', note: 'The Alps' },
+  { place: 'Iceland', note: 'The aurora' },
+  { place: 'New Zealand', note: 'The far south' },
+];

@@ -4,8 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#282722" />
-    <title>Project — Phyo Aung Zaw</title>
+    <title>Project · Phyo Aung Zaw</title>
     <meta name="description" content="A selected mobile product case study by Phyo Aung Zaw." />
+    <script>
+      (() => {
+        try {
+          if (sessionStorage.getItem('paz-entry') === 'project') {
+            sessionStorage.removeItem('paz-entry');
+            document.documentElement.classList.add('is-project-entering');
+          }
+        } catch { /* storage can be unavailable */ }
+      })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet" />

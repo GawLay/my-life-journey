@@ -86,4 +86,6 @@ export function initSound() {
     savePreference(preferred);
     await setPlaying(shouldEnable);
   });
+
+  return ambient;
 }

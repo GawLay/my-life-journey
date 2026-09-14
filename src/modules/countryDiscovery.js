@@ -178,7 +178,7 @@ export function initCountryDiscovery({ globe, globeMount, places, reduced = fals
         </header>
         <div class="memory-scene__canvas">
           ${renderScene(featureMemories, featureLayouts, 'feature')}
-          <p class="memory-scene__aside">${place.coordinates}<br />${cityList.join(' — ')}</p>
+          <p class="memory-scene__aside">${place.coordinates}<br />${cityList.join(' · ')}</p>
         </div>
       </section>
 
@@ -187,7 +187,7 @@ export function initCountryDiscovery({ globe, globeMount, places, reduced = fals
         <header class="memory-scene__heading">
           <span>SCENE 03 / SMALL EVIDENCE</span>
           <h2 id="archive-scene-title">A place returns<br /><em>in fragments.</em></h2>
-          <p>Light, weather, movement—the images that stay after the itinerary disappears.</p>
+          <p>Light, weather, movement: the images that stay after the itinerary disappears.</p>
         </header>
         <div class="memory-scene__canvas memory-scene__canvas--archive">
           ${renderScene(archiveMemories, archiveLayouts, 'archive')}

@@ -12,7 +12,7 @@ function updateJournal(place) {
     const element = document.getElementById(id);
     if (element) element.textContent = value;
   };
-  setText('journal-index', `${String(index).padStart(2, '0')} / ${String(places.length).padStart(2, '0')} — ${place.country.toUpperCase()}`);
+  setText('journal-index', `${String(index).padStart(2, '0')} / ${String(places.length).padStart(2, '0')} · ${place.country.toUpperCase()}`);
   const title = document.getElementById('journal-title');
   if (title) title.innerHTML = `${place.country}<br /><em>${place.year}</em>`;
   setText('journal-when', place.year === 'NOW' ? 'CURRENT CHAPTER' : place.year);

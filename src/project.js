@@ -5,6 +5,9 @@ import { initHeaderWave } from './modules/headerWave.js';
 import { initLiquidWarp } from './modules/liquidWarp.js';
 import { initSound } from './modules/sound.js';
 import { initAetherWeather } from './modules/aetherWeather.js';
+import { initPortfolioMotion } from './modules/portfolioMotion.js';
+import { initTruemoneyNetwork } from './modules/truemoneyMotion.js';
+import { initBeehiveJourney } from './modules/beehiveMotion.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -16,6 +19,9 @@ const next = projects[(currentIndex + 1) % projects.length];
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches || params.has('static');
 
 const AETHER_INITIAL = 'rain';
+// Set by project.html's head script when arriving from the work list or a sibling
+// project: the page paints under the charcoal cover, which we iris open on load.
+const projectEntering = !reduced && document.documentElement.classList.contains('is-project-entering');
 
 const phoneFrame = (media, className = '') => `
   <div class="device ${className}">
@@ -53,32 +59,93 @@ function weatherVisual() {
     <div class="aether-showcase">
       <div class="aether-showcase__copy">
         <span>LIVE SCENE / <b data-aether-scene-label>RAIN</b></span>
-        <p>Real Android capture, held inside the same weather the page is showing. Try another scene — the whole screen changes with it.</p>
+        <p>Real Android capture, held inside the same weather the page is showing. Try another scene. The whole screen changes with it.</p>
       </div>
       ${phoneFrame(`<img src="./images/projects/aether/rain.png" alt="Aether Android app in the rain scene" data-aether-screen />`, 'device--weather')}
       <p class="aether-showcase__hint" aria-hidden="true">CURRENT / <span data-aether-readout>Rain</span></p>
     </div>`;
 }
 
+const PF_ICONS = {
+  home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 11l8-6 8 6"/><path d="M6 10v9h12v-9"/></svg>',
+  skill: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3l2.3 5.6L20 9l-4.4 3.9L17 19l-5-3.4L7 19l1.4-6.1L3 9l5.7-.4z"/></svg>',
+  explist: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="7" width="18" height="12" rx="2"/><path d="M8 7V5h8v2"/></svg>',
+  resume: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>',
+};
+
 function portfolioVisual() {
+  const nav = [['home', 'Home'], ['skill', 'Skill'], ['explist', 'Experience'], ['resume', 'Resume']];
+  const steps = [['home', 'Home'], ['skill', 'Skill'], ['explist', 'Experience'], ['resume', 'Résumé']];
+  const file = { home: 'about', skill: 'skill', explist: 'experience', expdetail: 'experience-detail', resume: 'resume' };
+  const screen = (id, alt) => `<img class="pf-scr" data-screen="${id}" src="./images/projects/portfolio/${file[id]}.png" alt="Portfolio app: ${alt}" />`;
   return `
-    <div class="portfolio-stage">
-      <div class="portfolio-stage__caption"><span>01 / PROFILE</span><p>A personal introduction that opens into the work.</p></div>
-      ${phoneFrame('<img src="./images/projects/portfolio/home.png" alt="Portfolio Android app home screen" />', 'device--portfolio-home')}
-      ${phoneFrame('<video src="./images/projects/portfolio/transition.mp4" poster="./images/projects/portfolio/experience.png" aria-label="Recorded Portfolio app section transition" muted loop playsinline autoplay></video>', 'device--portfolio-motion')}
-      <p class="portfolio-stage__motion-label">02 / TRANSITION<br /><span>REAL EMULATOR RECORDING</span></p>
+    <div class="pf-stage" data-pf-stage>
+      <img class="pf-backdrop" data-pf-backdrop src="./images/projects/portfolio/about.png" alt="" aria-hidden="true" />
+      <div class="pf-side">
+        <div class="pf-intro">
+          <span>02 / EXPLORE THE APP</span>
+          <p>The résumé app moves like a product. Open the menu and step between its pages: each change plays the app’s own circular reveal, the same clip-path motion this site uses between its own pages.</p>
+        </div>
+        <div class="pf-steps" data-pf-steps role="group" aria-label="App pages">${steps.map(([id, label]) => `<button type="button" data-pf-step="${id}">${label}</button>`).join('<i aria-hidden="true"></i>')}</div>
+        <p class="pf-tag">RECREATED FROM THE REAL APP</p>
+      </div>
+      <div class="device device--pf" data-pf-phone>
+        <span class="device__speaker" aria-hidden="true"></span>
+        <div class="device__screen">
+          ${screen('home', 'home card')}
+          ${screen('skill', 'skills grid')}
+          ${screen('explist', 'experience list')}
+          ${screen('expdetail', 'experience detail')}
+          ${screen('resume', 'résumé detail')}
+          <button class="pf-hotspot" type="button" data-pf-open-detail hidden>View role →</button>
+          <button class="pf-back" type="button" data-pf-back hidden>← Experiences</button>
+          <div class="pf-flycard" data-pf-fly hidden style="background-image:url('./images/projects/portfolio/role-card.png')"></div>
+          <div class="pf-fab" data-pf-fab>
+            <nav class="pf-fab__bar" data-pf-bar aria-label="App sections">
+              ${nav.map(([id, label]) => `<button type="button" data-pf-go="${id}">${PF_ICONS[id]}<b>${label}</b></button>`).join('')}
+            </nav>
+            <button class="pf-fab__toggle" type="button" data-pf-toggle aria-expanded="false" aria-label="Open sections menu"><span></span></button>
+          </div>
+        </div>
+      </div>
     </div>`;
 }
 
+// No private screens to show, so the system is the hero: transactions stream
+// from the 23K-agent core out along four service spokes; selecting one traces
+// its path. Pulses + selection live in modules/truemoneyMotion.js.
+const TM_SERVICES = [
+  ['remit', 'Remittance', 'Domestic transfers moved agent-to-agent across the country.', 15, 23],
+  ['topup', 'Mobile top-up', 'Airtime and data for every operator, settled at the counter.', 76, 18],
+  ['billpay', 'Bill payment', 'Utilities and everyday services paid in one place.', 82, 69],
+  ['cash', 'Cash in / out', 'The counter that turns digital value into cash and back.', 14, 75],
+];
+
 function networkVisual() {
+  const first = TM_SERVICES[0];
+  const spokes = TM_SERVICES.map(([id, , , x, y]) => `<line class="tm-spoke" data-spoke="${id}" x1="50" y1="50" x2="${x}" y2="${y}" />`).join('');
+  const nodes = TM_SERVICES.map(([id, name, desc, x, y]) => `
+        <button type="button" class="tm-node" data-tm-node="${id}" data-name="${name}" data-desc="${desc}" style="--x:${x}%;--y:${y}%" aria-pressed="false">
+          <span class="tm-node__dot" aria-hidden="true"></span><b>${name}</b>
+        </button>`).join('');
   return `
     <div class="system-stage system-stage--network">
-      <div class="network-map" aria-label="Diagram of the TrueMoney Agent service network">
-        <span class="network-map__ring network-map__ring--one"></span><span class="network-map__ring network-map__ring--two"></span>
-        <div class="network-map__core"><small>AGENT APP</small><strong>23K</strong><span>LOCAL AGENTS</span></div>
-        <i style="--x:15%;--y:23%">REMIT</i><i style="--x:76%;--y:18%">TOP UP</i><i style="--x:82%;--y:69%">BILL PAY</i><i style="--x:14%;--y:75%">CASH</i>
+      <div class="tm-network" data-tm-network role="group" aria-label="Live diagram of the TrueMoney agent service network">
+        <svg class="tm-wires" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+          <circle class="tm-wires__ring" cx="50" cy="50" r="45" />
+          <circle class="tm-wires__ring" cx="50" cy="50" r="29" />
+          <g class="tm-spokes">${spokes}</g>
+          <g class="tm-pulses" data-tm-pulses></g>
+        </svg>
+        <div class="tm-core"><small>AGENT APP</small><strong>23K</strong><span>LOCAL AGENTS</span></div>
+        ${nodes}
       </div>
-      <p class="system-stage__key">PUBLIC PRODUCT FOOTPRINT <span>TRANSACTIONS / CUSTOMERS / SERVICES</span></p>
+      <div class="tm-readout" data-tm-readout aria-live="polite">
+        <span>SERVICE / <b data-tm-index>01</b></span>
+        <h3 data-tm-name>${first[1]}</h3>
+        <p data-tm-desc>${first[2]}</p>
+      </div>
+      <p class="system-stage__key">LIVE SERVICE NETWORK <span>23,000 AGENTS · NATIONWIDE</span></p>
     </div>`;
 }
 
@@ -95,14 +162,53 @@ function layersVisual() {
     </div>`;
 }
 
+// Beehive — one order, two apps. An order token hops the honeycomb from browse
+// to doorstep; the traveled path lights up and a readout names who is acting at
+// each stage (customer / shop / biker). Motion + selection: modules/beehiveMotion.js
+const BEE_ICONS = {
+  browse: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M6 8h12l-1 11H7z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg>',
+  order: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M7 3h10v18l-2.5-1.6L12 21l-2.5-1.6L7 21z"/><path d="M10 8h4M10 12h4"/></svg>',
+  preparing: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M4 8l8-4 8 4-8 4z"/><path d="M4 8v8l8 4 8-4V8"/><path d="M12 12v8"/></svg>',
+  pickup: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="6" y="9" width="12" height="10" rx="1"/><path d="M12 9V4M9 6.5 12 4l3 2.5"/></svg>',
+  delivering: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><circle cx="7" cy="17" r="2.2"/><circle cx="17" cy="17" r="2.2"/><path d="M9 17h6l1.5-6H13l-1-3H8"/></svg>',
+  delivered: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M8.4 12.4l2.6 2.6 4.6-5"/></svg>',
+};
+// id, name, role, description, x%, y% (a gentle honeycomb zigzag)
+const BEE_STAGES = [
+  ['browse', 'Browse', 'customer', 'The customer explores products, food and shops and fills a cart.', 8, 34],
+  ['order', 'Order', 'customer', 'Checkout places the order: one id both apps now follow.', 24.8, 64],
+  ['preparing', 'Preparing', 'shop', 'The shop confirms and prepares the items while a rider is found.', 41.6, 34],
+  ['pickup', 'Pickup', 'biker', 'A biker accepts the job and collects the order from the shop.', 58.4, 64],
+  ['delivering', 'Delivering', 'biker', 'The biker rides out; live status and location stream to the customer.', 75.2, 34],
+  ['delivered', 'Delivered', 'customer', 'Handed over at the door, and the order closes on both sides at once.', 92, 64],
+];
+
 function journeyVisual() {
-  const steps = ['Browse', 'Order', 'Preparing', 'Pickup', 'Delivering', 'Delivered'];
+  const first = BEE_STAGES[0];
+  const links = BEE_STAGES.slice(1).map(([, , , , x, y], i) => {
+    const [, , , , px, py] = BEE_STAGES[i];
+    return `<line class="bee-link" data-link="${i}" x1="${px}" y1="${py}" x2="${x}" y2="${y}" />`;
+  }).join('');
+  const hexes = BEE_STAGES.map(([id, name, role, desc, x, y], i) => `
+        <button type="button" class="bee-hex is-${role}" data-bee-stage="${id}" data-name="${name}" data-role="${role}" data-desc="${desc}" style="--x:${x}%;--y:${y}%" aria-pressed="false">
+          <span class="bee-hex__cell"><span class="bee-hex__ic">${BEE_ICONS[id]}</span><em>0${i + 1}</em></span>
+          <b class="bee-hex__label">${name}</b>
+        </button>`).join('');
   return `
     <div class="system-stage system-stage--journey">
-      <div class="journey-map" aria-label="Diagram of the Beehive order journey">
-        ${steps.map((s, i) => `<div class="journey-node"><span>0${i + 1}</span><b>${s}</b></div>`).join('<i class="journey-link" aria-hidden="true"></i>')}
+      <div class="bee-journey" data-bee-journey role="group" aria-label="Interactive Beehive order journey">
+        <svg class="bee-track" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <g class="bee-track__links">${links}</g>
+        </svg>
+        <span class="bee-token" data-bee-token aria-hidden="true"></span>
+        ${hexes}
       </div>
-      <p class="system-stage__key">ORDER LIFECYCLE <span>CUSTOMER / BIKER — ONE ECOSYSTEM</span></p>
+      <div class="bee-readout" data-bee-readout aria-live="polite">
+        <span>STAGE / <b data-bee-index>01</b> · <i data-bee-role>${first[2]}</i></span>
+        <h3 data-bee-name>${first[1]}</h3>
+        <p data-bee-desc>${first[3]}</p>
+      </div>
+      <p class="system-stage__key">ONE ORDER · TWO APPS <span>CUSTOMER → SHOP → BIKER → DOOR</span></p>
     </div>`;
 }
 
@@ -189,7 +295,7 @@ const navFooter = () => `
   <footer class="project-footer"><span>PHYO AUNG ZAW © 2026</span><a href="mailto:phyoaz14@gmail.com">PHYOAZ14@GMAIL.COM ↗</a></footer>`;
 
 function render() {
-  document.title = `${project.title} — Phyo Aung Zaw`;
+  document.title = `${project.title} · Phyo Aung Zaw`;
   document.body.dataset.project = project.id;
   document.getElementById('project-header-index').textContent = `${project.index} / ${String(projects.length).padStart(2, '0')}`;
   document.getElementById('project-header-name').textContent = project.title;
@@ -204,7 +310,8 @@ function render() {
 
 function setupMotion() {
   if (reduced) return;
-  gsap.timeline({ defaults: { ease: 'power3.out' } })
+  // when arriving under the cover, hold the hero a beat so it reveals as the iris opens
+  gsap.timeline({ defaults: { ease: 'power3.out' }, delay: projectEntering ? .32 : 0 })
     .from('.case-hero__meta span', { autoAlpha: 0, y: 15, duration: .8, stagger: .08 }, .15)
     .from('.case-hero__title > *', { autoAlpha: 0, y: 46, duration: 1.15, stagger: .12 }, .28)
     .from('.case-hero__scroll', { autoAlpha: 0, y: 16, duration: .8 }, .72);
@@ -223,6 +330,8 @@ function setupNavigation() {
     link.addEventListener('click', (event) => {
       if (reduced || event.metaKey || event.ctrlKey) return;
       event.preventDefault();
+      // hand the incoming page a matching cover to iris open (work list vs. sibling project)
+      try { sessionStorage.setItem('paz-entry', link.getAttribute('href').includes('index.html') ? 'work' : 'project'); } catch { /* storage unavailable */ }
       transition.classList.add('is-active');
       window.setTimeout(() => window.location.assign(link.href), 650);
     });
@@ -230,14 +339,25 @@ function setupNavigation() {
   window.addEventListener('pageshow', () => transition.classList.remove('is-active'));
 }
 
+// Iris the charcoal cover open once the page has painted underneath it.
+function revealFromCover() {
+  const root = document.documentElement;
+  if (!projectEntering) { root.classList.remove('is-project-entering'); return; }
+  requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove('is-project-entering')));
+}
+
 async function boot() {
   render();
   try { await document.fonts.ready; } catch (_) { /* non-critical */ }
   initHeaderWave();
-  initSound();
-  if (project.id === 'aether') initAetherWeather(AETHER_INITIAL);
+  const ambient = initSound();
+  if (project.id === 'aether') initAetherWeather(AETHER_INITIAL, ambient);
+  if (project.id === 'portfolio') initPortfolioMotion();
+  if (project.id === 'truemoney') initTruemoneyNetwork();
+  if (project.id === 'beehive') initBeehiveJourney();
   setupMotion();
   setupNavigation();
+  revealFromCover();
   initLiquidWarp();
   requestAnimationFrame(() => ScrollTrigger.refresh());
 }

@@ -69,7 +69,7 @@ function easeEnv(env, goal, k) {
   for (const p of ['glowA', 'rain', 'snow', 'stars', 'motes', 'cloud', 'wind', 'storm']) env[p] = lerp(env[p], goal[p], k);
 }
 
-export function initAetherWeather(initial = 'rain') {
+export function initAetherWeather(initial = 'rain', ambient = null) {
   const switcher = document.querySelector('[data-aether-switch]');
   const screen = document.querySelector('[data-aether-screen]');
   const label = document.querySelector('[data-aether-scene-label]');
@@ -250,7 +250,7 @@ export function initAetherWeather(initial = 'rain') {
     document.documentElement.style.setProperty('--wx-accent', rgba(env.accent, 1));
 
     // storm lightning — a forked bolt with a soft screen flash behind it
-    if (env.storm > 0.4) { flashCue -= dt; if (flashCue <= 0) { bolt = { segs: makeBolt(), life: 1 }; flash = 0.5; flashCue = 2.8 + Math.random() * 4.5; } }
+    if (env.storm > 0.4) { flashCue -= dt; if (flashCue <= 0) { bolt = { segs: makeBolt(), life: 1 }; flash = 0.5; flashCue = 2.8 + Math.random() * 4.5; if (ambient) setTimeout(() => ambient.thunder(), 140 + Math.random() * 460); } }
     flash *= Math.pow(0.02, dt);
     if (bolt) bolt.life *= Math.pow(0.004, dt);
 
@@ -270,6 +270,7 @@ export function initAetherWeather(initial = 'rain') {
   function setState(name) {
     if (!STATES[name]) return;
     current = name; goal = toEnv(STATES[name]);
+    if (ambient) ambient.setScene(name); // rain/storm play a rain bed, else lo-fi
     document.body.dataset.weather = name;
     if (screen) { screen.src = STATES[name].screen; screen.alt = `Aether Android app in the ${STATES[name].label.toLowerCase()} scene`; }
     if (label) label.textContent = STATES[name].label.toUpperCase();

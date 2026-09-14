@@ -8,7 +8,7 @@ import { initHeaderWave } from './modules/headerWave.js';
 gsap.registerPlugin(ScrollTrigger);
 
 const params = new URLSearchParams(window.location.search);
-const place = places.find((item) => item.id === params.get('place')) || places.find((item) => item.id === 'japan') || places[0];
+const place = places.find((item) => item.id === params.get('place')) || places.find((item) => item.id === 'vietnam') || places[0];
 const fromDiscovery = params.get('from') === 'discovery';
 const index = places.findIndex((item) => item.id === place.id);
 const next = places[(index + 1) % places.length];
@@ -59,7 +59,7 @@ const defaultChapters = [
     title: deepDive.portraitTitle || 'The hour before<br /><em>everything opens.</em>',
     copy: deepDive.portraitCopy || 'Small rituals carry the shape of a place: shutters rising, breakfast behind a curtain, bicycles against old walls.' },
   { kind: 'diptych', detailRole: 'DETAIL', streetRole: 'STREET', detail: storyPhotos[2], street: storyPhotos[3],
-    copy: deepDive.diptychCopy || 'Not the landmark—the view beside it. Not the itinerary—the weather that changed it.' },
+    copy: deepDive.diptychCopy || 'Not the landmark, the view beside it. Not the itinerary, the weather that changed it.' },
   { kind: 'closing', role: 'DEPARTURE', photo: storyPhotos[4],
     copy: deepDive.closingCopy || 'Some memories return as images. The lasting ones come back as sound, weather and pace.' },
 ];
@@ -113,7 +113,7 @@ function storyChapter(chapter) {
   }
 }
 
-document.title = `${place.country} — World Journal / Phyo Aung Zaw`;
+document.title = `${place.country} · World Journal / Phyo Aung Zaw`;
 document.body.style.setProperty('--country-accent', accent);
 document.body.style.setProperty('--country-warm', warm);
 document.body.style.setProperty('--country-cool', cool);

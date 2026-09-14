@@ -199,11 +199,19 @@ html:has(.project) { scroll-snap-type: y proximity; }
 .project__visual::before { content: ""; position: absolute; inset: 8%; border: 1px solid rgba(40,39,34,.18); }
 .project__visual::after { content: attr(data-caption); position: absolute; left: 1.25rem; bottom: 1rem; font: 400 0.58rem/1 var(--mono); letter-spacing: 0.08em; opacity: .58; }
 .project__orbit { position: absolute; width: 64%; aspect-ratio: 1; border: 1px solid rgba(40,39,34,.22); border-radius: 50%; }
-.project__phone { width: min(37%, 255px); aspect-ratio: 300 / 620; background: var(--charcoal); padding: 5px; border-radius: 33px; box-shadow: 0 32px 55px rgba(40,39,34,.25); z-index: 1; transition: transform 650ms var(--ease); }
-.project__screen { width: 100%; height: 100%; border-radius: 29px; overflow: hidden; background: #f5f1e9; }
-.project__screen svg, .project__screen img { width: 100%; height: 100%; object-fit: cover; }
+/* Same device frame as the project detail page (.device in project.css): a clean
+   near-black body with a speaker pill and a black screen backing, so no cream
+   edge peeks past a screenshot that doesn't fully cover. */
+.project__phone { position: relative; width: min(37%, 255px); aspect-ratio: 1080 / 2424; background: #111; padding: 7px; border-radius: 38px; box-shadow: 0 40px 70px rgba(40,39,34,.32); z-index: 1; transition: transform 650ms var(--ease); }
+.project__phone::before { content: ""; position: absolute; z-index: 2; width: 25%; height: 5px; border-radius: 99px; left: 37.5%; top: 11px; background: rgba(255,255,255,.18); }
+.project__screen { width: 100%; height: 100%; border-radius: 32px; overflow: hidden; background: #111; }
+/* Round the media itself, not just the parent: a composited <img> ignores an
+   ancestor's overflow-clip at the corners, so a bright screenshot (Portfolio,
+   Aether) would show hard square corners. `inherit` tracks the screen radius. */
+.project__screen svg, .project__screen img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: inherit; }
 .project__visual:hover .project__phone { transform: translateY(-1.5%); }
 .project--landscape .project__phone { width: min(72%, 560px); aspect-ratio: 16 / 10; border-radius: 18px; padding: 4px; }
+.project--landscape .project__phone::before { display: none; }
 .project--landscape .project__screen { border-radius: 15px; }
 .project--offset .project__phone { transform: translate(18%, -5%); }
 .project--offset .project__visual:hover .project__phone { transform: translate(18%, -6.5%); }
@@ -423,7 +431,9 @@ html.is-entering .work-entry span { opacity: 1; }
   .chapter-intro__title, .chapter-intro__side { grid-column: 1; }
   .chapter-intro__title { font-size: clamp(3.6rem, 18vw, 6rem); }
   .project__visual { min-height: 122vw; }
-  .project__phone { width: 54%; }
+  .project__phone { width: 54%; border-radius: 32px; padding: 6px; }
+  .project__phone::before { top: 9px; height: 4px; }
+  .project__screen { border-radius: 27px; }
   .project--landscape .project__visual { min-height: 85vw; }
   .project--landscape .project__phone { width: 82%; }
   .practice h3 { width: 100%; }
