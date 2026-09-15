@@ -1,4 +1,5 @@
-const SKIP = 'script, style, svg, canvas, textarea, input, select, option, .liquid-word, .liquid-char, .liquid-cursor';
+const SKIP = 'script, style, svg, canvas, textarea, input, select, option, .liquid-word, .liquid-char, .liquid-cursor, [data-page-wave-temp], .wave-arrival, .page-wave-settled';
+const CHARACTERS = '.liquid-char, .page-wave-settled > .wave-letter';
 const TOP_BARS = '.site-header, .world-header, .discovery-header, .country-header, .project-header';
 const TRAIL_LIFETIME = 680;
 
@@ -47,8 +48,7 @@ export function initLiquidWarp() {
     || new URLSearchParams(location.search).has('static')) return;
 
   splitText(document.body);
-  let characters = [...document.querySelectorAll('.liquid-char')];
-  if (!characters.length) return;
+  let characters = [...document.querySelectorAll(CHARACTERS)];
 
   const cursor = document.createElement('i');
   cursor.className = 'liquid-cursor';
@@ -92,7 +92,7 @@ export function initLiquidWarp() {
       refreshFrame = 0;
       observer.disconnect();
       splitText(document.body);
-      characters = [...document.querySelectorAll('.liquid-char')];
+      characters = [...document.querySelectorAll(CHARACTERS)];
       measure();
       observer.observe(document.body, { childList: true, subtree: true, characterData: true });
     });
@@ -185,12 +185,17 @@ export function initLiquidWarp() {
   };
 
   const leave = () => { previous = null; };
+  const adoptWave = () => {
+    characters = [...document.querySelectorAll(CHARACTERS)];
+    measure();
+  };
   measure();
   window.setTimeout(measure, 1600);
   window.addEventListener('pointermove', move, { passive: true });
   window.addEventListener('pointerleave', leave);
   window.addEventListener('resize', scheduleMeasure);
   window.addEventListener('scroll', scheduleMeasure, { passive: true });
+  window.addEventListener('paz:wave-settled', adoptWave);
 
   return () => {
     cancelAnimationFrame(frame);
@@ -203,6 +208,7 @@ export function initLiquidWarp() {
     window.removeEventListener('pointerleave', leave);
     window.removeEventListener('resize', scheduleMeasure);
     window.removeEventListener('scroll', scheduleMeasure);
+    window.removeEventListener('paz:wave-settled', adoptWave);
     cursor.remove();
     clear();
   };

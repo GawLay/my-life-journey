@@ -1,4 +1,4 @@
-/* The old page stays still while the new page is uncovered by one soft wave. */
+/* The destination is uncovered directly; Work/project routes add a soft depth settle. */
 @view-transition { navigation: auto; }
 
 ::view-transition-image-pair(root) { isolation: auto; }
@@ -7,7 +7,29 @@
   animation: none;
   mix-blend-mode: normal;
 }
-::view-transition-new(root) { clip-path: inset(0 100% 0 0); }
+/* The ready callback supplies the hidden first keyframe before paint. Keep the
+   fallback fully visible when the browser retires the transition animation. */
+::view-transition-new(root) { clip-path: none; }
+/* The outgoing animation explicitly shows this layer while needed. Its resting
+   state must be hidden, including the frame in which snapshots are discarded. */
+html.has-wave-depth::view-transition-old(root) { opacity: 0; }
+html.is-wave-covered::view-transition-old(root) { visibility: hidden !important; }
+html.is-wave-covered::view-transition-new(root) {
+  clip-path: none !important;
+  transform: none !important;
+}
+
+.page-wave-depth {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10001;
+  pointer-events: none;
+  color: var(--charcoal);
+  opacity: 0;
+}
+.page-wave-depth__light { stroke: var(--cream); }
 
 html.has-wave-arrived .work-entry,
 html.has-wave-arrived .world-entry,
@@ -21,5 +43,6 @@ html.has-wave-arrived .world__intro h1 > em { display: inline-block; }
 html.has-wave-arrived .wave-arrival .wave-letter { transform-origin: 50% 85%; }
 
 @media (prefers-reduced-motion: reduce) {
+  .page-wave-depth { display: none; }
   ::view-transition-new(root) { clip-path: none; }
 }
