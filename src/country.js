@@ -208,11 +208,15 @@ function setupMotion() {
       .from('.country-hero__copy > span, .country-hero__copy > p', { y: 35, autoAlpha: 0, stagger: .09, duration: .82, ease: 'power3.out' }, .5)
       .from('.country-hero__route', { autoAlpha: 0, duration: .7 }, .66);
   } else {
+    // Scale + fade the country name in first so it lands with presence, then hold
+    // a beat before the charcoal cover irises open to the hero underneath.
     gsap.timeline()
-      .to('#country-entry', { clipPath: 'circle(0% at 50% 50%)', duration: 1.05, ease: 'power3.inOut' }, .18)
-      .from('.country-hero__photo', { scale: 1.12, duration: 1.35, ease: 'power3.out' }, .32)
-      .from('.country-hero__copy > *', { y: 45, autoAlpha: 0, stagger: .1, duration: .9, ease: 'power3.out' }, .58)
-      .from('.country-hero__route', { autoAlpha: 0, duration: .8 }, .85);
+      .from('#country-entry span', { autoAlpha: 0, y: 12, duration: .7, ease: 'power3.out' }, 0)
+      .from('#country-entry strong', { autoAlpha: 0, scale: .9, duration: 1, ease: 'power3.out' }, .05)
+      .to('#country-entry', { clipPath: 'circle(0% at 50% 50%)', duration: 1.05, ease: 'power3.inOut' }, .95)
+      .from('.country-hero__photo', { scale: 1.12, duration: 1.35, ease: 'power3.out' }, 1.1)
+      .from('.country-hero__copy > *', { y: 45, autoAlpha: 0, stagger: .1, duration: .9, ease: 'power3.out' }, 1.35)
+      .from('.country-hero__route', { autoAlpha: 0, duration: .8 }, 1.6);
   }
 
   gsap.to('.country-hero__photo', {

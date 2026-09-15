@@ -1,4 +1,4 @@
-/* The destination is uncovered directly; Work/project routes add a soft depth settle. */
+/* The destination is uncovered directly; every Work/World/project route adds a soft depth settle. */
 @view-transition { navigation: auto; }
 
 ::view-transition-image-pair(root) { isolation: auto; }

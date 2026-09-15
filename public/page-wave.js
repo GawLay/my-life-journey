@@ -36,7 +36,7 @@ if (supported) {
     const link = event.target.closest('a[href]');
     if (!link || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey
       || link.target && link.target !== '_self' || !window.__PAZ_WAVE_LINK__(link.href)) return;
-    stageWave(link.href, pageKind(location.href) === 'project' && pageKind(link.href) === 'work');
+    stageWave(link.href, pageKind(link.href) === 'work');
   }, { capture: true });
   // Also stage browser Back/Forward, which do not pass through the click handler.
   window.addEventListener('pageswap', (event) => {
@@ -44,7 +44,7 @@ if (supported) {
     if (!activation?.entry || !window.__PAZ_WAVE_LINK__(activation.entry.url)) return;
     const back = activation.navigationType === 'traverse'
       ? activation.entry.index < activation.from.index
-      : pageKind(location.href) === 'project' && pageKind(activation.entry.url) === 'work';
+      : pageKind(activation.entry.url) === 'work';
     stageWave(activation.entry.url, back);
   });
 }
@@ -216,12 +216,15 @@ window.addEventListener('pagereveal', (event) => {
   const activation = window.navigation?.activation;
   const from = route?.from || pageKind(activation?.from?.url || document.referrer || location.href);
   const to = pageKind(location.href);
-  const depth = ['work', 'project'].includes(from) && ['work', 'project'].includes(to);
+  // Every recognized page hand-off (Work · World · project detail) gets the same
+  // soft depth settle. "Back" (reverse sweep) is any return to the Work home page.
+  const kinds = ['work', 'project', 'world'];
+  const depth = kinds.includes(from) && kinds.includes(to);
   root.classList.toggle('has-wave-depth', depth);
   root.classList.remove('is-wave-covered');
   const reverse = depth && (route?.back ?? (activation?.navigationType === 'traverse'
     ? activation.entry.index < activation.from.index
-    : from === 'project' && to === 'work'));
+    : to === 'work'));
   const duration = depth ? 1120 : 980;
   const reveal = { duration, depth, reverse, animations: [], animated: new WeakSet(), startedAt: 0, active: true };
   // This live surface is captured with the arriving page, like its letter motion.
