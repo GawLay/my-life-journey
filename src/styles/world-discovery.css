@@ -111,6 +111,13 @@ html.is-discovery {
   pointer-events: none;
 }
 
+/* Descending into a deep dive: freeze the page so the globe can carry us in without
+   the scene scrolling out from under the camera, and stop stray interaction. */
+html.is-descending, .world-page.is-descending { overflow: hidden; }
+.world-page.is-descending .country-discovery,
+.world-page.is-descending .world-discovery-header,
+.world-page.is-descending .world__globe { pointer-events: none; }
+
 @media (max-width: 900px) {
   .country-discovery .discovery-hero {
     min-height: 100svh;

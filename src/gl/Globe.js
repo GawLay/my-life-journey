@@ -64,7 +64,11 @@ export default class Globe {
 
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(34, 1, 0.1, 20);
-    this.camera.position.set(0, 0, 3.35);
+    // Keep the wireframe halo inside the square render target. At 3.35 the
+    // sphere's tangent angle was slightly wider than half the 34° camera FOV,
+    // which shaved a flat edge from both sides of the globe.
+    this.baseCameraZ = 3.5;
+    this.camera.position.set(0, 0, this.baseCameraZ);
     this.group = new THREE.Group();
     this.scene.add(this.group);
 
@@ -277,9 +281,13 @@ export default class Globe {
     const place = this.places.find((item) => item.id === placeId);
     if (!place) return;
     const direction = latLngToVector(place.lat, place.lng);
-    const target = new THREE.Vector3(0.12, 0.04, 1)
-      .normalize()
-      .applyAxisAngle(new THREE.Vector3(0, 1, 0), COMPOSITION_YAW);
+    // The discovery composition sits the country slightly up-left; `center` aims it
+    // dead-on at the camera instead, for the head-on descent into the deep dive.
+    const target = options.center
+      ? new THREE.Vector3(0, 0, 1)
+      : new THREE.Vector3(0.12, 0.04, 1)
+        .normalize()
+        .applyAxisAngle(new THREE.Vector3(0, 1, 0), COMPOSITION_YAW);
     this.targetQuaternion.copy(new THREE.Quaternion().setFromUnitVectors(direction, target));
     this.focusSpeed = options.speed || 0.055;
     if (options.immediate) {
@@ -308,13 +316,16 @@ export default class Globe {
 
   render() {
     if (!this.visible) return;
+    const now = performance.now();
+    const frames = Math.min((now - (this.lastRenderTime ?? now - 1000 / 60)) / (1000 / 60), 2);
+    this.lastRenderTime = now;
     if (!this.dragging && !this.reduced && this.autoRotate) {
       const idle = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), 0.00022);
       this.targetQuaternion.premultiply(idle).normalize();
     }
-    const angle = this.currentQuaternion.angleTo(this.targetQuaternion);
-    this.currentQuaternion.slerp(this.targetQuaternion, this.reduced ? 1 : this.focusSpeed);
-    if (this.focusSpeed !== 0.055 && angle < 0.002) this.focusSpeed = 0.055;
+    // Keep damping consistent across refresh rates. The focus timeline owns its
+    // speed, so the render loop must not reset it mid-animation.
+    this.currentQuaternion.slerp(this.targetQuaternion, this.reduced ? 1 : 1 - Math.pow(1 - this.focusSpeed, frames));
     this.group.quaternion.copy(this.currentQuaternion);
     this.hitTest();
     this.renderer.render(this.scene, this.camera);

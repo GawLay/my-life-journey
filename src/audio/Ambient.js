@@ -19,6 +19,8 @@ export default class Ambient {
     this.lookahead = 0.12; // seconds scheduled ahead
     this.tickMs = 25;
     this._timer = null;
+    this._resumeDelay = null;
+    this._restoringPlayback = false;
     this._request = 0;
     this.onStateChange = null;
     this.volume = 0.3; // master target when on
@@ -37,6 +39,63 @@ export default class Ambient {
 
   get sixteenth() {
     return 60 / this.bpm / 4;
+  }
+
+  /**
+  * Capture the next musical step so a same-tab page navigation can resume the
+  * loop instead of beginning the chord progression again.
+  */
+  getPlaybackPosition() {
+    const cycleLength = 16 * 4;
+    const step = ((Math.trunc(this.step) % cycleLength) + cycleLength) % cycleLength;
+    const delay = this.ctx && this.nextTime
+      ? this.nextTime - this.ctx.currentTime
+      : 0.15;
+
+    return {
+      step,
+      delay: Math.max(0.03, Math.min(this.sixteenth, delay)),
+      savedAt: Date.now(),
+    };
+  }
+
+  /**
+  * Restore a captured position before starting, or resynchronise an AudioContext
+  * revived from the browser back-forward cache.
+  */
+  restorePlaybackPosition(position) {
+    if (!position || !Number.isFinite(position.step)) return;
+
+    const cycleLength = 16 * 4;
+    const savedStep = Math.trunc(position.step);
+    let step = ((savedStep % cycleLength) + cycleLength) % cycleLength;
+    let delay = Number.isFinite(position.delay)
+      ? Math.max(0.03, Math.min(this.sixteenth, position.delay))
+      : 0.15;
+
+    // Navigation time still counts as playback time. Advance across any beats
+    // that elapsed while the browser replaced the document, then schedule the
+    // actual next beat instead of pausing and restarting the loop on arrival.
+    const elapsed = Number.isFinite(position.savedAt)
+      ? Math.max(0, (Date.now() - position.savedAt) / 1000)
+      : 0;
+    if (elapsed >= delay) {
+      const elapsedAfterNext = elapsed - delay;
+      const passedSteps = Math.floor(elapsedAfterNext / this.sixteenth) + 1;
+      step = (step + passedSteps) % cycleLength;
+      delay += passedSteps * this.sixteenth - elapsed;
+    } else {
+      delay -= elapsed;
+    }
+
+    this.step = step;
+    this._resumeDelay = Math.max(0.03, Math.min(this.sixteenth, delay));
+    this._restoringPlayback = true;
+
+    if (this.ctx && this._timer) {
+      this.nextTime = this.ctx.currentTime + this._resumeDelay;
+      this._resumeDelay = null;
+    }
   }
 
   _noiseBuffer(seconds) {
@@ -237,7 +296,7 @@ export default class Ambient {
 
   // ---- instruments ---------------------------------------------------------
 
-  _pad(freqs, t, dur) {
+  _pad(freqs, t, dur, attack = 0.9) {
     const ctx = this.ctx;
 
     freqs.forEach((f, i) => {
@@ -253,18 +312,29 @@ export default class Ambient {
         .connect(g)
         .connect(this.master);
 
-      const a = 0.9;
-      const r = 1.4;
+      const a = Math.min(attack, Math.max(0.02, dur * 0.35));
+      const r = Math.min(1.4, Math.max(0.05, dur - a));
       const peak = 0.045;
 
       g.gain.setValueAtTime(0, t);
       g.gain.linearRampToValueAtTime(peak, t + a);
-      g.gain.setValueAtTime(peak, t + dur - r);
+      g.gain.setValueAtTime(peak, t + Math.max(a, dur - r));
       g.gain.linearRampToValueAtTime(0, t + dur);
 
       o.start(t);
       o.stop(t + dur + 0.05);
     });
+  }
+
+  _resumeCurrentPad(t, delay) {
+    const cycleLength = 16 * this.prog.length;
+    const nextStep = ((this.step % cycleLength) + cycleLength) % cycleLength;
+    const previousStep = (nextStep + cycleLength - 1) % cycleLength;
+    const chord = this.prog[Math.floor(previousStep / 16)];
+    const stepsToNextBar = (16 - (nextStep % 16)) % 16;
+    const remaining = delay + stepsToNextBar * this.sixteenth;
+
+    if (remaining > 0.12) this._pad(chord.pad, t, remaining, 0.06);
   }
 
   _bass(freq, t, dur, vol = 0.15) {
@@ -906,17 +976,23 @@ export default class Ambient {
         : 0.0,
       now +
       (this.enabled
-        ? 1.6
+        ? (this._restoringPlayback ? 0.04 : 1.6)
         : 0.9)
     );
 
     if (this.enabled) {
       if (!this._timer) {
-        this.step = 0;
+        const startDelay = this._resumeDelay ?? 0.15;
 
         this.nextTime =
           this.ctx.currentTime +
-          0.15;
+          startDelay;
+
+        if (this._restoringPlayback && !this._musicMuted) {
+          this._resumeCurrentPad(this.ctx.currentTime + 0.01, startDelay);
+        }
+
+        this._resumeDelay = null;
 
         this._timer =
           setInterval(
@@ -925,6 +1001,8 @@ export default class Ambient {
             this.tickMs
           );
       }
+
+      this._restoringPlayback = false;
     } else if (
       this._timer
     ) {

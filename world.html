@@ -27,8 +27,16 @@
             document.documentElement.style.setProperty('--handoff-b', b);
             document.documentElement.style.setProperty('--handoff-c', c);
           }
-          if (handoff.image) document.documentElement.style.setProperty('--handoff-image', `url("${handoff.image}")`);
+          if (handoff.image) {
+            document.documentElement.style.setProperty('--handoff-image', `url("${handoff.image}")`);
+            const preload = document.createElement('link');
+            preload.rel = 'preload';
+            preload.as = 'image';
+            preload.href = handoff.image;
+            document.head.appendChild(preload);
+          }
           window.__PAZ_COUNTRY_HANDOFF__ = handoff;
+          if (handoff.direction === 'return') document.documentElement.classList.add('is-earth-return');
           sessionStorage.removeItem('paz-country-handoff');
         } catch { /* continue with the palette fallback */ }
       })();

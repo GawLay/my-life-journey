@@ -33,12 +33,12 @@ const archiveLayouts = [
   { x: '5vw', y: '255vh', w: '22vw', r: '1.9deg', d: -.12, z: 4 },
 ];
 
-function photoSurface(memory) {
+function photoSurface(memory, eager = false) {
   if (memory.src) {
     if (memory.type === 'video') {
-      return `<video class="memory-photo__surface" src="${memory.src}" poster="${memory.poster || ''}" aria-label="${memory.alt}" muted loop playsinline preload="none" data-auto-play style="object-position:${memory.position || 'center'}"></video>`;
+      return `<video class="memory-photo__surface" src="${memory.src}" poster="${memory.poster || ''}" aria-label="${memory.alt}" muted loop playsinline preload="${eager ? 'metadata' : 'none'}" data-auto-play style="object-position:${memory.position || 'center'}"></video>`;
     }
-    return `<img class="memory-photo__surface" src="${memory.src}" alt="${memory.alt}" loading="lazy" decoding="async" style="object-position:${memory.position || 'center'}" />`;
+    return `<img class="memory-photo__surface" src="${memory.src}" alt="${memory.alt}" loading="${eager ? 'eager' : 'lazy'}" decoding="async" style="object-position:${memory.position || 'center'}" />`;
   }
   return '<span class="memory-photo__surface memory-photo__placeholder" aria-hidden="true"></span>';
 }
@@ -51,7 +51,7 @@ function photoMarkup(memory, layout, scene) {
       aria-label="View ${memory.city}, ${memory.moment}"
       style="--photo-left:${layout.x};--photo-top:${layout.y};--photo-width:${layout.w};--photo-rotation:${layout.r};--photo-z:${layout.z};--photo-a:${colorA};--photo-b:${colorB};--photo-c:${colorC}">
       <figure class="memory-photo__frame">
-        ${photoSurface(memory)}
+        ${photoSurface(memory, scene === 'orbit')}
         <figcaption><span>${String(memory.index).padStart(2, '0')}</span><b>${memory.city}<i>${memory.moment}</i></b></figcaption>
         <em aria-hidden="true">VIEW</em>
       </figure>
@@ -321,7 +321,7 @@ export function initCountryDiscovery({ globe, globeMount, places, reduced = fals
     window.history.replaceState({ ...currentState, pazView: 'world', place: place?.id || null }, '', url);
   }
 
-  function enter(place, { instant = false, reveal = false } = {}) {
+  function enter(place, { instant = false, reveal = false, earthReturn = false } = {}) {
     if (!place || changing || (viewMode === 'countryDiscovery' && selectedPlace?.id === place.id)) return;
     changing = true;
     selectedPlace = place;
@@ -335,20 +335,27 @@ export function initCountryDiscovery({ globe, globeMount, places, reduced = fals
     document.documentElement.classList.add('is-discovery');
     document.body.classList.add('is-discovery', 'is-changing-view');
     globe.autoRotate = false;
-    globe.focus(place.id, { speed: instant || reduced ? 1 : .075 });
+    globe.focus(place.id, {
+      center: earthReturn,
+      immediate: earthReturn,
+      speed: instant || reduced ? 1 : .075,
+    });
 
     const titleItems = root.querySelectorAll('.discovery-hero__title > *');
     const meta = root.querySelector('.discovery-hero__meta');
     const photos = root.querySelectorAll('.discovery-orbit .memory-photo');
     const scrollCue = root.querySelector('.discovery-scroll');
+    photos.forEach((photo) => {
+      const image = photo.querySelector('img');
+      if (image?.decode) image.decode().catch(() => {});
+    });
     gsap.set(header, { autoAlpha: 0 });
     gsap.set(titleItems, { y: 28, autoAlpha: 0 });
     gsap.set(meta, { y: 16, autoAlpha: 0 });
-    gsap.set(photos, { scale: .92, autoAlpha: 0 });
+    gsap.set(photos, { y: 14, scale: .985, autoAlpha: 0, force3D: true });
     gsap.set(scrollCue, { autoAlpha: 0 });
     gsap.set(root, { autoAlpha: 1 });
 
-    setupScrollMotion();
     setupMediaPlayback();
     requestAnimationFrame(() => ScrollTrigger.refresh());
 
@@ -358,10 +365,43 @@ export function initCountryDiscovery({ globe, globeMount, places, reduced = fals
       gsap.set(header, { autoAlpha: 1 });
       gsap.set(titleItems, { y: 0, autoAlpha: 1 });
       gsap.set(meta, { y: 0, autoAlpha: 1 });
-      gsap.set(photos, { scale: 1, autoAlpha: 1 });
+      gsap.set(photos, { y: 0, scale: 1, autoAlpha: 1 });
       gsap.set(scrollCue, { autoAlpha: 1 });
       document.body.classList.remove('is-changing-view');
       changing = false;
+      setupScrollMotion();
+      requestAnimationFrame(() => ScrollTrigger.refresh());
+      return;
+    }
+
+    if (reveal && earthReturn) {
+      // The destination starts under the departing cover with the globe already
+      // close enough to fill the viewport. As the cover clears, pull the camera
+      // back to the familiar Discovery composition and let the interface return.
+      const globeSize = globeMount.clientWidth || Math.max(window.innerWidth, window.innerHeight);
+      const returnScale = Math.hypot(window.innerWidth, window.innerHeight) / globeSize * 1.08;
+      gsap.set(worldTargets, { autoAlpha: 0 });
+      gsap.set(globeMount, { xPercent: 0, yPercent: 0, scale: returnScale, autoAlpha: 1 });
+      globe.camera.position.z = 1.45;
+      gsap.timeline({
+        onComplete: () => {
+          document.body.classList.remove('is-changing-view');
+          changing = false;
+          setupScrollMotion();
+          ScrollTrigger.refresh();
+        },
+      })
+        .to(globeMount, { scale: discoveryScale, duration: 2.3, ease: 'power2.inOut' }, 0)
+        .to(globe.camera.position, { z: globe.baseCameraZ, duration: 2.3, ease: 'power2.inOut' }, 0)
+        .add(() => globe.focus(place.id, { speed: .025 }), .28)
+        .to(header, { autoAlpha: 1, duration: .5, ease: 'power2.out' }, .62)
+        .to(titleItems, { y: 0, autoAlpha: 1, stagger: .07, duration: .72, ease: 'power3.out' }, .68)
+        .to(meta, { y: 0, autoAlpha: 1, duration: .62, ease: 'power3.out' }, .82)
+        .add(() => globe.focus(place.id, { immediate: true }), 2.3)
+        // Let the globe finish returning to its Discovery composition before the
+        // orbit photos unfold. Running both at once made the rotation feel jittery.
+        .to(photos, { y: 0, scale: 1, autoAlpha: 1, stagger: .07, duration: .62, ease: 'power3.out', force3D: true }, 2.38)
+        .to(scrollCue, { autoAlpha: 1, duration: .4, ease: 'power2.out' }, 2.62);
       return;
     }
 
@@ -376,12 +416,14 @@ export function initCountryDiscovery({ globe, globeMount, places, reduced = fals
         onComplete: () => {
           document.body.classList.remove('is-changing-view');
           changing = false;
+          setupScrollMotion();
+          ScrollTrigger.refresh();
         },
       })
         .to(header, { autoAlpha: 1, duration: .5, ease: 'power2.out' }, 0)
         .to(titleItems, { y: 0, autoAlpha: 1, stagger: .08, duration: .7, ease: 'power3.out' }, .08)
         .to(meta, { y: 0, autoAlpha: 1, duration: .6, ease: 'power3.out' }, .24)
-        .to(photos, { scale: 1, autoAlpha: 1, stagger: .06, duration: .66, ease: 'power3.out' }, .28)
+        .to(photos, { y: 0, scale: 1, autoAlpha: 1, stagger: .07, duration: .62, ease: 'power3.out', force3D: true }, .28)
         .to(scrollCue, { autoAlpha: 1, duration: .45, ease: 'power2.out' }, .6);
       return;
     }
@@ -390,6 +432,8 @@ export function initCountryDiscovery({ globe, globeMount, places, reduced = fals
       onComplete: () => {
         document.body.classList.remove('is-changing-view');
         changing = false;
+        setupScrollMotion();
+        ScrollTrigger.refresh();
       },
     })
       .to(worldTargets, { y: -12, autoAlpha: 0, stagger: .025, duration: .42, ease: 'power2.out' }, 0)
@@ -397,7 +441,7 @@ export function initCountryDiscovery({ globe, globeMount, places, reduced = fals
       .to(header, { autoAlpha: 1, duration: .48, ease: 'power2.out' }, .42)
       .to(titleItems, { y: 0, autoAlpha: 1, stagger: .075, duration: .65, ease: 'power3.out' }, .56)
       .to(meta, { y: 0, autoAlpha: 1, duration: .58, ease: 'power3.out' }, .7)
-      .to(photos, { scale: 1, autoAlpha: 1, stagger: .055, duration: .62, ease: 'power3.out' }, .72)
+      .to(photos, { y: 0, scale: 1, autoAlpha: 1, stagger: .07, duration: .62, ease: 'power3.out', force3D: true }, .72)
       .to(scrollCue, { autoAlpha: 1, duration: .4, ease: 'power2.out' }, 1.02);
   }
 
@@ -491,80 +535,213 @@ export function initCountryDiscovery({ globe, globeMount, places, reduced = fals
     viewer.querySelector('.memory-viewer__close').focus();
   }
 
-  function visiblePhotoSource() {
-    const center = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-    return [...root.querySelectorAll('.memory-photo')]
-      .map((photo) => ({ photo, rect: photo.getBoundingClientRect() }))
-      .filter(({ rect }) => rect.bottom > 0 && rect.top < window.innerHeight && rect.right > 0 && rect.left < window.innerWidth)
-      .sort((a, b) => {
-        const distanceA = Math.hypot(a.rect.left + a.rect.width / 2 - center.x, a.rect.top + a.rect.height / 2 - center.y);
-        const distanceB = Math.hypot(b.rect.left + b.rect.width / 2 - center.x, b.rect.top + b.rect.height / 2 - center.y);
-        return distanceA - distanceB;
-      })[0];
+  function buildArrivalCover(place, cover) {
+    // The warm surface the country page opens under, same palette / photo, so the
+    // globe descent, this cover and the deep-dive hero read as one continuous surface.
+    const transition = document.createElement('div');
+    transition.className = 'deep-dive-transition';
+    transition.innerHTML = `
+      <div class="deep-dive-transition__surface" aria-hidden="true"></div>
+      <div class="deep-dive-transition__atmosphere" aria-hidden="true"></div>
+      <div class="deep-dive-transition__speed" aria-hidden="true"></div>
+      <div class="deep-dive-transition__copy">
+        <span>DEEP DIVE / ${place.country.toUpperCase()}</span>
+        <strong>${place.country}</strong>
+      </div>
+      <div class="deep-dive-transition__hud" aria-hidden="true">
+        <span>${place.coordinates}</span>
+        <b>ALT 12.8K KM</b>
+      </div>`;
+    transition.querySelector('.deep-dive-transition__surface').style.setProperty('--transition-image', cover.src
+      ? `url("${cover.src}")`
+      : `linear-gradient(135deg, ${cover.palette[0]}, ${cover.palette[1]} 52%, ${cover.palette[2]})`);
+    transition.style.setProperty('--transition-position', cover.position || 'center');
+    transition.style.setProperty('--transition-color', cover.palette[0]);
+    document.body.appendChild(transition);
+    gsap.set(transition.querySelector('.deep-dive-transition__surface'), { autoAlpha: 0, scale: 1.24, filter: 'blur(18px)' });
+    gsap.set(transition.querySelectorAll('.deep-dive-transition__copy > *'), { autoAlpha: 0, y: 24 });
+    gsap.set(transition.querySelector('.deep-dive-transition__hud'), { autoAlpha: 0 });
+    return transition;
   }
 
-  function transitionToStory(link) {
+  // The surrounding interface gently releases the globe: opaque scenes clear to
+  // uncover it, headings drift and stretch (echoing the liquid-warp vocabulary),
+  // supporting content and the orbit photographs flow softly outward. Everything
+  // dissolves with small timing differences; nothing is thrown off-screen.
+  function dissolveDiscoveryUI(timeline) {
+    const titleItems = root.querySelectorAll('.discovery-hero__title > *');
+    const meta = root.querySelector('.discovery-hero__meta');
+    const scrollCue = root.querySelector('.discovery-scroll');
+    const scenes = root.querySelectorAll('.memory-scene, .memory-group');
+    const finaleCopy = root.querySelectorAll('.discovery-finale__copy > *');
+
+    if (scenes.length) timeline.to(scenes, { autoAlpha: 0, duration: .5, ease: 'power2.out' }, 0);
+    timeline.to(header, { autoAlpha: 0, y: -22, duration: .55, ease: 'power2.out' }, 0);
+    if (titleItems.length) timeline.to(titleItems, { autoAlpha: 0, y: -26, scaleY: 1.06, skewX: 3, transformOrigin: '0% 50%', stagger: .05, duration: .7, ease: 'power2.out' }, 0);
+    if (meta) timeline.to(meta, { autoAlpha: 0, x: 34, duration: .6, ease: 'power2.out' }, .05);
+    if (scrollCue) timeline.to(scrollCue, { autoAlpha: 0, duration: .4, ease: 'power1.out' }, 0);
+    if (finaleCopy.length) timeline.to(finaleCopy, { autoAlpha: 0, y: 26, stagger: .05, duration: .6, ease: 'power2.out' }, 0);
+
+    root.querySelectorAll('.discovery-orbit .memory-photo').forEach((photo, index) => {
+      const rect = photo.getBoundingClientRect();
+      const nx = (rect.left + rect.width / 2) / window.innerWidth - .5;
+      const ny = (rect.top + rect.height / 2) / window.innerHeight - .5;
+      timeline.to(photo, { autoAlpha: 0, x: `+=${nx * 90}`, y: `+=${ny * 90}`, scale: .9, duration: .75, ease: 'power2.out' }, index * .04);
+    });
+  }
+
+  // One continuous descent shared by both deep-dive triggers: Discovery releases the
+  // globe, the globe finds the country and the camera travels into it, then Earth
+  // dissolves into the arrival cover and the deep-dive page takes over. The globe
+  // itself is the bridge between the two pages, not a page-swap dressed up.
+  function enterDeepDive(link) {
     if (storyTransitioning || !selectedPlace) return;
     storyTransitioning = true;
-    if (reduced) {
-      window.location.assign(link.href);
-      return;
-    }
+    const place = selectedPlace;
+    const cover = place.deepDive?.cover || place.memories[7] || place.memories[0];
+    const navigate = () => window.location.assign(link.href);
 
-    const visibleSource = visiblePhotoSource();
-    const sourcePhoto = visibleSource?.photo;
-    const sourceFrame = sourcePhoto?.querySelector('.memory-photo__surface')?.getBoundingClientRect()
-      || visibleSource?.rect
-      || link.getBoundingClientRect();
-    const sourceMemory = selectedPlace.deepDive?.cover
-      || selectedPlace.memories.find((memory) => memory.id === sourcePhoto?.dataset.memory)
-      || selectedPlace.memories[orbitLayouts.length]
-      || selectedPlace.memories[0];
-    const [colorA, colorB, colorC] = sourceMemory.palette;
+    // Hand the warm destination cover to the country page so it paints a matching
+    // surface before first paint (see the motion-system seamless hand-off rules).
     try {
       sessionStorage.setItem('paz-country-handoff', JSON.stringify({
-        id: selectedPlace.id,
-        country: selectedPlace.country,
-        palette: sourceMemory.palette,
-        image: sourceMemory.src || '',
-        position: sourceMemory.position || 'center',
+        id: place.id,
+        country: place.country,
+        palette: cover.palette,
+        image: cover.src || '',
+        position: cover.position || 'center',
+        direction: 'forward',
       }));
     } catch { /* storage can be unavailable */ }
 
-    const transition = document.createElement('div');
-    transition.className = 'deep-dive-transition';
-    transition.innerHTML = `<span>DEEP DIVE / ${selectedPlace.country.toUpperCase()}</span><strong>${selectedPlace.country}</strong>`;
-    transition.style.setProperty('--transition-image', sourceMemory.src
-      ? `url("${sourceMemory.src}")`
-      : `linear-gradient(135deg, ${colorA}, ${colorB} 52%, ${colorC})`);
-    transition.style.setProperty('--transition-position', sourceMemory.position || 'center');
-    transition.style.backgroundColor = colorA;
-    document.body.appendChild(transition);
-    gsap.set(transition, {
-      left: sourceFrame.left,
-      top: sourceFrame.top,
-      width: Math.max(sourceFrame.width, 2),
-      height: Math.max(sourceFrame.height, 2),
-      borderRadius: 2,
-    });
-    gsap.set(transition.children, { autoAlpha: 0, y: 16 });
-    const outgoingUi = [header, ...root.querySelectorAll('.discovery-finale__copy, .discovery-hero__title, .discovery-hero__meta')];
-    gsap.timeline({ onComplete: () => window.location.assign(link.href) })
-      .to(outgoingUi, {
-        autoAlpha: 0,
-        duration: .36,
-        ease: 'power2.out',
-      }, 0)
-      .to(transition, {
-        left: 0,
-        top: 0,
-        width: window.innerWidth,
-        height: window.innerHeight,
-        borderRadius: 0,
-        duration: .82,
-        ease: 'power3.inOut',
-      }, 0)
-      .to(transition.children, { autoAlpha: 1, y: 0, stagger: .06, duration: .42, ease: 'power3.out' }, .4);
+    closeViewer({ instant: true });
+    killSceneAnimations();
+    globe.autoRotate = false;
+
+    if (reduced) {
+      // Simplified path: the interface softly clears, the globe snaps its focus onto
+      // the country, and a short cover carries us in — no extended camera descent.
+      document.body.classList.add('is-changing-view');
+      globe.focus(place.id, { center: true, immediate: true });
+      const staticCover = buildArrivalCover(place, cover);
+      const staticSurface = staticCover.querySelector('.deep-dive-transition__surface');
+      const staticCopy = staticCover.querySelectorAll('.deep-dive-transition__copy > *');
+      gsap.timeline({ onComplete: navigate })
+        .to([header, root], { autoAlpha: 0, duration: .3, ease: 'power1.out' }, 0)
+        .to(staticSurface, { autoAlpha: 1, scale: 1, filter: 'blur(0px)', duration: .35, ease: 'power1.out' }, .18)
+        .to(staticCopy, { autoAlpha: 1, y: 0, stagger: .05, duration: .3, ease: 'power2.out' }, .3);
+      return;
+    }
+
+    // Keep Discovery mounted and freeze the page — the globe carries us in, so the
+    // scene must not unmount and the descent must not scroll out from under itself.
+    document.documentElement.classList.add('is-descending');
+    document.body.classList.add('is-descending', 'is-changing-view');
+    // Begin almost at rest, then gather rotational speed before the camera commits.
+    // A constant fast slerp made the first beat snap even though the later dive felt
+    // right; easing focusSpeed keeps the country search calm without slowing the trip.
+    globe.focus(place.id, { center: true, speed: .006 });
+
+    // Cover the viewport's diagonal so the square globe canvas fills the frame with no
+    // dark corners as Earth grows (the sphere already overflows the canvas at this dolly).
+    const globeSize = globeMount.clientWidth || Math.max(window.innerWidth, window.innerHeight);
+    const coverScale = Math.hypot(window.innerWidth, window.innerHeight) / globeSize * 1.08;
+    const transition = buildArrivalCover(place, cover);
+    const surface = transition.querySelector('.deep-dive-transition__surface');
+    const atmosphere = transition.querySelector('.deep-dive-transition__atmosphere');
+    const speed = transition.querySelector('.deep-dive-transition__speed');
+    const copy = transition.querySelectorAll('.deep-dive-transition__copy > *');
+    const hud = transition.querySelector('.deep-dive-transition__hud');
+    const altitude = hud.querySelector('b');
+    const flight = { altitude: 12800 };
+
+    const tl = gsap.timeline({ onComplete: navigate });
+    // Discovery releases the globe (overlaps every stage below).
+    dissolveDiscoveryUI(tl);
+    tl
+      .to(globe, { focusSpeed: .055, duration: .72, ease: 'power2.in' }, 0)
+      // The globe simultaneously becomes dominant: recentre and steady it.
+      .to(globeMount, { xPercent: 0, yPercent: 0, opacity: 1, duration: .6, ease: 'power2.out' }, 0)
+      // The approach accelerates: a calm release, then the camera commits and rushes
+      // into the surface (power3.in) rather than coasting, travel, not a slow preset.
+      .to(globeMount, { scale: coverScale, duration: 1.58, ease: 'power3.in' }, .28)
+      .to(globe.camera.position, { z: 1.45, duration: 1.58, ease: 'power3.in' }, .28)
+      .to(flight, {
+        altitude: 3,
+        duration: 1.58,
+        ease: 'power3.in',
+        onUpdate: () => {
+          const value = Math.round(flight.altitude);
+          altitude.textContent = value > 999 ? `ALT ${(value / 1000).toFixed(1)}K KM` : `ALT ${value} KM`;
+        },
+      }, .28)
+      .to(hud, { autoAlpha: 1, duration: .35, ease: 'power2.out' }, .38)
+      .fromTo(atmosphere, { autoAlpha: 0, scale: .72 }, { autoAlpha: .78, scale: 1.22, duration: .82, ease: 'power2.inOut' }, .74)
+      .fromTo(speed, { autoAlpha: 0, scaleX: .82 }, { autoAlpha: .34, scaleX: 1.18, duration: .55, ease: 'power2.in' }, .92)
+      // Surface detail replaces vector detail across the full frame. There is no
+      // circular mask: blur resolves as the cover photo takes over the camera.
+      .to(surface, { autoAlpha: 1, scale: 1, filter: 'blur(0px)', duration: .78, ease: 'power2.out' }, 1.36)
+      .to(globeMount, { autoAlpha: 0, duration: .38, ease: 'power2.in' }, 1.52)
+      .to([atmosphere, speed, hud], { autoAlpha: 0, duration: .38, ease: 'power2.out' }, 1.64)
+      .to(copy, { autoAlpha: 1, y: 0, stagger: .06, duration: .48, ease: 'power3.out' }, 1.74);
+  }
+
+  // Undo a frozen mid-descent DOM (bfcache restore) so the back button lands on a
+  // clean discovery view rather than a giant globe under a half-faded interface.
+  function restoreFromDescent() {
+    storyTransitioning = false;
+    const transition = document.querySelector('.deep-dive-transition');
+    gsap.killTweensOf([globe, globeMount, globe.camera.position]);
+    globe.autoRotate = false;
+    const photos = [...root.querySelectorAll('.discovery-orbit .memory-photo')];
+    const revealTargets = [
+      header,
+      ...root.querySelectorAll('.discovery-hero__title > *, .discovery-hero__meta, .discovery-scroll, .memory-scene, .memory-group, .discovery-finale__copy > *'),
+    ];
+    const allRevealTargets = [...revealTargets, ...photos];
+
+    if (reduced || !transition) {
+      transition?.remove();
+      globe.camera.position.z = globe.baseCameraZ;
+      gsap.set(globeMount, { xPercent: 0, yPercent: 0, scale: discoveryScale, autoAlpha: 1, clearProps: 'opacity' });
+      gsap.set([header, root, ...allRevealTargets], { clearProps: 'opacity,visibility,transform' });
+      document.documentElement.classList.remove('is-descending');
+      document.body.classList.remove('is-descending', 'is-changing-view');
+      if (selectedPlace) globe.focus(selectedPlace.id, { immediate: true });
+      setupScrollMotion();
+      requestAnimationFrame(() => ScrollTrigger.refresh());
+      return;
+    }
+
+    // Browser Back may restore the exact final frame from the forward descent.
+    // Use that retained photo cover as the first frame, then reverse the camera.
+    const globeSize = globeMount.clientWidth || Math.max(window.innerWidth, window.innerHeight);
+    const returnScale = Math.hypot(window.innerWidth, window.innerHeight) / globeSize * 1.08;
+    gsap.set(globeMount, { xPercent: 0, yPercent: 0, scale: returnScale, autoAlpha: 1 });
+    globe.camera.position.z = 1.45;
+    if (selectedPlace) globe.focus(selectedPlace.id, { center: true, immediate: true });
+    gsap.timeline({
+      onComplete: () => {
+        transition.remove();
+        gsap.set([header, root, ...allRevealTargets], { clearProps: 'opacity,visibility,transform' });
+        document.documentElement.classList.remove('is-descending');
+        document.body.classList.remove('is-descending', 'is-changing-view');
+        setupScrollMotion();
+        requestAnimationFrame(() => ScrollTrigger.refresh());
+      },
+    })
+      .to(transition.querySelectorAll('.deep-dive-transition__copy > *'), { autoAlpha: 0, y: 16, duration: .28, ease: 'power2.in' }, 0)
+      .to(transition, { autoAlpha: 0, duration: .55, ease: 'power2.inOut' }, .08)
+      .to(globeMount, { scale: discoveryScale, duration: 2.3, ease: 'power2.inOut' }, .18)
+      .to(globe.camera.position, { z: globe.baseCameraZ, duration: 2.3, ease: 'power2.inOut' }, .18)
+      .add(() => {
+        if (selectedPlace) globe.focus(selectedPlace.id, { speed: .025 });
+      }, .46)
+      .to(revealTargets, { autoAlpha: 1, stagger: .02, duration: .62, ease: 'power3.out' }, .72)
+      .add(() => {
+        if (selectedPlace) globe.focus(selectedPlace.id, { immediate: true });
+      }, 2.48)
+      .to(photos, { x: 0, y: 0, scale: 1, autoAlpha: 1, stagger: .07, duration: .62, ease: 'power3.out', force3D: true }, 2.56);
   }
 
   backButton.addEventListener('click', leave);
@@ -577,7 +754,7 @@ export function initCountryDiscovery({ globe, globeMount, places, reduced = fals
     const deepLink = event.target.closest('a[href*="country.html"]');
     if (deepLink) {
       event.preventDefault();
-      transitionToStory(deepLink);
+      enterDeepDive(deepLink);
       return;
     }
     const photo = event.target.closest('[data-memory]');
@@ -588,7 +765,7 @@ export function initCountryDiscovery({ globe, globeMount, places, reduced = fals
   });
   deepHeaderLink.addEventListener('click', (event) => {
     event.preventDefault();
-    transitionToStory(deepHeaderLink);
+    enterDeepDive(deepHeaderLink);
   });
   viewer.querySelector('.memory-viewer__close').addEventListener('click', () => closeViewer());
   viewer.addEventListener('click', (event) => { if (event.target === viewer) closeViewer(); });
@@ -596,11 +773,7 @@ export function initCountryDiscovery({ globe, globeMount, places, reduced = fals
 
   window.addEventListener('pageshow', (event) => {
     if (!event.persisted || viewMode !== 'countryDiscovery') return;
-    storyTransitioning = false;
-    document.querySelectorAll('.deep-dive-transition').forEach((transition) => transition.remove());
-    const restoredUi = [header, ...root.querySelectorAll('.discovery-finale__copy, .discovery-hero__title, .discovery-hero__meta')];
-    gsap.set(restoredUi, { clearProps: 'opacity,visibility,transform' });
-    requestAnimationFrame(() => ScrollTrigger.refresh());
+    restoreFromDescent();
   });
 
   return {

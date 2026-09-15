@@ -180,6 +180,7 @@ function setupMotion() {
     sharedTitle.className = 'country-shared-title';
     sharedTitle.setAttribute('aria-hidden', 'true');
     document.body.appendChild(sharedTitle);
+    gsap.set(entryElement, { clipPath: 'inset(0)' });
     gsap.set(sharedTitle, {
       autoRound: false,
       left: start.left, top: start.top, width: start.width, height: start.height,
@@ -193,11 +194,11 @@ function setupMotion() {
       onComplete: () => {
         gsap.set(heroTitle, { clearProps: 'opacity' });
         sharedTitle.remove();
-        gsap.set(entryElement, { clipPath: 'circle(0% at 50% 50%)', clearProps: 'opacity,visibility' });
+        gsap.set(entryElement, { autoAlpha: 0, scale: 1, filter: 'none', clipPath: 'inset(0)' });
       },
     })
-      .fromTo('.country-hero__photo', { scale: 1.025 }, { scale: 1, duration: 1.05, ease: 'power3.out' }, 0)
-      .to(entryElement, { autoAlpha: 0, duration: .62, ease: 'power2.inOut' }, .08)
+      .fromTo('.country-hero__photo', { scale: 1.08, filter: 'blur(8px)' }, { scale: 1, filter: 'blur(0px)', duration: 1.08, ease: 'power3.out' }, 0)
+      .to(entryElement, { autoAlpha: 0, scale: .97, filter: 'blur(8px)', duration: .62, ease: 'power2.inOut' }, .08)
       .to(sharedTitle, {
         autoRound: false,
         left: end.left, top: end.top, width: end.width, height: end.height,
@@ -218,6 +219,16 @@ function setupMotion() {
       .from('.country-hero__copy > *', { y: 45, autoAlpha: 0, stagger: .1, duration: .9, ease: 'power3.out' }, 1.35)
       .from('.country-hero__route', { autoAlpha: 0, duration: .8 }, 1.6);
   }
+
+  // Ease the fixed top bar in as the cover clears, rather than letting it snap to
+  // full opacity while the rest of the hero is still settling.
+  gsap.from('.country-header', {
+    autoAlpha: 0,
+    y: -18,
+    duration: .9,
+    ease: 'power3.out',
+    delay: fromDiscovery ? .55 : 1.15,
+  });
 
   gsap.to('.country-hero__photo', {
     scale: 1.08,
@@ -290,6 +301,33 @@ function setupReturnNavigation() {
         window.location.assign(link.href);
         return;
       }
+      const returningToDiscovery = link.href.includes('view=discovery');
+      // Returning to the discovery view: hand the same warm cover (palette + photo)
+      // to world.html so it paints a matching cover before first paint. The incoming
+      // globe then pulls back from the surface to reverse the forward camera move.
+      if (returningToDiscovery) {
+        try {
+          sessionStorage.setItem('paz-country-handoff', JSON.stringify({
+            id: place.id,
+            country: place.country,
+            palette: handoffPalette,
+            image: handoffImage || '',
+            position: handoffPosition,
+            direction: 'return',
+          }));
+        } catch { /* storage can be unavailable */ }
+        entry.classList.add('is-earth-return');
+        entry.querySelector('strong').textContent = 'DISCOVERY';
+        entry.querySelector('span').textContent = 'RETURN TO';
+        gsap.set(entry.querySelectorAll('span, strong'), { autoAlpha: 1, y: 0 });
+        gsap.timeline({ onComplete: () => window.location.assign(link.href) })
+          .to('.country-header', { autoAlpha: 0, y: -16, duration: .4, ease: 'power2.out' }, 0)
+          .fromTo(entry,
+            { autoAlpha: 0, scale: 1.08, filter: 'blur(8px)' },
+            { autoAlpha: 1, scale: 1, filter: 'blur(0px)', duration: .78, ease: 'power3.out' }, .06);
+        return;
+      }
+      entry.classList.remove('is-earth-return');
       entry.querySelector('strong').textContent = link.dataset.returnLabel;
       entry.querySelector('span').textContent = 'RETURN TO';
       gsap.set(entry, { autoAlpha: 1 });
@@ -312,7 +350,15 @@ requestAnimationFrame(() => ScrollTrigger.refresh());
 window.addEventListener('pageshow', (event) => {
   if (!event.persisted) return;
   gsap.killTweensOf('#country-entry');
-  document.querySelector('#country-entry span').textContent = `DEEP DIVE / ${place.country.toUpperCase()}`;
-  document.querySelector('#country-entry strong').textContent = place.country;
-  gsap.set('#country-entry', { clipPath: 'circle(0% at 50% 50%)', clearProps: 'opacity,visibility' });
+  const entry = document.querySelector('#country-entry');
+  entry.classList.remove('is-earth-return');
+  entry.querySelector('span').textContent = `DEEP DIVE / ${place.country.toUpperCase()}`;
+  entry.querySelector('strong').textContent = place.country;
+  gsap.set(entry, {
+    autoAlpha: 0,
+    scale: 1,
+    filter: 'none',
+    clipPath: fromDiscovery ? 'inset(0)' : 'circle(0% at 50% 50%)',
+  });
+  gsap.set('.country-header', { clearProps: 'opacity,visibility,transform' });
 });

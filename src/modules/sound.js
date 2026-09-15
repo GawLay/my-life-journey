@@ -3,6 +3,7 @@ import { setWaveText } from './headerWave.js';
 
 const SOUND_PREFERENCE_KEY = 'paz-lofi-enabled';
 const SOUND_PLAYED_KEY = 'paz-lofi-was-playing';
+const SOUND_POSITION_KEY = 'paz-lofi-position';
 
 function getPreference() {
   try {
@@ -24,8 +25,24 @@ function wasPlaying() {
 function rememberPlaying(playing) {
   try {
     if (playing) sessionStorage.setItem(SOUND_PLAYED_KEY, 'true');
-    else sessionStorage.removeItem(SOUND_PLAYED_KEY);
+    else {
+      sessionStorage.removeItem(SOUND_PLAYED_KEY);
+      sessionStorage.removeItem(SOUND_POSITION_KEY);
+    }
   } catch (_) { /* storage is optional */ }
+}
+
+function getPlaybackPosition() {
+  try {
+    const position = JSON.parse(sessionStorage.getItem(SOUND_POSITION_KEY));
+    return Number.isFinite(position?.step) ? position : null;
+  } catch (_) {
+    return null;
+  }
+}
+
+function rememberPlaybackPosition(position) {
+  try { sessionStorage.setItem(SOUND_POSITION_KEY, JSON.stringify(position)); } catch (_) { /* storage is optional */ }
 }
 
 export function initSound() {
@@ -36,6 +53,10 @@ export function initSound() {
   const label = btn.querySelector('.nav__sound-label');
   let preferred = getPreference();
   let request = 0;
+
+  if (preferred && wasPlaying()) {
+    ambient.restorePlaybackPosition(getPlaybackPosition());
+  }
 
   const updateUI = (on) => {
     btn.classList.toggle('is-on', on);
@@ -74,6 +95,23 @@ export function initSound() {
   };
   window.addEventListener('pointerdown', resumePreferred, { capture: true });
   window.addEventListener('keydown', resumePreferred, { capture: true });
+
+  // AudioContexts cannot survive a full document navigation, but the musical
+  // playhead can. Hand the next beat to the destination page so its freshly
+  // created sound engine continues the progression rather than restarting it.
+  window.addEventListener('pagehide', () => {
+    if (preferred && ambient.built && (ambient.enabled || wasPlaying())) {
+      rememberPlaybackPosition(ambient.getPlaybackPosition());
+    }
+  });
+
+  // Browser Back may revive this exact document from the back-forward cache.
+  // Resynchronise it with the page we just left before its scheduler continues.
+  window.addEventListener('pageshow', (event) => {
+    if (!event.persisted || !preferred || !wasPlaying()) return;
+    ambient.restorePlaybackPosition(getPlaybackPosition());
+    setPlaying(true);
+  });
 
   // Every full page navigation creates a new AudioContext. Resume a previously
   // running session immediately when allowed, with the gesture listeners above

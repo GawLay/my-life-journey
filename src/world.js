@@ -99,17 +99,35 @@ function discoveryCoverBackground(place) {
   return '';
 }
 
-function revealIntoDiscovery(place) {
+async function revealIntoDiscovery(place) {
   const entry = document.querySelector('.world-entry');
   if (reduced || !entry) {
     gsap.set('.world-entry', { clipPath: 'circle(0% at 50% 50%)' });
     discovery.enter(place, { instant: true });
     return;
   }
+  await globe.ready;
   // The Deep Dive page hands off under a warm place-cover; match it and keep it in
-  // place, build the discovery view behind it, then iris the cover open to reveal it.
+  // place, then build the discovery view behind it.
   entry.style.background = discoveryCoverBackground(place);
-  discovery.enter(place, { reveal: true });
+  const earthReturn = document.documentElement.classList.contains('is-earth-return');
+  discovery.enter(place, { reveal: true, earthReturn });
+
+  if (earthReturn) {
+    // Reverse the Earth dive without a circular mask. The full-frame photo releases
+    // into an oversized globe while the camera pulls back to Discovery distance.
+    gsap.set(entry, { autoAlpha: 1, clipPath: 'inset(0)', scale: 1, filter: 'blur(0px)' });
+    gsap.timeline({
+      onComplete: () => {
+        gsap.set(entry, { autoAlpha: 0, scale: 1, filter: 'none', clipPath: 'inset(0)' });
+        document.documentElement.classList.remove('is-discovery-entry', 'is-earth-return');
+      },
+    })
+      .to(entry.querySelectorAll('.world-entry__discovery > *'), { autoAlpha: 0, y: 14, duration: .28, ease: 'power2.in' }, 0)
+      .to(entry, { autoAlpha: 0, scale: .97, filter: 'blur(8px)', duration: .68, ease: 'power2.inOut' }, .12);
+    return;
+  }
+
   // Leave the inline circle(0%) in place on completion — the CSS default for
   // .world-entry is circle(150%) (covering), so clearing props would re-cover it.
   gsap.fromTo(entry,
