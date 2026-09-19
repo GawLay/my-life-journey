@@ -26,7 +26,11 @@ if (waveEntering) window.__PAZ_WAVE_CONTENT_READY__?.();
 
 function setupHeader() {
   const header = document.getElementById('site-header');
-  const updateHeader = () => header?.classList.toggle('is-scrolled', window.scrollY > 24);
+  const hero = document.querySelector('.hero');
+  const updateHeader = () => {
+    header?.classList.toggle('is-scrolled', window.scrollY > 24);
+    header?.classList.toggle('on-dark', hero.getBoundingClientRect().bottom > header.offsetHeight);
+  };
   updateHeader();
   window.addEventListener('scroll', updateHeader, { passive: true });
 }

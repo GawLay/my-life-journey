@@ -3,12 +3,20 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#f0eadf" />
+    <meta name="theme-color" content="#f4efe4" />
     <title>Country Journal · Phyo Aung Zaw</title>
     <meta name="description" content="A photographic country journal from the world of Phyo Aung Zaw." />
     <script>
       (() => {
         const params = new URLSearchParams(window.location.search);
+        try {
+          const chapter = JSON.parse(sessionStorage.getItem('paz-chapter-entry'));
+          sessionStorage.removeItem('paz-chapter-entry');
+          if (chapter?.target === location.pathname + location.search) {
+            document.documentElement.classList.add('is-chapter-entry');
+            window.__PAZ_CHAPTER_ENTRY__ = chapter;
+          }
+        } catch { /* ordinary entrances work without storage */ }
         if (params.get('from') !== 'discovery') return;
         document.documentElement.classList.add('from-discovery');
         try {
@@ -45,12 +53,12 @@
       <strong id="country-entry-name">Vietnam</strong>
     </div>
     <script>
-      if (document.documentElement.classList.contains('from-discovery')) {
+      (() => {
         const id = new URLSearchParams(window.location.search).get('place') || 'vietnam';
-        const country = window.__PAZ_COUNTRY_HANDOFF__?.country || id.charAt(0).toUpperCase() + id.slice(1);
+        const country = window.__PAZ_CHAPTER_ENTRY__?.country || window.__PAZ_COUNTRY_HANDOFF__?.country || id.charAt(0).toUpperCase() + id.slice(1);
         document.getElementById('country-entry-label').textContent = country.toUpperCase();
         document.getElementById('country-entry-name').textContent = country;
-      }
+      })();
     </script>
 
     <header class="country-header">

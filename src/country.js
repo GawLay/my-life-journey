@@ -10,17 +10,10 @@ gsap.registerPlugin(ScrollTrigger);
 const params = new URLSearchParams(window.location.search);
 const place = places.find((item) => item.id === params.get('place')) || places.find((item) => item.id === 'vietnam') || places[0];
 const fromDiscovery = params.get('from') === 'discovery';
+const chapterEntering = document.documentElement.classList.contains('is-chapter-entry');
 const index = places.findIndex((item) => item.id === place.id);
 const next = places[(index + 1) % places.length];
 const cities = place.cities.split(' / ').map((city) => city.trim());
-const palettes = [
-  ['#ad563b', '#d8a266', '#435d58'],
-  ['#a94834', '#cf9462', '#52635a'],
-  ['#b86643', '#dbc192', '#3e5d5c'],
-  ['#b54e34', '#d8a15f', '#475d57'],
-  ['#a44935', '#cf9b67', '#4a5f5b'],
-];
-const [accent, warm, cool] = palettes[index] || palettes[0];
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches || params.has('static');
 let storedHandoff = null;
 try {
@@ -66,11 +59,21 @@ const defaultChapters = [
 const chapters = deepDive.chapters?.length ? deepDive.chapters : defaultChapters;
 
 let photoPlate = 0;
+let chapterTransitioning = false;
 const plateLabel = (role) => `${String(++photoPlate).padStart(2, '0')} / ${role}`;
 const photoSub = (photo, fallback) => {
   const moment = photo?.moment || fallback;
   return photo?.city ? `${photo.city} / ${moment}` : moment;
 };
+
+function storyCopy(chapter) {
+  const paragraphs = chapter.paragraphs || (chapter.copy ? [chapter.copy] : []);
+  return `<div class="story-copy">${paragraphs.map((paragraph) => `<p>${paragraph}</p>`).join('')}</div>`;
+}
+
+function storyNote(chapter) {
+  return `<div class="photo-chapter__note">${chapter.quote ? `<blockquote>${chapter.quote}</blockquote>` : ''}${storyCopy(chapter)}</div>`;
+}
 
 function storyChapter(chapter) {
   switch (chapter.kind) {
@@ -78,7 +81,7 @@ function storyChapter(chapter) {
       return `
     <article class="photo-chapter photo-chapter--collection">
       <header><span>${chapter.eyebrow || chapter.role}</span><time>${chapter.role || place.year}</time></header>
-      <div class="photo-collection__intro"><h2>${chapter.title || ''}</h2><p>${chapter.copy || ''}</p></div>
+      <div class="photo-collection__intro"><h2>${chapter.title || ''}</h2>${storyCopy(chapter)}</div>
       <div class="photo-collection">
         ${(chapter.media || []).map((photo) => journalPhoto(photo, 'tile', plateLabel(photo.type === 'video' ? 'MOVING IMAGE' : 'PHOTOGRAPH'), photoSub(photo, chapter.role || 'FIELD NOTE'))).join('')}
       </div>
@@ -87,36 +90,33 @@ function storyChapter(chapter) {
       return `
     <article class="photo-chapter photo-chapter--split">
       ${journalPhoto(chapter.photo, 'portrait', plateLabel(chapter.role || 'MORNING'), photoSub(chapter.photo, 'MORNING'))}
-      <div class="photo-chapter__text"><span>${chapter.eyebrow || photoSub(chapter.photo, chapter.role || 'MORNING')}</span><h2>${chapter.title || ''}</h2><p>${chapter.copy || ''}</p></div>
+      <div class="photo-chapter__text"><span>${chapter.eyebrow || photoSub(chapter.photo, chapter.role || 'MORNING')}</span><h2>${chapter.title || ''}</h2>${storyCopy(chapter)}</div>
     </article>`;
     case 'diptych':
       return `
     <article class="photo-chapter photo-chapter--diptych">
       ${journalPhoto(chapter.detail, 'detail', plateLabel(chapter.detailRole || 'DETAIL'), photoSub(chapter.detail, 'TEXTURE'))}
       ${journalPhoto(chapter.street, 'street', plateLabel(chapter.streetRole || 'STREET'), photoSub(chapter.street, 'AFTER RAIN'))}
-      <p>${chapter.copy || ''}</p>
+      ${storyNote(chapter)}
     </article>`;
     case 'closing':
       return `
     <article class="photo-chapter photo-chapter--closing">
       <p class="photo-chapter__coordinates">${chapter.eyebrow || place.coordinates}</p>
       ${journalPhoto(chapter.photo, 'panorama', plateLabel(chapter.role || 'DEPARTURE'), photoSub(chapter.photo, 'FIELD NOTES'))}
-      <blockquote>${chapter.copy || ''}</blockquote>
+      ${storyNote(chapter)}
     </article>`;
     default:
       return `
     <article class="photo-chapter photo-chapter--wide">
       <header><span>${chapter.eyebrow || photoSub(chapter.photo, chapter.role || 'OPENING')}</span><time>${chapter.time || place.year}</time></header>
       ${journalPhoto(chapter.photo, 'wide', plateLabel(chapter.role || 'OPENING'), photoSub(chapter.photo, 'BLUE HOUR'))}
-      <p>${chapter.copy || ''}</p>
+      ${storyCopy(chapter)}
     </article>`;
   }
 }
 
 document.title = `${place.country} · World Journal / Phyo Aung Zaw`;
-document.body.style.setProperty('--country-accent', accent);
-document.body.style.setProperty('--country-warm', warm);
-document.body.style.setProperty('--country-cool', cool);
 document.documentElement.style.setProperty('--handoff-a', handoffPalette[0]);
 document.documentElement.style.setProperty('--handoff-b', handoffPalette[1]);
 document.documentElement.style.setProperty('--handoff-c', handoffPalette[2]);
@@ -142,7 +142,10 @@ content.innerHTML = `
 
   <section class="country-intro">
     <p class="country-intro__label">A PERSONAL FIELD NOTE</p>
-    <blockquote>“${deepDive.intro || place.note}”</blockquote>
+    <div class="country-intro__text">
+      <blockquote>“${deepDive.intro || place.note}”</blockquote>
+      ${(deepDive.introParagraphs || []).map((paragraph) => `<p>${paragraph}</p>`).join('')}
+    </div>
     <dl style="--country-stat-count:${place.videos ? 5 : 4}">
       <div><dt>CHAPTER</dt><dd>${String(index + 1).padStart(2, '0')} / ${String(places.length).padStart(2, '0')}</dd></div>
       <div><dt>PHOTOGRAPHS</dt><dd>${String(place.photos).padStart(2, '0')}</dd></div>
@@ -209,15 +212,20 @@ function setupMotion() {
       .from('.country-hero__copy > span, .country-hero__copy > p', { y: 35, autoAlpha: 0, stagger: .09, duration: .82, ease: 'power3.out' }, .5)
       .from('.country-hero__route', { autoAlpha: 0, duration: .7 }, .66);
   } else {
-    // Scale + fade the country name in first so it lands with presence, then hold
-    // a beat before the charcoal cover irises open to the hero underneath.
-    gsap.timeline()
-      .from('#country-entry span', { autoAlpha: 0, y: 12, duration: .7, ease: 'power3.out' }, 0)
-      .from('#country-entry strong', { autoAlpha: 0, scale: .9, duration: 1, ease: 'power3.out' }, .05)
-      .to('#country-entry', { clipPath: 'circle(0% at 50% 50%)', duration: 1.05, ease: 'power3.inOut' }, .95)
-      .from('.country-hero__photo', { scale: 1.12, duration: 1.35, ease: 'power3.out' }, 1.1)
-      .from('.country-hero__copy > *', { y: 45, autoAlpha: 0, stagger: .1, duration: .9, ease: 'power3.out' }, 1.35)
-      .from('.country-hero__route', { autoAlpha: 0, duration: .8 }, 1.6);
+    // A Next Chapter hand-off arrives with its title already visible. Ordinary
+    // visits introduce the name before the same charcoal cover irises open.
+    const entrance = gsap.timeline();
+    if (!chapterEntering) {
+      entrance
+        .from('#country-entry span', { autoAlpha: 0, y: 12, duration: .7, ease: 'power3.out' }, 0)
+        .from('#country-entry strong', { autoAlpha: 0, scale: .9, duration: 1, ease: 'power3.out' }, .05);
+    }
+    const revealAt = chapterEntering ? 0 : .95;
+    entrance
+      .to('#country-entry', { clipPath: 'circle(0% at 50% 50%)', duration: 1.05, ease: 'power3.inOut' }, revealAt)
+      .from('.country-hero__photo', { scale: 1.12, duration: 1.35, ease: 'power3.out' }, revealAt + .15)
+      .from('.country-hero__copy > *', { y: 45, autoAlpha: 0, stagger: .1, duration: .9, ease: 'power3.out' }, revealAt + .4)
+      .from('.country-hero__route', { autoAlpha: 0, duration: .8 }, revealAt + .65);
   }
 
   // Ease the fixed top bar in as the cover clears, rather than letting it snap to
@@ -227,7 +235,7 @@ function setupMotion() {
     y: -18,
     duration: .9,
     ease: 'power3.out',
-    delay: fromDiscovery ? .55 : 1.15,
+    delay: fromDiscovery ? .55 : chapterEntering ? .2 : 1.15,
   });
 
   gsap.to('.country-hero__photo', {
@@ -270,11 +278,25 @@ function setupMotion() {
 
   document.querySelectorAll('[data-country-link]').forEach((link) => {
     link.addEventListener('click', (event) => {
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       event.preventDefault();
+      if (chapterTransitioning) return;
+      chapterTransitioning = true;
+      const target = new URL(link.href);
+      try {
+        sessionStorage.setItem('paz-chapter-entry', JSON.stringify({
+          target: target.pathname + target.search,
+          country: next.country,
+        }));
+      } catch { /* navigation still works without storage */ }
       const entry = document.getElementById('country-entry');
-      gsap.set(entry, { autoAlpha: 1, clipPath: 'circle(0% at 50% 50%)' });
+      // Match the arriving page's charcoal cover, even after a photo hand-off.
+      entry.classList.remove('is-earth-return');
+      entry.style.background = 'var(--charcoal)';
+      gsap.set(entry, { autoAlpha: 1, scale: 1, filter: 'none', clipPath: 'circle(0% at 50% 50%)' });
       entry.querySelector('strong').textContent = next.country;
       entry.querySelector('span').textContent = `DEEP DIVE / ${next.country.toUpperCase()}`;
+      gsap.set(entry.querySelectorAll('span, strong'), { autoAlpha: 1, y: 0, scale: 1 });
       gsap.to(entry, { clipPath: 'circle(150% at 50% 50%)', duration: 1, ease: 'power3.inOut', onComplete: () => { window.location.href = link.href; } });
     });
   });
@@ -302,7 +324,7 @@ function setupReturnNavigation() {
         return;
       }
       const returningToDiscovery = link.href.includes('view=discovery');
-      // Returning to the discovery view: hand the same warm cover (palette + photo)
+      // Returning to the discovery view: hand the same photo cover (palette + photo)
       // to world.html so it paints a matching cover before first paint. The incoming
       // globe then pulls back from the surface to reverse the forward camera move.
       if (returningToDiscovery) {
@@ -341,7 +363,10 @@ function setupReturnNavigation() {
 initHeaderWave();
 initSound();
 initLiquidWarp();
-if (fromDiscovery && !reduced) document.fonts.ready.then(setupMotion);
+if (chapterEntering && !reduced) {
+  const cover = document.querySelector('.country-hero__photo img');
+  Promise.all([document.fonts.ready, cover?.decode().catch(() => {})]).then(setupMotion);
+} else if (fromDiscovery && !reduced) document.fonts.ready.then(setupMotion);
 else setupMotion();
 setupStoryMedia();
 setupReturnNavigation();
@@ -349,9 +374,12 @@ requestAnimationFrame(() => ScrollTrigger.refresh());
 
 window.addEventListener('pageshow', (event) => {
   if (!event.persisted) return;
+  chapterTransitioning = false;
   gsap.killTweensOf('#country-entry');
   const entry = document.querySelector('#country-entry');
+  if (!entry) return;
   entry.classList.remove('is-earth-return');
+  entry.style.background = '';
   entry.querySelector('span').textContent = `DEEP DIVE / ${place.country.toUpperCase()}`;
   entry.querySelector('strong').textContent = place.country;
   gsap.set(entry, {

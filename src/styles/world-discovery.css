@@ -28,7 +28,7 @@
   border: 0;
   border-bottom: 1px solid transparent;
   padding: 0 0 .3rem;
-  color: rgba(242,237,227,.56);
+  color: rgba(var(--mist-rgb),.56);
   background: transparent;
   cursor: pointer;
 }

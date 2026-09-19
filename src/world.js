@@ -84,7 +84,7 @@ function animateWorldEntrance() {
     .from('.world__countries', { yPercent: 100, duration: .8, ease: 'power3.out' }, .8);
 }
 
-// Rebuild the exact warm cover the Deep Dive page departs under (same palette /
+// Rebuild the exact photo cover the Deep Dive page departs under (same palette /
 // photo), so the two page-covers read as one continuous surface across the load.
 function discoveryCoverBackground(place) {
   let palette = place.memories[7]?.palette || place.memories[0]?.palette;
@@ -147,7 +147,7 @@ function setupSceneParallax() {
   const movers = memories.map((memory, index) => ({
     x: gsap.quickTo(memory, 'x', { duration: 1.6 + index * .18, ease: 'power3.out' }),
     y: gsap.quickTo(memory, 'y', { duration: 1.6 + index * .18, ease: 'power3.out' }),
-    amount: amounts[index],
+    amount: amounts[index % amounts.length],
   }));
   window.addEventListener('pointermove', (event) => {
     if (discovery.viewMode !== 'world') return;
@@ -206,8 +206,30 @@ initLiquidWarp();
 setupSceneParallax();
 setupBackToWork();
 
+if (waveEntering) {
+  Promise.all([
+    document.fonts.ready,
+    globe.ready,
+  ]).then(() => {
+    // Compile/upload one complete globe frame before the wave starts. Keep that
+    // frame still until the wave settles so WebGL and the page transition never
+    // compete for the same animation frames on slower machines.
+    globe.render();
+    window.__PAZ_WAVE_WORLD_READY__?.();
+  });
+}
+
 if (reduced) globe.ready.finally(() => globe.render());
-else gsap.ticker.add(() => globe.render());
+else {
+  let transitionSettled = !waveEntering;
+  if (waveEntering) window.addEventListener('paz:wave-settled', () => {
+    transitionSettled = true;
+    globe.render();
+  }, { once: true });
+  gsap.ticker.add(() => {
+    if (transitionSettled) globe.render();
+  });
+}
 
 if (requestedDiscovery && requestedPlace) {
   revealIntoDiscovery(requestedPlace);

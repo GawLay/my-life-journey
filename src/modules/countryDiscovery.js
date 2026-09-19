@@ -141,9 +141,6 @@ export function initCountryDiscovery({ globe, globeMount, places, reduced = fals
       storyCoverPreload.src = place.deepDive.cover.src;
     }
 
-    document.body.style.setProperty('--discovery-accent', place.memories[0].palette[2]);
-    document.body.style.setProperty('--discovery-warm', place.memories[1].palette[1]);
-    document.body.style.setProperty('--discovery-cool', place.memories[2].palette[0]);
     headerLabel.dataset.waveReady = '';
     deepHeaderLink.querySelector('[data-wave]').dataset.waveReady = '';
     updateWave(headerLabel, `${place.country.toUpperCase()} / DISCOVERY`);

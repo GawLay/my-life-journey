@@ -91,6 +91,9 @@ export function initSound() {
   const resumePreferred = (event) => {
     if (event.target instanceof Element && event.target.closest('.nav__sound')) return;
     if (!preferred || ambient.isPlaying) return;
+    // Record the trusted start gesture before a link can replace this document.
+    // The destination then resumes the same musical position automatically.
+    rememberPlaying(true);
     setPlaying(true);
   };
   window.addEventListener('pointerdown', resumePreferred, { capture: true });

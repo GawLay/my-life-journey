@@ -120,6 +120,23 @@ do not place essential content near its far left or right edges.
 - Countries without explicit photo data continue to use the existing generated
   placeholders.
 
+## Myanmar: integrated September 2026
+
+Myanmar uses 15 unique photographs from the 16 supplied JPEGs. The exact duplicate
+`kalaw_mountain_five.jpeg` is preserved with the masters and is not published.
+
+- Explore My World: 15 real photographs across the existing three scenes.
+- Country Deep Dive: six chapters reusing eight gallery photographs, plus the cover.
+- Both Bagan photographs appear in Discovery and together in the Deep Dive.
+- The main World page has eight floating photographs: both Bagan frames,
+  Shwedagon at night, two Thailand frames and three Vietnam frames.
+- Cover: `08-shwedagon-night.webp`.
+- Locations represented: Yangon, Bagan and Kalaw. The flower detail and evening
+  rooftops retain a country-level caption because their city is not supplied.
+- Published files: sRGB WebP at quality 82, about 1.8 MB total, with private
+  metadata removed. Original dimensions are preserved without upscaling.
+- Local untouched masters: `source-images/world/myanmar/` (git-ignored).
+
 ## Vietnam: integrated September 2026
 
 Vietnam uses all 21 unique iPhone photographs supplied. The duplicate
@@ -152,7 +169,7 @@ Vietnam uses all 21 unique iPhone photographs supplied. The duplicate
 | 13 | `13-night-walk-saigon-lantern-alley.webp` | Ho Chi Minh City | Night Walk |
 | 14 | `14-small-rituals-da-nang-beach.webp` | Đà Nẵng | Small Rituals |
 | 15 | `15-departure-saigon-night-traffic.webp` | Ho Chi Minh City | Departure |
-| 16 | `16-night-study-hoi-an-photographer.webp` | Hội An | Night Study |
+| 16 | `da_nang_one.jpeg` | Đà Nẵng | Night Harbor |
 
 ### Vietnam Deep Dive sequence
 

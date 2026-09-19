@@ -41,6 +41,18 @@ function pointInFeature(point, feature) {
 export default class Globe {
   constructor(element, options = {}) {
     this.element = element;
+    const styles = getComputedStyle(document.documentElement);
+    const token = (name) => styles.getPropertyValue(name).trim();
+    this.palette = {
+      ocean: token('--charcoal'),
+      land: token('--globe-land'),
+      line: token('--globe-line'),
+      visited: token('--amber'),
+      active: token('--accent-glow'),
+      mist: token('--cream'),
+      shade: token('--sage'),
+      grid: `rgba(${token('--mist-rgb')}, .11)`,
+    };
     this.places = options.places || [];
     this.onSelect = options.onSelect || (() => {});
     this.onHover = options.onHover || (() => {});
@@ -88,12 +100,12 @@ export default class Globe {
 
     const wire = new THREE.Mesh(
       new THREE.SphereGeometry(RADIUS * 1.004, 24, 16),
-      new THREE.MeshBasicMaterial({ color: 0x6d665c, transparent: true, opacity: 0.08, wireframe: true })
+      new THREE.MeshBasicMaterial({ color: this.palette.line, transparent: true, opacity: 0.08, wireframe: true })
     );
     this.group.add(wire);
 
-    this.scene.add(new THREE.HemisphereLight(0xfff8ea, 0x6f594b, 2.1));
-    const key = new THREE.DirectionalLight(0xfff3d6, 2.8);
+    this.scene.add(new THREE.HemisphereLight(this.palette.mist, this.palette.shade, 2.1));
+    const key = new THREE.DirectionalLight(this.palette.mist, 2.8);
     key.position.set(-3, 4, 5);
     this.scene.add(key);
 
@@ -168,10 +180,10 @@ export default class Globe {
 
   drawTexture() {
     const ctx = this.context;
-    ctx.fillStyle = '#24231f';
+    ctx.fillStyle = this.palette.ocean;
     ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-    ctx.strokeStyle = 'rgba(242, 237, 227, .11)';
+    ctx.strokeStyle = this.palette.grid;
     ctx.lineWidth = 1;
     for (let lng = -150; lng <= 150; lng += 30) {
       const x = ((lng + 180) / 360) * this.canvas.width;
@@ -187,8 +199,8 @@ export default class Globe {
       const visited = this.visitedFeatures.has(iso);
       const active = iso === this.selectedIso;
       const hovered = iso === this.hoveredIso;
-      const fill = active ? '#cf6848' : hovered ? '#d98a62' : visited ? '#a95139' : '#373732';
-      const stroke = visited ? '#e49b78' : '#777166';
+      const fill = active ? this.palette.active : hovered ? this.palette.mist : visited ? this.palette.visited : this.palette.land;
+      const stroke = visited ? this.palette.active : this.palette.line;
       this.drawFeature(feature, fill, stroke, visited ? 1.8 : 0.75);
     }
     this.texture.needsUpdate = true;

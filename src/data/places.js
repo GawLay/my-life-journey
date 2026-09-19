@@ -17,12 +17,12 @@ const memoryBlueprints = [
 ];
 
 const memoryPalettes = [
-  ['#344b48', '#d0a66d', '#9f4935'],
-  ['#5d6355', '#e2c394', '#b35c3c'],
-  ['#263d3c', '#bd714e', '#d8a668'],
-  ['#6d4538', '#d98d55', '#3f5957'],
-  ['#293833', '#c9b88f', '#a84732'],
-  ['#425b57', '#e1b574', '#7f4035'],
+  ['#493d35', '#d2c6b5', '#bd3918'],
+  ['#817367', '#e9e2d5', '#bd3918'],
+  ['#27201d', '#f4efe4', '#d88765'],
+  ['#5f5045', '#c6b6a3', '#bd3918'],
+  ['#493d35', '#d2c6b5', '#d88765'],
+  ['#817367', '#e9e2d5', '#bd3918'],
 ];
 
 function createMemories(place, placeIndex) {
@@ -79,7 +79,7 @@ const thailandGallery = [
   { src: '/images/world/thailand/hua-hin-01-shoreline.webp', group: 'hua-hin', city: 'HUA HIN', moment: 'SHORELINE', aspect: 'portrait', position: 'center 60%', alt: 'A long Hua Hin shoreline with low waves, horses and distant beachgoers' },
   { src: '/images/world/thailand/nakhon-pathom-02-canal-path.webp', group: 'nakhon-pathom', city: 'NAKHON PATHOM', moment: 'CANAL PATH', aspect: 'landscape', position: 'center 52%', alt: 'A narrow path beneath palms and fruit trees beside a canal in Nakhon Pathom' },
   { src: '/images/world/thailand/nakhon-pathom-03-watering.webp', group: 'nakhon-pathom', city: 'NAKHON PATHOM', moment: 'WATERING', aspect: 'portrait', position: 'center', alt: 'Water spraying across rows of plants in a Nakhon Pathom garden' },
-  { src: '/images/world/thailand/nakhon-pathom-04-chillies.webp', group: 'nakhon-pathom', city: 'NAKHON PATHOM', moment: 'HOME GARDEN', aspect: 'portrait', position: 'center', alt: 'Red chillies growing among green leaves in a home garden in Nakhon Pathom' },
+  { src: '/images/world/thailand/nakhon-pathom-04-firelight-supper.webp', group: 'nakhon-pathom', city: 'NAKHON PATHOM', moment: 'FIRELIGHT SUPPER', aspect: 'landscape', position: 'center', alt: 'Friends sharing supper beside a small outdoor fire in Nakhon Pathom' },
   { src: '/images/world/thailand/nakhon-pathom-05-night-fire.webp', group: 'nakhon-pathom', city: 'NAKHON PATHOM', moment: 'NIGHT GATHERING', aspect: 'landscape', position: 'center', alt: 'A small outdoor fire during a night gathering in Nakhon Pathom' },
   { type: 'video', src: '/images/world/thailand/nakhon-pathom-06-cycling.m4v', poster: '/images/world/thailand/nakhon-pathom-06-cycling-poster.webp', group: 'nakhon-pathom', city: 'NAKHON PATHOM', moment: 'EVENING RIDE', aspect: 'portrait', position: 'center', alt: 'An evening bicycle ride along a tree-lined path in Nakhon Pathom' },
   { type: 'video', src: '/images/world/thailand/nakhon-pathom-07-fireplace.m4v', poster: '/images/world/thailand/nakhon-pathom-07-fireplace-poster.webp', group: 'nakhon-pathom', city: 'NAKHON PATHOM', moment: 'FIRELIGHT', aspect: 'wide', position: 'center', alt: 'A small outdoor fire glowing during a night gathering in Nakhon Pathom' },
@@ -88,51 +88,92 @@ const thailandGallery = [
   { src: '/images/world/thailand/companions-03-milo.webp', group: 'companions', city: 'THAILAND', moment: 'MILO', aspect: 'portrait', position: 'center', alt: 'A small brown dog looking toward the camera from a bed' },
 ];
 
+// Fifteen unique home photographs. The duplicate Kalaw mountain frame stays
+// with the local masters; smaller originals are published without upscaling.
+const myanmarGallery = [
+  { src: '/images/world/myanmar/01-yangon-neighbourhood.webp', city: 'YANGON', moment: 'ROOFTOPS', aspect: 'landscape', alt: 'Trees and apartment buildings beneath a cloudy sky in Yangon' },
+  { src: '/images/world/myanmar/02-yangon-monsoon.webp', city: 'YANGON', moment: 'MONSOON AIR', aspect: 'landscape', alt: 'Dark monsoon clouds above rooftops and a building under construction in Yangon' },
+  { src: '/images/world/myanmar/03-bagan-tree.webp', city: 'BAGAN', moment: 'UNDER THE TREES', aspect: 'landscape', alt: 'A horse cart beneath a spreading tree beside a white building in Bagan' },
+  { src: '/images/world/myanmar/04-kalaw-pond.webp', city: 'KALAW', moment: 'STILL WATER', aspect: 'wide', alt: 'A roofed pavilion beside a green pond surrounded by gardens in Kalaw' },
+  { src: '/images/world/myanmar/05-bagan-temple.webp', city: 'BAGAN', moment: 'OLD BRICK', aspect: 'square', alt: 'A brick temple rising above trees and a sandy path in Bagan' },
+  { src: '/images/world/myanmar/06-mountain-flowers.webp', city: 'MYANMAR', moment: 'SMALL THINGS', aspect: 'wide', alt: 'Red blossoms among green leaves against a clear blue sky' },
+  { src: '/images/world/myanmar/07-kalaw-trail.webp', city: 'KALAW', moment: 'THE LONG WAY', aspect: 'wide', alt: 'A mountain path winding between trees and dry grass beneath a blue sky in Kalaw' },
+  { src: '/images/world/myanmar/08-shwedagon-night.webp', city: 'YANGON', moment: 'SHWEDAGON AT NIGHT', aspect: 'landscape', alt: 'The illuminated golden stupa of Shwedagon Pagoda beneath the moon in Yangon' },
+  { src: '/images/world/myanmar/09-kalaw-forest.webp', city: 'KALAW', moment: 'THROUGH THE TREES', aspect: 'wide', alt: 'Mountain ridges seen through trees and red blossoms in Kalaw' },
+  { src: '/images/world/myanmar/10-kalaw-ridges.webp', city: 'KALAW', moment: 'DISTANT RIDGES', aspect: 'wide', alt: 'Layers of forested mountain ridges beneath a clear blue sky in Kalaw' },
+  { src: '/images/world/myanmar/11-kalaw-roadside.webp', city: 'KALAW', moment: 'BESIDE THE ROAD', aspect: 'wide', alt: 'A roadside building and flowering trees beside a dusty mountain road in Kalaw' },
+  { src: '/images/world/myanmar/12-kalaw-mountain-light.webp', city: 'KALAW', moment: 'MOUNTAIN LIGHT', aspect: 'wide', alt: 'A tall tree silhouetted against distant hazy mountains in Kalaw' },
+  { src: '/images/world/myanmar/13-kalaw-hillside.webp', city: 'KALAW', moment: 'OPEN SKY', aspect: 'wide', alt: 'Trees and red blossoms along a dry hillside under a vivid blue sky in Kalaw' },
+  { src: '/images/world/myanmar/14-kalaw-valley.webp', city: 'KALAW', moment: 'THE QUIET HILLS', aspect: 'wide', alt: 'A forested valley and long mountain ridge beyond dry grass in Kalaw' },
+  { src: '/images/world/myanmar/15-evening-rooftops.webp', city: 'MYANMAR', moment: 'LAST LIGHT', aspect: 'square', alt: 'Evening light above rooftops, trees and distant hills beneath a cloudy sky' },
+];
+
 const placeData = [
   {
-    // Home. No gallery yet, on purpose: these are the frames I never thought to
-    // fill. The copy leans into that, and the placeholders wait for the photos I
-    // will bring back. `photos: 0` keeps the counts honest until then.
-    id: 'myanmar', iso: 'MMR', country: 'Myanmar', year: '2016', cities: 'YANGON / MANDALAY',
-    coordinates: '16.8409° N / 96.1735° E', lat: 16.84, lng: 96.17, photos: 0, stories: 6,
-    note: 'It felt like home, so I never thought to photograph it. Myanmar is where everything began: my family, my street, the small world that made me. I was too busy living inside those days to hold up a camera, and the ordinary moments I never kept are the ones I miss most. These frames are still empty. Someday soon I will go home and fill them.',
-    images: [],
+    id: 'myanmar', iso: 'MMR', country: 'Myanmar', year: '2016', cities: 'YANGON / BAGAN / KALAW',
+    coordinates: '16.8409° N / 96.1735° E', lat: 16.84, lng: 96.17, photos: 15, stories: 6,
+    note: 'Myanmar is where everything began: my family, my street, the small world that made me. I did not photograph enough of the ordinary days. These few pictures bring back pieces of home: Yangon rooftops, old brick in Bagan and the quiet hills of Kalaw.',
+    gallery: myanmarGallery,
     deepDive: {
-      cover: { city: 'YANGON', moment: 'HOME', palette: ['#7a3b2e', '#d8a866', '#3f5148'] },
-      intro: 'Some places you visit. One place makes you. Myanmar is where my footprints first meant something, and where my family, my whole world, still is. I never imagined I could miss a place this much. I have almost no pictures of it, because when you are home you never believe the ordinary will one day be the thing you ache for.',
+      cover: { ...myanmarGallery[7], palette: ['#493d35', '#d2c6b5', '#bd3918'] },
+      intro: 'Some places you visit. One place makes you.',
+      introParagraphs: [
+        'Myanmar is where everything began: where my footprints first meant something, and where my family, my whole world, still is. I remember monsoon air on warm pavement, the smell of the first rain, and familiar streets that knew my name before I did. I thought home would always be there, exactly the way I left it, waiting for whenever I chose to come back.',
+        'I have no photographs of my hometown, only these few fragments of Myanmar. Small and imperfect, they bring me closer to a place I never imagined I could miss this much.',
+      ],
       chapters: [
         {
-          kind: 'wide', role: 'WHERE IT BEGAN', eyebrow: 'YANGON', time: '2016',
-          photo: { city: 'YANGON', moment: 'HOME STREETS' },
-          copy: 'This is where it all began. Monsoon air on warm pavement, the smell of the first rain, familiar streets that knew my name before I did. It is the first place my footprints ever left a mark, and everything I have made since still starts from here. I thought it would always be there, exactly the way I left it, waiting for whenever I chose to come back.',
+          kind: 'wide', role: 'AN ORDINARY DAY', eyebrow: 'YANGON', time: '2016',
+          photo: myanmarGallery[0],
+          paragraphs: [
+            'Clouds gathering over Yangon rooftops, trees between the buildings, an ordinary day held in a photograph. This frame keeps a small piece of Myanmar for me.',
+            'Looking at it now, I wish I had photographed more of the everyday places in my own hometown.',
+          ],
         },
         {
-          kind: 'split', role: 'MY WHOLE WORLD', eyebrow: 'FAMILY',
-          title: 'My family,<br /><em>my whole world.</em>',
-          photo: { city: 'YANGON', moment: 'THE TABLE' },
-          copy: 'Home was never the skyline or the landmarks. It was the people around the table, the tea going cold while we talked, the small rituals of an ordinary evening. It was my family, who are, and always will be, my whole world. I did not know then that I was already living inside the memory I would one day miss the most.',
+          kind: 'collection', role: 'OLD BRICK', eyebrow: 'BAGAN',
+          title: 'The places<br /><em>that stay with me.</em>',
+          media: [myanmarGallery[2], myanmarGallery[4]],
+          paragraphs: [
+            'A brick temple, a sandy path, trees softening the edges. These pictures hold the places I did remember to photograph.',
+            'But home was always more than the landmarks: it was my family, the people around the table and the small rituals of an ordinary evening. They are still my whole world.',
+          ],
         },
         {
-          kind: 'diptych', detailRole: 'THE EVERYDAY', streetRole: 'THE ORDINARY',
-          detail: { city: 'YANGON', moment: 'SMALL THINGS' },
-          street: { city: 'MANDALAY', moment: 'A PASSING DAY' },
-          copy: 'The ordinary days I never thought to photograph: a corner, a light, a face I passed every morning, the particular way the afternoon fell across the floor. I did not value them enough to keep them. Now I would give almost anything for one honest frame of a day I was so sure would repeat forever.',
+          kind: 'diptych', detailRole: 'THE EVERYDAY', streetRole: 'STILL WATER',
+          detail: myanmarGallery[5],
+          street: myanmarGallery[3],
+          quote: 'A few small things survived in the camera roll.',
+          paragraphs: [
+            'Blossoms against a blue sky, a pavilion beside still water. They bring back the pace of those days.',
+            'I wish I had kept more of the ordinary, but I am grateful for the fragments I have.',
+          ],
         },
         {
-          kind: 'wide', role: 'FROM FAR AWAY', eyebrow: 'HOMESICK',
-          photo: { city: 'YANGON', moment: 'LONGING' },
-          copy: 'I never imagined I would have to miss my hometown this much. From far away the smallest things turn into poetry: a song, a smell, a word in my own language, the sound of home in someone else&rsquo;s voice. The longing does not shout. It just lingers, quiet and constant, underneath everything. You do not understand how much a place is a part of you until you are standing somewhere it is not.',
+          kind: 'wide', role: 'FROM FAR AWAY', eyebrow: 'KALAW',
+          photo: myanmarGallery[9],
+          paragraphs: [
+            'From far away the smallest things turn into poetry: a song, a smell, a word in my own language. These mountain ridges bring back another kind of quiet.',
+            'The longing does not shout. It just lingers underneath everything. You do not understand how much a place is a part of you until you are standing somewhere it is not.',
+          ],
         },
         {
           kind: 'split', role: 'ONE PHOTOGRAPH', eyebrow: 'WHAT I LEARNED',
           title: 'One photograph,<br /><em>a whole world back.</em>',
-          photo: { city: 'HOME', moment: 'IF ONLY' },
-          copy: 'I never understood how a single photograph could become the most valuable thing you own. Now I do. One ordinary frame can hand you back a whole afternoon: a voice, a laugh, a version of the people you love that will never come again. I learned it a little too late for some of them. I am trying to learn it in time for the rest.',
+          photo: myanmarGallery[14],
+          paragraphs: [
+            'I never understood how a single photograph could become the most valuable thing you own. Now I do.',
+            'Even a small, imperfect frame can hand you back a whole afternoon: the light over the rooftops, the weather, the feeling of being there. I am trying to remember to keep more of those moments.',
+          ],
         },
         {
-          kind: 'closing', role: 'PHOTOS TO COME',
-          photo: { city: 'YANGON', moment: 'SOMEDAY' },
-          copy: 'So this chapter waits, honestly, with more blank space than pictures. I did not capture enough of home the first time around, and I have made my peace with letting that ache show here. But I am going back, and this time I will hold up the camera. Someday soon these frames will hold my family, my streets and my whole world: the photographs they have always deserved.',
+          kind: 'closing', role: 'UNTIL I RETURN',
+          photo: myanmarGallery[13],
+          quote: 'This chapter begins with the pictures I have.',
+          paragraphs: [
+            'I did not capture enough of home the first time around, but these fragments carry more than their size suggests.',
+            'Someday I will go back, and this time I will hold up the camera for my family, my streets and the ordinary days I want to keep.',
+          ],
         },
       ],
     },
@@ -149,8 +190,12 @@ const placeData = [
       { id: 'companions', eyebrow: 'SMALL COMPANIONS', title: 'The softest<br /><em>footnotes.</em>', copy: 'Mico and Milo, two small dogs who quietly ran the household and kept turning up in the camera roll.' },
     ],
     deepDive: {
-      cover: { ...thailandGallery[0], moment: 'FIRST ADDRESS', palette: ['#2f4245', '#c9a779', '#a64d39'] },
-      intro: 'Thailand began for me in Sathorn: river weather outside the window, ferries below and a skyline changing by the hour. The map widened from there, but that first address still holds the beginning.',
+      cover: { ...thailandGallery[0], moment: 'FIRST ADDRESS', palette: ['#27201d', '#c6b6a3', '#d88765'] },
+      intro: 'The first address still holds the beginning.',
+      introParagraphs: [
+        'Thailand began for me in Sathorn: river weather outside the window, ferries below and a skyline changing by the hour.',
+        'The map widened from there, into old brick, island shores and the ordinary days that made Thailand feel familiar.',
+      ],
       chapters: [
         { kind: 'collection', role: 'FIRST ADDRESS', eyebrow: 'SATHORN · WHERE IT STARTED', title: 'The first view<br /><em>became a beginning.</em>', copy: 'Sathorn was my first place in Thailand. Morning entered through the window; boats and storms crossed the river; the skyline taught me the changing pace of Bangkok.', media: thailandGallery.filter((item) => item.group === 'sathorn') },
         { kind: 'collection', role: 'OLD CAPITAL', eyebrow: 'AYUTTHAYA · OLD STONE', title: 'Time held<br /><em>in warm brick.</em>', copy: 'Ayutthaya slowed the journey down: weathered prangs holding the afternoon heat, and brick foundations that have outlasted everything once built on them.', media: thailandGallery.filter((item) => item.group === 'ayutthaya') },
@@ -242,9 +287,9 @@ const placeData = [
         alt: 'Motorbikes and market lights filling a Ho Chi Minh City street at night',
       },
       {
-        src: '/images/world/vietnam/16-night-study-hoi-an-photographer.webp',
-        city: 'HỘI AN', moment: 'NIGHT STUDY', aspect: 'landscape', position: 'center 48%',
-        alt: 'A photographer checking his camera beside colourful reflections on the Hội An river at night',
+        src: '/images/world/vietnam/da_nang_one.jpeg',
+        city: 'ĐÀ NẴNG', moment: 'NIGHT HARBOR', aspect: 'portrait', position: 'center',
+        alt: 'Boats beneath waterfront lamps and bougainvillea in Đà Nẵng at night',
       },
     ],
     deepDive: {
@@ -252,9 +297,12 @@ const placeData = [
         src: '/images/world/vietnam/08-the-long-way-mui-ne-coast.webp',
         city: 'MŨI NÉ', moment: 'THE LONG WAY', position: 'center',
         alt: 'Travellers waving beside two colourful open-top jeeps on the coast at Mũi Né',
-        palette: ['#293833', '#c9b88f', '#a84732'],
+        palette: ['#493d35', '#d2c6b5', '#bd3918'],
       },
-      intro: 'Home is not one fixed point. It is cathedral bells and midnight traffic, a white statue over the sea, lanterns above an old street, and the long road out to the open sand.',
+      intro: 'Home is not one fixed point.',
+      introParagraphs: [
+        'It is cathedral bells and midnight traffic, a white statue over the sea, lanterns above an old street, and the long road out to the open sand.',
+      ],
       // A four-city arc: Ho Chi Minh City → Đà Nẵng → Hội An → Mũi Né. Each city
       // is its own chapter set, rendered by src/country.js#storyChapter.
       chapters: [
@@ -289,7 +337,8 @@ const placeData = [
         },
         {
           kind: 'diptych', detailRole: 'WILD EDGE', streetRole: 'SHORELINE',
-          copy: 'The peninsula still belongs to the monkeys; the beach belongs to whoever left their shoes in the sand.',
+          quote: 'The peninsula still belongs to the monkeys.',
+          copy: 'The beach belongs to whoever left their shoes in the sand.',
           detail: {
             src: '/images/world/vietnam/11-weather-study-da-nang-macaque.webp',
             city: 'ĐÀ NẴNG', moment: 'SƠN TRÀ', position: 'center 45%',
@@ -322,7 +371,8 @@ const placeData = [
         },
         {
           kind: 'diptych', detailRole: 'HANDMADE', streetRole: 'RIVER',
-          copy: 'Colour made by hand, one lantern at a time, then the river gathers all of it into a single warm crowd.',
+          quote: 'Colour made by hand.',
+          copy: 'One lantern at a time, then the river gathers all of it into a single warm crowd.',
           detail: {
             src: '/images/world/vietnam/deep-03-hoi-an-lantern-detail.webp',
             city: 'HỘI AN', moment: 'LANTERNS', position: 'center',
@@ -336,7 +386,8 @@ const placeData = [
         },
         {
           kind: 'closing', role: 'DEPARTURE',
-          copy: 'And then the road gives way to sand. At Mũi Né people become small marks on the ridge, the jeeps shrink to bright dots, and the horizon does the rest of the remembering.',
+          quote: 'And then the road gives way to sand.',
+          copy: 'At Mũi Né people become small marks on the ridge, the jeeps shrink to bright dots, and the horizon does the rest of the remembering.',
           photo: {
             src: '/images/world/vietnam/deep-05-mui-ne-dunes.webp',
             city: 'MŨI NÉ', moment: 'DEPARTURE', position: 'center',

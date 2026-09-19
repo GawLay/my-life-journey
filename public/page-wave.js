@@ -17,6 +17,13 @@ function pageKind(url) {
   return null;
 }
 
+// pagereveal can precede World's module. Keep the source snapshot intact until
+// the destination has warmed its first WebGL frame. Photographs can finish
+// decoding behind the wave without holding the interaction on one frame.
+const worldReady = supported && pageKind(location.href) === 'world'
+  ? new Promise((resolve) => { window.__PAZ_WAVE_WORLD_READY__ = resolve; })
+  : null;
+
 window.__PAZ_PAGE_WAVE__ = supported;
 window.__PAZ_WAVE_LINK__ = (url) => supported && Boolean(pageKind(location.href) && pageKind(url));
 
@@ -38,16 +45,23 @@ if (supported) {
       || link.target && link.target !== '_self' || !window.__PAZ_WAVE_LINK__(link.href)) return;
     stageWave(link.href, pageKind(link.href) === 'work');
   }, { capture: true });
-  // Also stage browser Back/Forward, which do not pass through the click handler.
-  window.addEventListener('pageswap', (event) => {
-    const activation = event.activation;
-    if (!activation?.entry || !window.__PAZ_WAVE_LINK__(activation.entry.url)) return;
-    const back = activation.navigationType === 'traverse'
-      ? activation.entry.index < activation.from.index
-      : pageKind(activation.entry.url) === 'work';
-    stageWave(activation.entry.url, back);
-  });
 }
+
+// Static and reduced-motion routes also opt out of the native snapshot.
+// Catch its ready promise on the outgoing document before skipping it.
+window.addEventListener('pageswap', (event) => {
+  event.viewTransition?.ready.catch(() => {});
+  const activation = event.activation;
+  if (!supported || !activation?.entry || !window.__PAZ_WAVE_LINK__(activation.entry.url)) {
+    // Discovery and country journals use their own iris/photo covers.
+    event.viewTransition?.skipTransition();
+    return;
+  }
+  const back = activation.navigationType === 'traverse'
+    ? activation.entry.index < activation.from.index
+    : pageKind(activation.entry.url) === 'work';
+  stageWave(activation.entry.url, back);
+});
 
 const ease = (t) => t * t * (3 - 2 * t);
 function waveEdge(progress, y, depth) {
@@ -116,58 +130,26 @@ function preserveWordSpacing(word) {
   word.dataset.pageWaveSpaced = 'true';
 }
 
-// Preserve links, emphasis and intentional line breaks by splitting only their
-// visible text nodes. Existing [data-wave] labels already have letter spans.
+// Reuse the arriving headline spans prepared by the page module. Splitting all
+// visible copy here forced repeated layout during the reveal, including nav text.
 function prepareVisibleText() {
-  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-  const nodes = [];
-  let node;
-  while ((node = walker.nextNode())) {
-    const parent = node.parentElement;
-    if (!node.textContent.trim() || !parent || parent.closest('script, style, svg, canvas, textarea, select, option, [hidden], [aria-hidden="true"], [data-wave], .wave-word, .work-entry, .world-entry, .project-transition')) continue;
-    const range = document.createRange();
-    range.selectNodeContents(node);
-    if (![...range.getClientRects()].some(inViewport)) continue;
-    let hidden = false;
-    for (let element = parent; element && element !== document.body; element = element.parentElement) {
-      const style = getComputedStyle(element);
-      if (style.visibility === 'hidden' || style.opacity === '0') { hidden = true; break; }
-    }
-    if (!hidden) nodes.push(node);
-  }
-
-  nodes.forEach((textNode) => {
-    const fragment = document.createDocumentFragment();
-    for (const piece of textNode.textContent.match(/\S+|\s+/g) || []) {
-      if (!piece.trim()) { fragment.appendChild(document.createTextNode(piece)); continue; }
-      const word = document.createElement('span');
-      word.className = 'wave-word';
-      word.dataset.pageWaveTemp = '';
-      for (const character of piece) {
-        const letter = document.createElement('span');
-        letter.className = 'wave-letter';
-        letter.textContent = character;
-        word.appendChild(letter);
-      }
-      fragment.appendChild(word);
-    }
-    textNode.replaceWith(fragment);
-  });
-  root.querySelectorAll('[data-page-wave-temp], .wave-arrival .wave-word').forEach(preserveWordSpacing);
+  root.querySelectorAll('.wave-arrival .wave-word').forEach(preserveWordSpacing);
 }
 
 function animateVisibleText(reveal) {
   const elapsed = performance.now() - reveal.startedAt;
-  for (const letter of root.querySelectorAll('.wave-letter')) {
-    if (reveal.animated.has(letter)) continue;
-    const rect = letter.getBoundingClientRect();
-    if (!inViewport(rect)) continue;
+  // Read geometry as one batch before creating animations, which write styles.
+  const letters = [...root.querySelectorAll('.wave-arrival .wave-letter')]
+    .filter((letter) => !reveal.animated.has(letter))
+    .map((letter) => ({ letter, rect: letter.getBoundingClientRect(), fontSize: parseFloat(getComputedStyle(letter).fontSize) }))
+    .filter(({ rect }) => inViewport(rect));
+  for (const { letter, rect, fontSize } of letters) {
     const center = rect.left + rect.width / 2;
     const x = reveal.reverse ? innerWidth - center : center;
     // The reveal edge acts like a cursor sweeping across the text.
     const start = Math.max(elapsed, letterDelay(x, reveal.duration, rect.top + rect.height / 2, reveal.depth) - 85);
     if (start >= reveal.duration - 20) continue;
-    const rise = Math.min(6, Math.max(1.5, parseFloat(getComputedStyle(letter).fontSize) * .2));
+    const rise = Math.min(6, Math.max(1.5, fontSize * .2));
     // A single soft crest travels with the edge. Keep the same pace on the
     // right-hand side instead of squeezing its letters into a quick bounce.
     const frames = Array.from({ length: 13 }, (_, i) => {
@@ -209,6 +191,7 @@ window.addEventListener('pagereveal', (event) => {
   const transition = event.viewTransition;
   if (!transition) { root.classList.remove('is-wave-entering'); return; }
   if (!supported || !root.classList.contains('is-wave-entering')) {
+    transition.ready.catch(() => {});
     transition.skipTransition();
     return;
   }
@@ -226,7 +209,7 @@ window.addEventListener('pagereveal', (event) => {
     ? activation.entry.index < activation.from.index
     : to === 'work'));
   const duration = depth ? 1120 : 980;
-  const reveal = { duration, depth, reverse, animations: [], animated: new WeakSet(), startedAt: 0, active: true };
+  const reveal = { duration, depth, reverse, animations: [], animated: new WeakSet(), startedAt: 0, active: true, holds: [] };
   // This live surface is captured with the arriving page, like its letter motion.
   // Only the inside half of the soft shadow is visible through the reveal clip.
   let edge = null;
@@ -241,9 +224,21 @@ window.addEventListener('pagereveal', (event) => {
     document.body.appendChild(edge);
   }
   activeReveal = reveal;
-  prepareVisibleText();
-  transition.ready.then(() => {
+  transition.ready.then(async () => {
     if (!reveal.active) return;
+    if (worldReady) {
+      const hidden = wavePolygon(0, depth, reverse);
+      const newHold = root.animate([{ clipPath: hidden }, { clipPath: hidden }], {
+        duration, fill: 'both', pseudoElement: '::view-transition-new(root)',
+      });
+      const oldHold = root.animate([{ opacity: 1 }, { opacity: 1 }], {
+        duration, fill: 'both', pseudoElement: '::view-transition-old(root)',
+      });
+      reveal.holds = [newHold, oldHold];
+      reveal.holds.forEach((animation) => animation.pause());
+      await worldReady;
+      if (!reveal.active) return;
+    }
     prepareVisibleText();
     const frames = Array.from({ length: 61 }, (_, i) => ({
       offset: i / 60,
@@ -267,6 +262,7 @@ window.addEventListener('pagereveal', (event) => {
         filter: `brightness(${1 - .035 * Math.sin(Math.PI * ease(i / 60))})`,
       })), { duration, easing: 'linear', fill: 'both', pseudoElement: '::view-transition-old(root)' });
     }
+    reveal.holds.forEach((animation) => animation.cancel());
     reveal.startedAt = performance.now();
     if (edge) {
       const shadow = edge.querySelector('path');
@@ -292,8 +288,9 @@ window.addEventListener('pagereveal', (event) => {
     animateVisibleText(reveal);
   }).catch(() => { /* a cancelled navigation is safe to show directly */ });
 
-  transition.finished.finally(() => {
+  transition.finished.catch(() => {}).finally(() => {
     reveal.active = false;
+    reveal.holds.forEach((animation) => animation.cancel());
     cancelAnimationFrame(edgeFrame);
     edge?.remove();
     if (activeReveal === reveal) activeReveal = null;
