@@ -1,4 +1,6 @@
-# Phyo Aung Zaw · Portfolio
+# My Life Journey
+
+**Live:** https://gawlay.github.io/my-life-journey/
 
 The personal portfolio of **Kyrie (Phyo Aung Zaw)**, a senior mobile engineer
 (Android & Flutter) based in Ho Chi Minh City.
@@ -131,10 +133,13 @@ src/
 
 ## Deploy
 
-It is a fully static site. `npm run build` writes every page to `dist/`, which can be
-published to GitHub Pages (or any static host). `vite.config.js` uses a relative
-`base`, so it also works from a project subpath like `username.github.io/repo/`.
-`dist/`, `node_modules/` and `public/images/` are git-ignored.
+Every push to `main` runs [.github/workflows/deploy.yml](./.github/workflows/deploy.yml),
+which installs, builds and publishes `dist/` to GitHub Pages at
+https://gawlay.github.io/my-life-journey/ (Settings → Pages → Source: **GitHub Actions**).
+It can also be run by hand from the Actions tab.
+
+`vite.config.js` uses a relative `base`, so the build works from that subpath or any
+static host. `dist/`, `node_modules/` and `public/images/` are git-ignored.
 
 ## Working on it
 

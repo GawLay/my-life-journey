@@ -116,7 +116,7 @@ function storyChapter(chapter) {
   }
 }
 
-document.title = `${place.country} · World Journal / Phyo Aung Zaw`;
+document.title = `${place.country} · World Journal / My Life Journey`;
 document.documentElement.style.setProperty('--handoff-a', handoffPalette[0]);
 document.documentElement.style.setProperty('--handoff-b', handoffPalette[1]);
 document.documentElement.style.setProperty('--handoff-c', handoffPalette[2]);

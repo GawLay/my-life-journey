@@ -76,7 +76,7 @@ const featureMemories = place.memories.slice(orbitLayouts.length, orbitLayouts.l
 const archiveMemories = place.memories.slice(orbitLayouts.length + featureLayouts.length, orbitLayouts.length + featureLayouts.length + archiveLayouts.length);
 const cityList = place.cities.split(' / ').map((city) => city.trim());
 
-document.title = `${place.country} Discovery · Explore My World / Phyo Aung Zaw`;
+document.title = `${place.country} Discovery · Explore My World / My Life Journey`;
 document.body.style.setProperty('--discovery-accent', place.memories[0].palette[2]);
 document.body.style.setProperty('--discovery-warm', place.memories[1].palette[1]);
 document.body.style.setProperty('--discovery-cool', place.memories[2].palette[0]);

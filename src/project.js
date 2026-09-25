@@ -298,7 +298,7 @@ const navFooter = () => `
   <footer class="project-footer"><span>PHYO AUNG ZAW © 2026</span><a href="mailto:phyoaz14@gmail.com">PHYOAZ14@GMAIL.COM ↗</a></footer>`;
 
 function render() {
-  document.title = `${project.title} · Phyo Aung Zaw`;
+  document.title = `${project.title} · My Life Journey`;
   document.body.dataset.project = project.id;
   document.getElementById('project-header-index').textContent = `${project.index} / ${String(projects.length).padStart(2, '0')}`;
   document.getElementById('project-header-name').textContent = project.title;
