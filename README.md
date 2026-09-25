@@ -1,95 +1,143 @@
-# Kyrie Paz — Portfolio
+# Phyo Aung Zaw · Portfolio
 
-An immersive portfolio for **Kyrie (Phyo Aung Zaw)**,
-Senior Android & Flutter Engineer. The whole site speaks one visual language: a
-refined GPU **fluid liquid-distortion** shader that reacts to your cursor, used for
-the hero background and for every project card, with a drifting **particle field**
-and an optional **ambient soundscape**.
+The personal portfolio of **Kyrie (Phyo Aung Zaw)**, a senior mobile engineer
+(Android & Flutter) based in Ho Chi Minh City.
 
-Built with **Vite · Three.js · GSAP (ScrollTrigger) · Lenis** + the Web Audio API.
+It is two things in one site:
 
-## Features
+- **Work:** selected product case studies, each told through its own interactive
+  scene instead of a static screenshot grid.
+- **World:** a photo journal of the places I have lived and travelled, reached
+  through an interactive 3D globe.
 
-- 🌊 **Fluid liquid hero** — a custom GLSL domain-warped shader (6-octave fBm, fine
-  filaments, ordered dithering to kill banding, gentle desaturation) distorted by a
-  pointer "touch texture" trail (`src/gl/`).
-- ✦ **Particle field** — ~900 soft GPU particles drifting with cursor parallax,
-  layered over the hero (`src/gl/Particles.js`).
-- 🔊 **Ambient soundscape** — a calm, generative pad + reverb built entirely with the
-  Web Audio API (no audio files), behind a nav toggle. Starts silent; fades in on
-  click (`src/audio/Ambient.js`).
-- 🎴 **Per-project liquid cards** — each card is its own WebGL surface with a unique
-  elegant palette (set via `data-*` attributes in `index.html`).
-- ⏳ **Preloader** with animated % counter and reveal.
-- 🖱️ **Custom cursor** (blend-mode) with `View` state, + **magnetic** buttons.
-- 📜 **Smooth scroll** (Lenis) synced to GSAP ScrollTrigger.
-- ✨ **Scroll reveals** — masked text, per-character/line splits, counters, marquee parallax.
-- ♿ Respects `prefers-reduced-motion` — renders a single static frame, no animation.
-  Append **`?static`** to the URL to force this low-power/no-intro mode for testing.
-- 📱 Fully responsive.
+Both halves share one editorial visual language (warm paper tones, a serif display
+face, mono labels) and are stitched together by native page transitions, so moving
+between separate pages feels like one continuous piece.
+
+## The site
+
+| Page | What it is | Entry |
+| --- | --- | --- |
+| `index.html` | **Work:** hero, selected projects, experience, practice, contact | `src/main.js` |
+| `project.html?project=<id>` | **Case study** for one project | `src/project.js` |
+| `world.html` | **Explore my world:** 3D globe and a country discovery gallery | `src/world.js` |
+| `country.html?place=<id>` | **Country journal:** a long-form photo story for one country | `src/country.js` |
+| `discovery.html` | Redirect helper to `world.html?view=discovery` | inline |
+
+### Case studies
+
+Each project has a signature interaction built for it:
+
+- **Aether Weather:** the whole page becomes a living sky. A six-state switcher
+  (sunny, cloudy, rain, snow, storm, night) cross-fades one canvas atmosphere, with
+  particles modelled on the real app's rain painter.
+- **TrueMoney Agent App:** a live agent service network, with transactions streaming
+  out from a 23K-agent core.
+- **Portfolio App:** an interactive recreation of my résumé app inside a single phone.
+- **Beehive:** one order travelling across two apps, from browsing to the doorstep.
+
+### Explore my world
+
+- A **Three.js globe** you can drag and spin. Visited countries are selectable, and a
+  few "someday" places sit alongside them.
+- **Country journals** for Myanmar, Thailand and Vietnam: city by city, with photos
+  and short looping video clips.
+
+### Across every page
+
+- **Page transitions** using the native cross-document View Transitions API (`@view-transition`
+  plus a small head script), so the next page is revealed over the current one
+  without a blank flash.
+- **Liquid lettering:** display type and headers ripple under the cursor.
+- **Ambient soundtrack:** an optional generative lo-fi loop (pad, sub bass, arpeggio,
+  dub delay) made entirely with the Web Audio API, no audio files. It starts only on
+  a user gesture and keeps its place in the progression when you change pages.
+- **Reduced motion:** every animation has a calm, static fallback for
+  `prefers-reduced-motion`. Add `?static` to any URL to force it.
+- Fully responsive, from phone to wide desktop.
+
+## Built with
+
+| | |
+| --- | --- |
+| Build | [Vite](https://vite.dev) 6, multi-page (one HTML entry per page) |
+| 3D | [Three.js](https://threejs.org) for the globe |
+| Motion | [GSAP](https://gsap.com) + ScrollTrigger |
+| Transitions | Native View Transitions API |
+| Sound | Web Audio API |
+| Media hosting | [Supabase Storage](https://supabase.com/docs/guides/storage) (public bucket) |
+| Type | Instrument Serif, Manrope, DM Mono (Google Fonts) |
+| Hosting | GitHub Pages (static) |
+
+No front-end framework: plain HTML, CSS custom properties and ES modules.
 
 ## Getting started
 
 ```bash
 npm install
-npm run dev      # start dev server → http://localhost:5173
-npm run build    # production build → dist/
-npm run preview  # preview the production build
+npm run dev       # dev server at http://localhost:5173
+npm run build     # production build to dist/
+npm run preview   # serve the production build
 ```
 
-## Make it yours
+### Media
 
-Everything user-facing lives in **`index.html`** (content) and a few CSS variables.
+Photos, videos and project screenshots are **not in this repo**. They live in the
+public Supabase Storage bucket `life-journey` and are loaded from the URL in `.env`:
 
-For the World gallery and Country Deep Dive image counts, ratios, filenames and
-export checklist, see [PHOTO_CONTENT_GUIDE.md](./PHOTO_CONTENT_GUIDE.md).
+```bash
+VITE_MEDIA_URL=https://<project>.supabase.co/storage/v1/object/public/life-journey
+```
+
+JavaScript reads it as `import.meta.env.VITE_MEDIA_URL`, and HTML as `%VITE_MEDIA_URL%`.
+The bucket mirrors these paths:
+
+```
+life-journey/
+  world/<country>/<file>.webp | .m4v     photos, clips and their posters
+  projects/<project>/<file>.png          app screenshots
+```
+
+To add a photo: upload it to the matching folder in the bucket, then reference it in
+`src/data/places.js` as `` `${MEDIA}/world/<country>/<file>.webp` ``. Sizes, ratios
+and export settings are in [PHOTO_CONTENT_GUIDE.md](./PHOTO_CONTENT_GUIDE.md).
+
+## Editing content
 
 | What | Where |
 | --- | --- |
-| Name / role / bio / links | `index.html` (search for `Kyrie Paz`, `mailto:`, social `<a>` tags) |
-| Projects (title, tags, year) | `.project` blocks in `index.html` |
-| **Project colours** | `data-bg` / `data-c1` / `data-c2` / `data-c3` on each `.project` |
-| Hero fluid colours / intensity | `initWebGL()` in `src/main.js` (the hero `colors` object) |
-| Particles (count, size, colour) | `initWebGL()` in `src/main.js` (the `Particles` options) |
-| Ambient sound (chord, volume) | `src/audio/Ambient.js` (`chord`, master gain) |
-| Fonts | `<link>` in `index.html` + `--font-*` in `src/styles/main.css` |
-| Palette / accent / spacing / easing | `:root` variables in `src/styles/main.css` |
-
-> **Contact email:** currently `phyoaz14@gmail.com` in `index.html`. Your resume
-> also lists `phyoaz14@gmail.com` — swap if you'd rather visitors use that. Phone
-> number is intentionally left off a public page.
-
-### Using real project images (optional next step)
-
-Right now each project "image" is a procedural liquid gradient. To swap in real
-screenshots with a hover displacement, drop images in `public/` and we can extend
-`LiquidSurface` to sample an image texture instead of the procedural palette.
-
-## Deploy
-
-It's a static site — deploy the `dist/` folder anywhere (Vercel, Netlify, GitHub
-Pages, Cloudflare Pages). `vite.config.js` uses a relative `base` so it works from
-a subfolder too.
+| Name, bio, experience, contact links | `index.html` |
+| Projects and case-study copy | `src/data/projects.js` |
+| Countries, cities, photos, captions | `src/data/places.js` |
+| Colours, spacing, easing, fonts | `:root` tokens in `src/styles/main.css` |
+| Soundtrack | `src/audio/Ambient.js` |
 
 ## Structure
 
 ```
-index.html              # markup + content (edit me)
+index.html  project.html  world.html  country.html  discovery.html
+public/
+  page-wave.js          cross-document page transition (head script)
+  data/                 world-countries.geojson for the globe
 src/
-  main.js               # bootstraps everything
-  styles/main.css       # design system
-  gl/
-    LiquidSurface.js     # reusable WebGL liquid plane (hero + cards)
-    TouchTexture.js      # cursor-trail texture that drives the distortion
-    Particles.js         # drifting particle field with cursor parallax
-  audio/
-    Ambient.js           # generative Web Audio soundscape
-  modules/
-    preloader.js  cursor.js  magnetic.js  nav.js  sound.js
-    reveal.js            # all GSAP scroll animations
-    split.js             # text splitting helpers
+  main.js  project.js  world.js  country.js      one entry per page
+  data/                 projects.js, places.js (all content)
+  modules/              page behaviour: work grid, case-study scenes,
+                        country discovery, header wave, liquid text, sound
+  gl/                   Globe.js (Three.js)
+  audio/                Ambient.js (generative Web Audio)
+  styles/               main.css (shared tokens) + one stylesheet per page
 ```
 
----
+## Deploy
 
-Colours, copy and projects are **placeholders** — swap in your real work. 🖤
+It is a fully static site. `npm run build` writes every page to `dist/`, which can be
+published to GitHub Pages (or any static host). `vite.config.js` uses a relative
+`base`, so it also works from a project subpath like `username.github.io/repo/`.
+`dist/`, `node_modules/` and `public/images/` are git-ignored.
+
+## Working on it
+
+House rules live in [vibecoding.md](./vibecoding.md) (reuse before adding, native
+platform features first, design tokens over magic numbers) and in
+[CLAUDE.md](./CLAUDE.md) / [AGENTS.md](./AGENTS.md) for AI-assisted work.

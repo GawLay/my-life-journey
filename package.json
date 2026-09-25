@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Creative developer portfolio with WebGL fluid distortion.",
+  "description": "Phyo Aung Zaw's portfolio: interactive mobile case studies and a photo journal of places, built with Vite, Three.js and GSAP.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
