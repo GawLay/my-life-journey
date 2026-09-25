@@ -1,2 +1,9 @@
 # Full-resolution photography masters are kept locally; publish optimized copies only.
 source-images/
+
+# Photos and screenshots are hosted in Supabase Storage (bucket: life-journey); see .env.
+public/images/
+
+# Generated: install with npm install, build with npm run build.
+node_modules/
+dist/

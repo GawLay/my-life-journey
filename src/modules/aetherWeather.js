@@ -9,7 +9,7 @@
 // RainParticlePainter): hash-seeded streaks/dots, looped with per-particle
 // speed, size and opacity. Intensities fade with the env, so states blend.
 
-const IMG = './images/projects/aether';
+const IMG = `${import.meta.env.VITE_MEDIA_URL}/projects/aether`;
 
 // Each state is a target the env eases toward. sky = [top, mid, bottom].
 const STATES = {

@@ -1,9 +1,11 @@
+const MEDIA = import.meta.env.VITE_MEDIA_URL;
+
 export const projects = [
   {
     id: 'aether', index: '01', eyebrow: 'EXPERIMENT / ATMOSPHERE', title: 'Aether Weather',
     subtitle: 'Forecasting designed as a sense of place.',
     description: 'A weather experiment built in native Android and then Flutter, where GPU shaders and particle systems turn rain, snow and night skies into part of the interface.',
-    tags: ['Android', 'Flutter', 'Motion'], year: '2025', image: './images/projects/aether/rain.png', tint: '#536a83', surface: '#aebbc5', layout: 'offset',
+    tags: ['Android', 'Flutter', 'Motion'], year: '2025', image: `${MEDIA}/projects/aether/rain.png`, tint: '#536a83', surface: '#aebbc5', layout: 'offset',
     href: './project.html?project=aether',
   },
   {
@@ -17,7 +19,7 @@ export const projects = [
     id: 'portfolio', index: '03', eyebrow: 'PERSONAL PRODUCT / STORYTELLING', title: 'Portfolio App',
     subtitle: 'A résumé that moves like a product, not a document.',
     description: 'A native Android portfolio built around expressive transitions, a focused information hierarchy and direct access to work, skills and experience.',
-    tags: ['Android', 'Kotlin', 'Transitions'], year: '2024', image: './images/projects/portfolio/about.png', tint: '#cc5f36', surface: '#dac3ab', layout: 'phone',
+    tags: ['Android', 'Kotlin', 'Transitions'], year: '2024', image: `${MEDIA}/projects/portfolio/about.png`, tint: '#cc5f36', surface: '#dac3ab', layout: 'phone',
     href: './project.html?project=portfolio',
   },
   {

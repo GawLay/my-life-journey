@@ -9,6 +9,8 @@ import { initPortfolioMotion } from './modules/portfolioMotion.js';
 import { initTruemoneyNetwork } from './modules/truemoneyMotion.js';
 import { initBeehiveJourney } from './modules/beehiveMotion.js';
 
+const MEDIA = import.meta.env.VITE_MEDIA_URL;
+
 gsap.registerPlugin(ScrollTrigger);
 
 const params = new URLSearchParams(window.location.search);
@@ -62,7 +64,7 @@ function weatherVisual() {
         <span>LIVE SCENE / <b data-aether-scene-label>RAIN</b></span>
         <p>Real Android capture, held inside the same weather the page is showing. Try another scene. The whole screen changes with it.</p>
       </div>
-      ${phoneFrame(`<img src="./images/projects/aether/rain.png" alt="Aether Android app in the rain scene" data-aether-screen />`, 'device--weather')}
+      ${phoneFrame(`<img src="${MEDIA}/projects/aether/rain.png" alt="Aether Android app in the rain scene" data-aether-screen />`, 'device--weather')}
       <p class="aether-showcase__hint" aria-hidden="true">CURRENT / <span data-aether-readout>Rain</span></p>
     </div>`;
 }
@@ -78,10 +80,10 @@ function portfolioVisual() {
   const nav = [['home', 'Home'], ['skill', 'Skill'], ['explist', 'Experience'], ['resume', 'Resume']];
   const steps = [['home', 'Home'], ['skill', 'Skill'], ['explist', 'Experience'], ['resume', 'Résumé']];
   const file = { home: 'about', skill: 'skill', explist: 'experience', expdetail: 'experience-detail', resume: 'resume' };
-  const screen = (id, alt) => `<img class="pf-scr" data-screen="${id}" src="./images/projects/portfolio/${file[id]}.png" alt="Portfolio app: ${alt}" />`;
+  const screen = (id, alt) => `<img class="pf-scr" data-screen="${id}" src="${MEDIA}/projects/portfolio/${file[id]}.png" alt="Portfolio app: ${alt}" />`;
   return `
     <div class="pf-stage" data-pf-stage>
-      <img class="pf-backdrop" data-pf-backdrop src="./images/projects/portfolio/about.png" alt="" aria-hidden="true" />
+      <img class="pf-backdrop" data-pf-backdrop src="${MEDIA}/projects/portfolio/about.png" alt="" aria-hidden="true" />
       <div class="pf-side">
         <div class="pf-intro">
           <span>02 / EXPLORE THE APP</span>
@@ -100,7 +102,7 @@ function portfolioVisual() {
           ${screen('resume', 'résumé detail')}
           <button class="pf-hotspot" type="button" data-pf-open-detail hidden>View role →</button>
           <button class="pf-back" type="button" data-pf-back hidden>← Experiences</button>
-          <div class="pf-flycard" data-pf-fly hidden style="background-image:url('./images/projects/portfolio/role-card.png')"></div>
+          <div class="pf-flycard" data-pf-fly hidden style="background-image:url('${MEDIA}/projects/portfolio/role-card.png')"></div>
           <div class="pf-fab" data-pf-fab>
             <nav class="pf-fab__bar" data-pf-bar aria-label="App sections">
               ${nav.map(([id, label]) => `<button type="button" data-pf-go="${id}">${PF_ICONS[id]}<b>${label}</b></button>`).join('')}
