@@ -89,31 +89,31 @@ const thailandGallery = [
   { src: `${MEDIA}/world/thailand/companions-03-milo.webp`, group: 'companions', city: 'THAILAND', moment: 'MILO', aspect: 'portrait', position: 'center', alt: 'A small brown dog looking toward the camera from a bed' },
 ];
 
-// Fifteen unique home photographs. The duplicate Kalaw mountain frame stays
+// Fifteen unique home photographs. The duplicate Mt. Victoria mountain frame stays
 // with the local masters; smaller originals are published without upscaling.
 const myanmarGallery = [
   { src: `${MEDIA}/world/myanmar/01-yangon-neighbourhood.webp`, city: 'YANGON', moment: 'ROOFTOPS', aspect: 'landscape', alt: 'Trees and apartment buildings beneath a cloudy sky in Yangon' },
   { src: `${MEDIA}/world/myanmar/02-yangon-monsoon.webp`, city: 'YANGON', moment: 'MONSOON AIR', aspect: 'landscape', alt: 'Dark monsoon clouds above rooftops and a building under construction in Yangon' },
   { src: `${MEDIA}/world/myanmar/03-bagan-tree.webp`, city: 'BAGAN', moment: 'UNDER THE TREES', aspect: 'landscape', alt: 'A horse cart beneath a spreading tree beside a white building in Bagan' },
-  { src: `${MEDIA}/world/myanmar/04-kalaw-pond.webp`, city: 'KALAW', moment: 'STILL WATER', aspect: 'wide', alt: 'A roofed pavilion beside a green pond surrounded by gardens in Kalaw' },
+  { src: `${MEDIA}/world/myanmar/04-kalaw-pond.webp`, city: 'TAUNGGYI', moment: 'STILL WATER', aspect: 'wide', alt: 'A roofed pavilion beside a green pond surrounded by gardens in Taunggyi' },
   { src: `${MEDIA}/world/myanmar/05-bagan-temple.webp`, city: 'BAGAN', moment: 'OLD BRICK', aspect: 'square', alt: 'A brick temple rising above trees and a sandy path in Bagan' },
   { src: `${MEDIA}/world/myanmar/06-mountain-flowers.webp`, city: 'MYANMAR', moment: 'SMALL THINGS', aspect: 'wide', alt: 'Red blossoms among green leaves against a clear blue sky' },
-  { src: `${MEDIA}/world/myanmar/07-kalaw-trail.webp`, city: 'KALAW', moment: 'THE LONG WAY', aspect: 'wide', alt: 'A mountain path winding between trees and dry grass beneath a blue sky in Kalaw' },
+  { src: `${MEDIA}/world/myanmar/07-kalaw-trail.webp`, city: 'MT. VICTORIA', moment: 'THE LONG WAY', aspect: 'wide', alt: 'A mountain path winding between trees and dry grass beneath a blue sky on Mt. Victoria' },
   { src: `${MEDIA}/world/myanmar/08-shwedagon-night.webp`, city: 'YANGON', moment: 'SHWEDAGON AT NIGHT', aspect: 'landscape', alt: 'The illuminated golden stupa of Shwedagon Pagoda beneath the moon in Yangon' },
-  { src: `${MEDIA}/world/myanmar/09-kalaw-forest.webp`, city: 'KALAW', moment: 'THROUGH THE TREES', aspect: 'wide', alt: 'Mountain ridges seen through trees and red blossoms in Kalaw' },
-  { src: `${MEDIA}/world/myanmar/10-kalaw-ridges.webp`, city: 'KALAW', moment: 'DISTANT RIDGES', aspect: 'wide', alt: 'Layers of forested mountain ridges beneath a clear blue sky in Kalaw' },
-  { src: `${MEDIA}/world/myanmar/11-kalaw-roadside.webp`, city: 'KALAW', moment: 'BESIDE THE ROAD', aspect: 'wide', alt: 'A roadside building and flowering trees beside a dusty mountain road in Kalaw' },
-  { src: `${MEDIA}/world/myanmar/12-kalaw-mountain-light.webp`, city: 'KALAW', moment: 'MOUNTAIN LIGHT', aspect: 'wide', alt: 'A tall tree silhouetted against distant hazy mountains in Kalaw' },
-  { src: `${MEDIA}/world/myanmar/13-kalaw-hillside.webp`, city: 'KALAW', moment: 'OPEN SKY', aspect: 'wide', alt: 'Trees and red blossoms along a dry hillside under a vivid blue sky in Kalaw' },
-  { src: `${MEDIA}/world/myanmar/14-kalaw-valley.webp`, city: 'KALAW', moment: 'THE QUIET HILLS', aspect: 'wide', alt: 'A forested valley and long mountain ridge beyond dry grass in Kalaw' },
-  { src: `${MEDIA}/world/myanmar/15-evening-rooftops.webp`, city: 'MYANMAR', moment: 'LAST LIGHT', aspect: 'square', alt: 'Evening light above rooftops, trees and distant hills beneath a cloudy sky' },
+  { src: `${MEDIA}/world/myanmar/09-kalaw-forest.webp`, city: 'MT. VICTORIA', moment: 'THROUGH THE TREES', aspect: 'wide', alt: 'Mountain ridges seen through trees and red blossoms on Mt. Victoria' },
+  { src: `${MEDIA}/world/myanmar/10-kalaw-ridges.webp`, city: 'MT. VICTORIA', moment: 'DISTANT RIDGES', aspect: 'wide', alt: 'Layers of forested mountain ridges beneath a clear blue sky on Mt. Victoria' },
+  { src: `${MEDIA}/world/myanmar/11-kalaw-roadside.webp`, city: 'KANPETLET', moment: 'BESIDE THE ROAD', aspect: 'wide', alt: 'A roadside building and flowering trees beside a dusty mountain road in Kanpetlet' },
+  { src: `${MEDIA}/world/myanmar/12-kalaw-mountain-light.webp`, city: 'MT. VICTORIA', moment: 'MOUNTAIN LIGHT', aspect: 'wide', alt: 'A tall tree silhouetted against distant hazy mountains on Mt. Victoria' },
+  { src: `${MEDIA}/world/myanmar/13-kalaw-hillside.webp`, city: 'MT. VICTORIA', moment: 'OPEN SKY', aspect: 'wide', alt: 'Trees and red blossoms along a dry hillside under a vivid blue sky on Mt. Victoria' },
+  { src: `${MEDIA}/world/myanmar/14-kalaw-valley.webp`, city: 'MT. VICTORIA', moment: 'THE QUIET HILLS', aspect: 'wide', alt: 'A forested valley and long mountain ridge beyond dry grass on Mt. Victoria' },
+  { src: `${MEDIA}/world/myanmar/15-evening-rooftops.webp`, city: 'KALAW', moment: 'LAST LIGHT', aspect: 'square', alt: 'Evening light above rooftops, trees and distant hills beneath a cloudy sky in Kalaw' },
 ];
 
 const placeData = [
   {
-    id: 'myanmar', iso: 'MMR', country: 'Myanmar', year: '2016', cities: 'YANGON / BAGAN / KALAW',
+    id: 'myanmar', iso: 'MMR', country: 'Myanmar', year: '2016', cities: 'YANGON / BAGAN / TAUNGGYI / KALAW / MT. VICTORIA',
     coordinates: '16.8409° N / 96.1735° E', lat: 16.84, lng: 96.17, photos: 15, stories: 6,
-    note: 'Myanmar is where everything began: my family, my street, the small world that made me. I did not photograph enough of the ordinary days. These few pictures bring back pieces of home: Yangon rooftops, old brick in Bagan and the quiet hills of Kalaw.',
+    note: 'Myanmar is where everything began: my family, my street, the small world that made me. I did not photograph enough of the ordinary days. These few pictures bring back pieces of home: Yangon rooftops, old brick in Bagan and the quiet hills of Mt. Victoria.',
     gallery: myanmarGallery,
     deepDive: {
       cover: { ...myanmarGallery[7], palette: ['#493d35', '#d2c6b5', '#bd3918'] },
@@ -151,7 +151,7 @@ const placeData = [
           ],
         },
         {
-          kind: 'wide', role: 'FROM FAR AWAY', eyebrow: 'KALAW',
+          kind: 'wide', role: 'FROM FAR AWAY', eyebrow: 'MT. VICTORIA',
           photo: myanmarGallery[9],
           paragraphs: [
             'From far away the smallest things turn into poetry: a song, a smell, a word in my own language. These mountain ridges bring back another kind of quiet.',

@@ -75,14 +75,15 @@ body.world-page { color: var(--cream); }
   .world-header > p { display: none; }
   .world__intro { inset: 14vh var(--gutter) auto; }
   .world__globe { width: 116vw; }
-  .world-memory { width: 28vw; }
-  .world-memory span { left: .4rem; bottom: .4rem; font-size: .45rem; line-height: 1.4; }
-  .world-memory--one, .world-memory--three, .world-memory--five, .world-memory--seven { left: 0; }
-  .world-memory--two, .world-memory--four, .world-memory--six, .world-memory--eight { right: 0; }
-  .world-memory--one, .world-memory--two { top: 34%; }
-  .world-memory--three, .world-memory--four { top: 49%; }
-  .world-memory--five, .world-memory--six { top: 67%; bottom: auto; }
-  .world-memory--seven, .world-memory--eight { top: 81%; bottom: auto; }
+  /* Phones: four photos peek in from the edges, clear of the globe's warm
+     countries (left of centre after the intro spin): two on the right, a small
+     overlapping stack low on the left. */
+  .world-memory { width: clamp(112px, 34vw, 210px); aspect-ratio: 4 / 3; }
+  .world-memory span, .world-memory--three, .world-memory--five, .world-memory--seven, .world-memory--eight { display: none; }
+  .world-memory--two { right: -7vw; left: auto; top: 37%; bottom: auto; transform: rotate(3deg); }
+  .world-memory--six { right: -7vw; left: auto; top: 61%; bottom: auto; transform: rotate(-3deg); }
+  .world-memory--one { left: -8vw; right: auto; top: 62%; bottom: auto; transform: rotate(-6deg); }
+  .world-memory--four { left: -1vw; right: auto; top: 71%; bottom: auto; z-index: 4; transform: rotate(3deg); }
   .world__countries { inset-inline: 0; overflow-x: auto; grid-template-columns: repeat(var(--country-cols, 5), minmax(130px, 1fr)); }
   .world__instruction { bottom: 12vh; }
   .country-departure { padding-top: 13vh; }

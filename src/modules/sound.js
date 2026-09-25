@@ -96,8 +96,11 @@ export function initSound() {
     rememberPlaying(true);
     setPlaying(true);
   };
-  window.addEventListener('pointerdown', resumePreferred, { capture: true });
-  window.addEventListener('keydown', resumePreferred, { capture: true });
+  // A touch pointerdown is not a user activation; phones only unlock audio on
+  // the tap's pointerup / touchend, so listen for those as well.
+  ['pointerdown', 'pointerup', 'touchend', 'keydown'].forEach((type) => {
+    window.addEventListener(type, resumePreferred, { capture: true });
+  });
 
   // AudioContexts cannot survive a full document navigation, but the musical
   // playhead can. Hand the next beat to the destination page so its freshly
