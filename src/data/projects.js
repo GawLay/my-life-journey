@@ -99,6 +99,16 @@ export const projectDetails = {
   aether: {
     role: 'Designer & Android Engineer', period: 'PERSONAL PROJECT · 2025', location: 'HO CHI MINH CITY, VIET NAM',
     intro: 'Aether explores weather as atmosphere. Live forecast data sets the colour, motion and character of the screen while GPU shaders and particles make each implemented condition feel present.',
+    promo: {
+      label: 'AETHER / THE FILM',
+      title: 'See the forecast come to life.',
+      copy: 'A short look at Aether in motion. Watch the promo, then explore the weather scenes below.',
+      landscape: `${MEDIA}/promo-videos/aether-trailer-1920x1080.mp4`,
+      portrait: `${MEDIA}/promo-videos/aether-play-store-1080x1920.mp4`,
+      poster: `${MEDIA}/promo-videos/aether-trailer-thumbnail-3840x2160.png`,
+      caption: 'Aether Weather · Promo film',
+      fallback: 'Open the video',
+    },
     statement: 'The forecast can describe a feeling as clearly as it describes a number.',
     contributions: [
       ['01', 'Weather as material', 'Built distinct clear, rainy, snowy and starry scenes with AGSL shaders and Compose particle systems.'],

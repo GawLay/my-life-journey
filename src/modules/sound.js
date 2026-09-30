@@ -53,17 +53,20 @@ export function initSound() {
   const label = btn.querySelector('.nav__sound-label');
   let preferred = getPreference();
   let request = 0;
+  const videos = [...document.querySelectorAll('.case-promo video')];
+  const filmIsAudible = () => videos.some((video) => !video.paused && !video.ended && !video.error && !video.muted && video.volume > 0);
 
   if (preferred && wasPlaying()) {
     ambient.restorePlaybackPosition(getPlaybackPosition());
   }
 
   const updateUI = (on) => {
+    const yielding = preferred && filmIsAudible();
     btn.classList.toggle('is-on', on);
-    btn.setAttribute('aria-pressed', String(on));
-    btn.setAttribute('aria-label', on ? 'Turn off the lo-fi soundscape' : 'Turn on the lo-fi soundscape');
+    btn.setAttribute('aria-pressed', String(on || yielding));
+    btn.setAttribute('aria-label', on || yielding ? 'Turn off the lo-fi soundscape' : 'Turn on the lo-fi soundscape');
     btn.dataset.audioState = on ? 'playing' : 'paused';
-    if (label) setWaveText(label, on ? 'Lo-fi on' : 'Lo-fi off');
+    if (label) setWaveText(label, yielding ? 'Lo-fi paused' : on ? 'Lo-fi on' : 'Lo-fi off');
   };
 
   updateUI(false);
@@ -73,7 +76,7 @@ export function initSound() {
   const setPlaying = async (enabled) => {
     const currentRequest = ++request;
     try {
-      const playing = await ambient.setEnabled(enabled);
+      const playing = await ambient.setEnabled(enabled && !filmIsAudible());
       if (currentRequest !== request) return playing;
       if (playing) rememberPlaying(true);
       else if (!enabled) rememberPlaying(false);
@@ -90,7 +93,7 @@ export function initSound() {
   // visitor's first interaction and returns on subsequent site pages.
   const resumePreferred = (event) => {
     if (event.target instanceof Element && event.target.closest('.nav__sound')) return;
-    if (!preferred || ambient.isPlaying) return;
+    if (!preferred || ambient.isPlaying || filmIsAudible()) return;
     // Record the trusted start gesture before a link can replace this document.
     // The destination then resumes the same musical position automatically.
     rememberPlaying(true);
@@ -124,8 +127,15 @@ export function initSound() {
   // as the browser-policy fallback.
   if (preferred && wasPlaying()) setPlaying(true);
 
+  // Temporarily yield to the film without changing the saved lo-fi preference.
+  videos.forEach((video) => {
+    ['play', 'pause', 'ended', 'volumechange', 'error'].forEach((type) => {
+      video.addEventListener(type, () => setPlaying(preferred));
+    });
+  });
+
   btn.addEventListener('click', async () => {
-    const shouldEnable = btn.getAttribute('aria-pressed') !== 'true';
+    const shouldEnable = filmIsAudible() ? !preferred : btn.getAttribute('aria-pressed') !== 'true';
     preferred = shouldEnable;
     savePreference(preferred);
     await setPlaying(shouldEnable);
