@@ -254,6 +254,22 @@ const showcaseSection = () => `
     ${projectVisual()}
   </section>`;
 
+const promoSection = () => maybe(detail.promo && `
+  <section class="case-promo" aria-labelledby="promo-title">
+    <header class="case-promo__head">
+      <p class="case-label">${detail.promo.label}</p>
+      <div><h2 id="promo-title">${detail.promo.title}</h2><p>${detail.promo.copy}</p></div>
+    </header>
+    <figure class="case-promo__film">
+      <video controls playsinline preload="none" poster="${detail.promo.poster}" aria-label="${detail.promo.caption}">
+        <source src="${detail.promo.portrait}" type="video/mp4" media="(max-width: 700px)" />
+        <source src="${detail.promo.landscape}" type="video/mp4" />
+        <a href="${detail.promo.landscape}">${detail.promo.fallback}</a>
+      </video>
+      <figcaption><span>${detail.promo.caption}</span><a href="${detail.promo.landscape}" target="_blank" rel="noopener">${detail.promo.fallback} ↗</a></figcaption>
+    </figure>
+  </section>`);
+
 const flowsSection = () => maybe(detail.flows && `
   <section class="case-flows">
     <div class="case-flows__head"><p class="case-label">03 / PRODUCT FLOWS</p><h2>${detail.flowsTitle || 'What it does.'}</h2></div>
@@ -304,7 +320,7 @@ function render() {
   document.getElementById('project-header-name').textContent = project.title;
 
   document.getElementById('project-content').innerHTML = [
-    heroSection(), overviewSection(), showcaseSection(), flowsSection(),
+    heroSection(), overviewSection(), promoSection(), showcaseSection(), flowsSection(),
     statementSection(), contributionSection(), techSection(), outcomeSection(),
     navFooter(),
     project.id === 'aether' ? weatherSwitcher() : '',
@@ -333,6 +349,16 @@ function setupMotion() {
   document.querySelectorAll('.case-contribution__rows article, .case-flows__rows article, .case-tech__grid article').forEach((element, index) => {
     gsap.from(element, { autoAlpha: 0, y: 30, duration: .9, delay: (index % 3) * .06, ease: 'power3.out', scrollTrigger: { trigger: element, start: 'top 88%' } });
   });
+}
+
+function setupPromo() {
+  const video = document.querySelector('.case-promo video');
+  if (!video) return;
+  // Keep the floating weather controls out of the film and its native controls.
+  const observer = new IntersectionObserver(([entry]) => {
+    document.body.classList.toggle('is-viewing-film', entry.isIntersecting);
+  });
+  observer.observe(video);
 }
 
 function setupNavigation() {
@@ -369,6 +395,7 @@ async function boot() {
   if (project.id === 'portfolio') initPortfolioMotion();
   if (project.id === 'truemoney') initTruemoneyNetwork();
   if (project.id === 'beehive') initBeehiveJourney();
+  setupPromo();
   setupMotion();
   setupNavigation();
   revealFromCover();
